@@ -560,77 +560,62 @@
 
 </div>
 
-<!-- MODAL GRABAR VIDEO -->
+<!-- MODAL CÁMARA -->
 <div
-    id="modalVideo"
-    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 px-4"
+    id="modalCamara"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 px-4"
 >
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-5 text-center relative">
         <button
-            id="cerrarModalVideo"
+            id="cerrarModalCamara"
             type="button"
-            class="absolute top-3 right-4 text-2xl text-gray-500 hover:text-gray-800"
+            class="absolute top-3 right-4 text-2xl text-gray-500 hover:text-gray-800 z-10"
             aria-label="Cerrar"
-        >
-            ×
-        </button>
+        >×</button>
 
-        <h3 class="title-font text-3xl mb-4">🎥 Grabar un video</h3>
+        <h3 id="tituloCamara" class="title-font text-3xl mb-4">📷 Sacar foto</h3>
 
         <video
-            id="previewVideo"
+            id="previewCamara"
             class="w-full rounded-xl bg-black aspect-video object-cover"
             autoplay
             muted
             playsinline
         ></video>
 
-        <p id="estadoVideo" class="text-sm text-gray-600 mt-3">
+        <canvas id="canvasFoto" class="hidden"></canvas>
+
+        <p id="estadoCamara" class="text-sm text-gray-600 mt-3">
             Preparando cámara…
         </p>
 
         <div class="flex flex-wrap justify-center gap-3 mt-4">
             <button
-                id="btnIniciarGrabacion"
+                id="btnCapturarFoto"
                 type="button"
                 class="btn bg-stone-700 text-white"
             >
-                🔴 Empezar a grabar
+                📸 Sacar foto
             </button>
 
             <button
-                id="btnDetenerGrabacion"
+                id="btnIniciarGrabacionCamara"
+                type="button"
+                class="btn bg-stone-700 text-white hidden"
+            >
+                🔴 Grabar video
+            </button>
+
+            <button
+                id="btnDetenerGrabacionCamara"
                 type="button"
                 class="btn bg-red-700 text-white hidden"
             >
-                ⏹️ Detener
-            </button>
-
-            <button
-                id="btnSubirVideo"
-                type="button"
-                class="btn bg-green-700 text-white hidden"
-            >
-                ☁️ Subir video
-            </button>
-
-            <button
-                id="btnCancelarVideo"
-                type="button"
-                class="btn bg-gray-200 text-gray-800"
-            >
-                Cancelar
+                ⏹️ Detener y subir
             </button>
         </div>
     </div>
 </div>
-
-    <p
-        id="mensajeSubida"
-        class="text-sm text-gray-500 mt-5"
-        style="display:none;"
-    ></p>
-
 </section>
 
     <!-- =====================================================
@@ -1280,120 +1265,111 @@
 
 
     // =====================================================
-    // BOTÓN
+    // BOTONES: EN CELULAR ABRIMOS LA CÁMARA DIRECTAMENTE
     // =====================================================
 
-    document
-        .getElementById("btnFotos")
-        .addEventListener(
-            "click",
-            function() {
+    const esCelular = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-                widgetCloudinary.open();
+    const btnFotos = document.getElementById("btnFotos");
+    const btnGrabarVideo = document.getElementById("btnGrabarVideo");
 
-            }
-        );
+    const modalCamara = document.getElementById("modalCamara");
+    const cerrarModalCamara = document.getElementById("cerrarModalCamara");
+    const tituloCamara = document.getElementById("tituloCamara");
+    const previewCamara = document.getElementById("previewCamara");
+    const canvasFoto = document.getElementById("canvasFoto");
+    const estadoCamara = document.getElementById("estadoCamara");
+    const btnCapturarFoto = document.getElementById("btnCapturarFoto");
+    const btnIniciarGrabacionCamara = document.getElementById("btnIniciarGrabacionCamara");
+    const btnDetenerGrabacionCamara = document.getElementById("btnDetenerGrabacionCamara");
 
+    let streamCamara = null;
+    let mediaRecorderCamara = null;
+    let partesVideoCamara = [];
+    let modoCamara = "foto";
 
-    // =====================================================
-    // GRABAR VIDEO DIRECTAMENTE DESDE LA PÁGINA
-    // =====================================================
+    function mostrarMensajeSubida(texto) {
+        const mensaje = document.getElementById("mensajeSubida");
+        if (mensaje) {
+            mensaje.textContent = texto;
+            mensaje.style.display = "block";
+        }
+    }
 
-    const btnGrabarVideo =
-        document.getElementById("btnGrabarVideo");
-    const modalVideo =
-        document.getElementById("modalVideo");
-    const cerrarModalVideo =
-        document.getElementById("cerrarModalVideo");
-    const cancelarVideo =
-        document.getElementById("btnCancelarVideo");
-    const previewVideo =
-        document.getElementById("previewVideo");
-    const estadoVideo =
-        document.getElementById("estadoVideo");
-    const btnIniciarGrabacion =
-        document.getElementById("btnIniciarGrabacion");
-    const btnDetenerGrabacion =
-        document.getElementById("btnDetenerGrabacion");
-    const btnSubirVideo =
-        document.getElementById("btnSubirVideo");
-
-    let streamVideo = null;
-    let mediaRecorder = null;
-    let partesVideo = [];
-    let blobVideo = null;
-
-    function cerrarGrabadorVideo() {
-
-        if (mediaRecorder && mediaRecorder.state !== "inactive") {
-            mediaRecorder.stop();
+    function cerrarCamara() {
+        if (mediaRecorderCamara && mediaRecorderCamara.state !== "inactive") {
+            mediaRecorderCamara.stop();
         }
 
-        if (streamVideo) {
-            streamVideo.getTracks().forEach(function(track) {
+        if (streamCamara) {
+            streamCamara.getTracks().forEach(function(track) {
                 track.stop();
             });
         }
 
-        streamVideo = null;
-        mediaRecorder = null;
-        partesVideo = [];
-        blobVideo = null;
-        previewVideo.srcObject = null;
-        previewVideo.removeAttribute("src");
-        previewVideo.load();
+        streamCamara = null;
+        mediaRecorderCamara = null;
+        partesVideoCamara = [];
+        previewCamara.srcObject = null;
+        previewCamara.removeAttribute("src");
+        previewCamara.controls = false;
+        previewCamara.load();
 
-        modalVideo.classList.add("hidden");
-        modalVideo.classList.remove("flex");
-        btnIniciarGrabacion.classList.remove("hidden");
-        btnDetenerGrabacion.classList.add("hidden");
-        btnSubirVideo.classList.add("hidden");
-        cancelarVideo.disabled = false;
-        estadoVideo.textContent = "Preparando cámara…";
+        modalCamara.classList.add("hidden");
+        modalCamara.classList.remove("flex");
+        btnCapturarFoto.classList.toggle("hidden", modoCamara !== "foto");
+        btnIniciarGrabacionCamara.classList.toggle("hidden", modoCamara !== "video");
+        btnDetenerGrabacionCamara.classList.add("hidden");
     }
 
-    async function abrirGrabadorVideo() {
+    async function abrirCamara(modo) {
+        modoCamara = modo;
 
-        modalVideo.classList.remove("hidden");
-        modalVideo.classList.add("flex");
-        estadoVideo.textContent = "Solicitando permiso para cámara y micrófono…";
+        modalCamara.classList.remove("hidden");
+        modalCamara.classList.add("flex");
+
+        const esVideo = modo === "video";
+        tituloCamara.textContent = esVideo ? "🎥 Grabar video" : "📷 Sacar foto";
+        btnCapturarFoto.classList.toggle("hidden", esVideo);
+        btnIniciarGrabacionCamara.classList.toggle("hidden", !esVideo);
+        btnDetenerGrabacionCamara.classList.add("hidden");
+        estadoCamara.textContent = "Solicitando permiso para usar la cámara" + (esVideo ? " y el micrófono…" : "…");
 
         try {
-
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                throw new Error("Este navegador no permite acceder a la cámara.");
+                throw new Error("Este navegador no permite acceder directamente a la cámara.");
             }
 
-            streamVideo = await navigator.mediaDevices.getUserMedia({
+            streamCamara = await navigator.mediaDevices.getUserMedia({
                 video: {
                     facingMode: { ideal: "environment" },
                     width: { ideal: 1280 },
                     height: { ideal: 720 }
                 },
-                audio: true
+                audio: esVideo
             });
 
-            previewVideo.srcObject = streamVideo;
-            await previewVideo.play();
+            previewCamara.srcObject = streamCamara;
+            await previewCamara.play();
 
-            estadoVideo.textContent = "Cámara lista. Cuando quieras, empezá a grabar.";
-
+            if (esVideo) {
+                estadoCamara.textContent = "Cámara lista. Tocá «Grabar video» cuando quieras empezar.";
+            } else {
+                estadoCamara.textContent = "Cámara lista. Tocá «Sacar foto» y se subirá automáticamente.";
+            }
         } catch (error) {
-
             console.error("Error al abrir cámara:", error);
-            estadoVideo.textContent =
-                "No pudimos acceder a la cámara. Revisá los permisos del navegador y volvé a intentarlo.";
+            estadoCamara.textContent = "No pudimos acceder a la cámara. Revisá los permisos del navegador y volvé a intentarlo.";
         }
     }
 
-    function obtenerFormatoGrabacion() {
-
+    function obtenerFormatoGrabacionCamara() {
         const formatos = [
+            "video/mp4;codecs=h264,aac",
+            "video/mp4",
             "video/webm;codecs=vp9,opus",
             "video/webm;codecs=vp8,opus",
-            "video/webm",
-            "video/mp4;codecs=h264,aac",
-            "video/mp4"
+            "video/webm"
         ];
 
         for (const formato of formatos) {
@@ -1401,223 +1377,162 @@
                 return formato;
             }
         }
-
         return "";
     }
 
-    function iniciarGrabacionVideo() {
+    async function subirArchivoDirecto(blob, nombre, mensajeExito) {
+        const datos = new FormData();
+        datos.append("file", blob, nombre);
+        datos.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+        datos.append("tags", GALERIA_TAG);
+        datos.append("folder", "boda-eunice-david");
 
-        if (!streamVideo) {
-            estadoVideo.textContent = "La cámara todavía no está disponible.";
+        const respuesta = await fetch(
+            "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/auto/upload",
+            { method: "POST", body: datos }
+        );
+
+        const info = await respuesta.json();
+
+        if (!respuesta.ok) {
+            throw new Error(
+                info.error && info.error.message
+                    ? info.error.message
+                    : "Cloudinary rechazó la subida."
+            );
+        }
+
+        console.log("Archivo subido correctamente:", info);
+        mostrarMensajeSubida(mensajeExito);
+        setTimeout(cargarGaleria, 1500);
+    }
+
+    async function capturarFotoDirecta() {
+        if (!streamCamara) {
+            estadoCamara.textContent = "La cámara todavía no está disponible.";
+            return;
+        }
+
+        btnCapturarFoto.disabled = true;
+        estadoCamara.textContent = "☁️ Subiendo la foto…";
+
+        try {
+            const ancho = previewCamara.videoWidth || 1280;
+            const alto = previewCamara.videoHeight || 720;
+            canvasFoto.width = ancho;
+            canvasFoto.height = alto;
+
+            const contexto = canvasFoto.getContext("2d");
+            contexto.drawImage(previewCamara, 0, 0, ancho, alto);
+
+            const blobFoto = await new Promise(function(resolve, reject) {
+                canvasFoto.toBlob(resolve, "image/jpeg", 0.92);
+                setTimeout(function() {
+                    reject(new Error("No se pudo preparar la foto."));
+                }, 5000);
+            });
+
+            if (!blobFoto) throw new Error("No se pudo crear la foto.");
+
+            await subirArchivoDirecto(
+                blobFoto,
+                "foto-boda-" + Date.now() + ".jpg",
+                "❤️ ¡Gracias por compartir esta foto!"
+            );
+
+            estadoCamara.textContent = "❤️ ¡Foto subida! Gracias por compartirla.";
+            setTimeout(cerrarCamara, 1000);
+        } catch (error) {
+            console.error("Error al subir foto:", error);
+            estadoCamara.textContent = "No se pudo subir la foto: " + error.message;
+            btnCapturarFoto.disabled = false;
+        }
+    }
+
+    function iniciarGrabacionCamara() {
+        if (!streamCamara) {
+            estadoCamara.textContent = "La cámara todavía no está disponible.";
             return;
         }
 
         if (!window.MediaRecorder) {
-            estadoVideo.textContent =
-                "Este navegador no admite grabación de video desde la página.";
+            estadoCamara.textContent = "Este navegador no admite grabación de video desde la página.";
             return;
         }
 
-        const mimeType = obtenerFormatoGrabacion();
+        const mimeType = obtenerFormatoGrabacionCamara();
 
         try {
+            mediaRecorderCamara = mimeType
+                ? new MediaRecorder(streamCamara, { mimeType: mimeType })
+                : new MediaRecorder(streamCamara);
 
-            mediaRecorder = mimeType
-                ? new MediaRecorder(streamVideo, { mimeType: mimeType })
-                : new MediaRecorder(streamVideo);
+            partesVideoCamara = [];
 
-            partesVideo = [];
-            blobVideo = null;
-
-            mediaRecorder.ondataavailable = function(event) {
+            mediaRecorderCamara.ondataavailable = function(event) {
                 if (event.data && event.data.size > 0) {
-                    partesVideo.push(event.data);
+                    partesVideoCamara.push(event.data);
                 }
             };
 
-            mediaRecorder.onstop = function() {
+            mediaRecorderCamara.onstop = async function() {
+                const tipo = mediaRecorderCamara.mimeType || mimeType || "video/webm";
+                const blobVideo = new Blob(partesVideoCamara, { type: tipo });
 
-                const tipo = mediaRecorder.mimeType || mimeType || "video/webm";
-                blobVideo = new Blob(partesVideo, { type: tipo });
+                btnDetenerGrabacionCamara.disabled = true;
+                estadoCamara.textContent = "☁️ Subiendo el video…";
 
-                const url = URL.createObjectURL(blobVideo);
-                previewVideo.srcObject = null;
-                previewVideo.src = url;
-                previewVideo.controls = true;
-                previewVideo.muted = false;
-                previewVideo.play().catch(function() {});
+                try {
+                    const extension = tipo.includes("mp4") ? "mp4" : "webm";
+                    await subirArchivoDirecto(
+                        blobVideo,
+                        "video-boda-" + Date.now() + "." + extension,
+                        "❤️ ¡Gracias por compartir este video!"
+                    );
 
-                btnDetenerGrabacion.classList.add("hidden");
-                btnSubirVideo.classList.remove("hidden");
-                estadoVideo.textContent =
-                    "Video listo. Podés verlo y subirlo a la galería.";
+                    estadoCamara.textContent = "❤️ ¡Video subido! Gracias por compartirlo.";
+                    setTimeout(cerrarCamara, 1000);
+                } catch (error) {
+                    console.error("Error al subir video:", error);
+                    estadoCamara.textContent = "No se pudo subir el video: " + error.message;
+                    btnDetenerGrabacionCamara.disabled = false;
+                }
             };
 
-            mediaRecorder.start(1000);
-
-            btnIniciarGrabacion.classList.add("hidden");
-            btnDetenerGrabacion.classList.remove("hidden");
-            btnSubirVideo.classList.add("hidden");
-            previewVideo.controls = false;
-            estadoVideo.textContent = "🔴 Grabando… tocá Detener cuando termines.";
-
+            mediaRecorderCamara.start(1000);
+            btnIniciarGrabacionCamara.classList.add("hidden");
+            btnDetenerGrabacionCamara.classList.remove("hidden");
+            estadoCamara.textContent = "🔴 Grabando… cuando termines, tocá «Detener y subir».";
         } catch (error) {
-
             console.error("Error al iniciar grabación:", error);
-            estadoVideo.textContent =
-                "No se pudo iniciar la grabación en este navegador.";
+            estadoCamara.textContent = "No se pudo iniciar la grabación en este navegador.";
         }
     }
 
-    function detenerGrabacionVideo() {
-
-        if (mediaRecorder && mediaRecorder.state !== "inactive") {
-            mediaRecorder.stop();
+    function detenerGrabacionCamara() {
+        if (mediaRecorderCamara && mediaRecorderCamara.state !== "inactive") {
+            mediaRecorderCamara.stop();
         }
     }
 
-    async function subirVideoGrabado() {
-
-        if (!blobVideo) {
-            estadoVideo.textContent = "Primero grabá un video.";
-            return;
+    btnFotos.addEventListener("click", function() {
+        // En celulares: cámara directa para sacar una foto.
+        // En PC: se mantiene el widget de Cloudinary para seleccionar fotos/videos.
+        if (esCelular) {
+            abrirCamara("foto");
+        } else {
+            widgetCloudinary.open();
         }
+    });
 
-        btnSubirVideo.disabled = true;
-        btnCancelarVideo.disabled = true;
-        estadoVideo.textContent = "☁️ Subiendo el video…";
+    btnGrabarVideo.addEventListener("click", function() {
+        abrirCamara("video");
+    });
 
-        try {
+    btnCapturarFoto.addEventListener("click", capturarFotoDirecta);
+    btnIniciarGrabacionCamara.addEventListener("click", iniciarGrabacionCamara);
+    btnDetenerGrabacionCamara.addEventListener("click", detenerGrabacionCamara);
+    cerrarModalCamara.addEventListener("click", cerrarCamara);
 
-            const tipo = blobVideo.type || "video/webm";
-            const extension = tipo.includes("mp4") ? "mp4" : "webm";
-            const nombre =
-                "video-boda-" +
-                Date.now() +
-                "." +
-                extension;
-
-            const datos = new FormData();
-            datos.append("file", blobVideo, nombre);
-            datos.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-            datos.append("tags", GALERIA_TAG);
-            datos.append("folder", "boda-eunice-david");
-
-            const respuesta = await fetch(
-                "https://api.cloudinary.com/v1_1/" +
-                CLOUDINARY_CLOUD_NAME +
-                "/auto/upload",
-                {
-                    method: "POST",
-                    body: datos
-                }
-            );
-
-            const info = await respuesta.json();
-
-            if (!respuesta.ok) {
-                throw new Error(
-                    info.error && info.error.message
-                        ? info.error.message
-                        : "Cloudinary rechazó la subida."
-                );
-            }
-
-            console.log("Video subido correctamente:", info);
-
-            const mensaje =
-                document.getElementById("mensajeSubida");
-
-            if (mensaje) {
-                mensaje.textContent =
-                    "❤️ ¡Gracias por compartir este video!";
-                mensaje.style.display = "block";
-            }
-
-            estadoVideo.textContent =
-                "❤️ ¡Video subido! Ya aparecerá en la galería.";
-
-            setTimeout(function() {
-                cerrarGrabadorVideo();
-                setTimeout(cargarGaleria, 2000);
-            }, 1200);
-
-        } catch (error) {
-
-            console.error("Error al subir video:", error);
-            estadoVideo.textContent =
-                "No se pudo subir el video: " + error.message;
-            btnSubirVideo.disabled = false;
-            btnCancelarVideo.disabled = false;
-        }
-    }
-
-    btnGrabarVideo.addEventListener(
-        "click",
-        abrirGrabadorVideo
-    );
-
-    btnIniciarGrabacion.addEventListener(
-        "click",
-        iniciarGrabacionVideo
-    );
-
-    btnDetenerGrabacion.addEventListener(
-        "click",
-        detenerGrabacionVideo
-    );
-
-    btnSubirVideo.addEventListener(
-        "click",
-        subirVideoGrabado
-    );
-
-    cerrarModalVideo.addEventListener(
-        "click",
-        cerrarGrabadorVideo
-    );
-
-    cancelarVideo.addEventListener(
-        "click",
-        cerrarGrabadorVideo
-    );
-
-    modalVideo.addEventListener(
-        "click",
-        function(event) {
-            if (event.target === modalVideo) {
-                cerrarGrabadorVideo();
-            }
-        }
-    );
-
-
-
-
-
-    // =====================================================
-    // MÚSICA: AUTOPLAY CON FALLBACK PARA NAVEGADORES
-    // =====================================================
-
-    const musicaBoda = document.getElementById("musicaBoda");
-
-    if (musicaBoda) {
-
-        // Intentamos reproducirla automáticamente al cargar.
-        musicaBoda.play().catch(function() {
-            // Los navegadores pueden bloquear el autoplay con sonido.
-        });
-
-        // Si el navegador bloqueó el autoplay, la iniciamos
-        // en la primera interacción del invitado.
-        const iniciarMusica = function() {
-            musicaBoda.play().catch(function() {});
-            document.removeEventListener("click", iniciarMusica);
-            document.removeEventListener("touchstart", iniciarMusica);
-        };
-
-        document.addEventListener("click", iniciarMusica, { once: true });
-        document.addEventListener("touchstart", iniciarMusica, { once: true });
-    }
 </script>
 </html>
