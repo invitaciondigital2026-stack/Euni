@@ -1,0 +1,597 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Responsive -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Eunice & David | Nos Casamos</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #fafaf9;
+            color: #44403c;
+        }
+
+        .title-font {
+            font-family: 'Great Vibes', cursive;
+        }
+
+        /* PORTADA */
+
+        .hero {
+            background-image: url("assets/portada.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            position: relative;
+        }
+
+        /* Oscurecer imagen */
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.40);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Títulos */
+
+        .section-title {
+            letter-spacing: 3px;
+        }
+
+        /* Línea decorativa */
+
+        .decorative-line {
+            width: 70px;
+            height: 1px;
+            background: #a8a29e;
+            margin: 15px auto;
+        }
+
+        /* Cuenta regresiva */
+
+        .countdown-box {
+            min-width: 70px;
+        }
+
+        .countdown-number {
+            font-size: 2rem;
+            font-weight: 500;
+        }
+
+        .countdown-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Botones */
+
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border-radius: 999px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Música */
+
+        audio {
+            max-width: 100%;
+        }
+
+        /* Mobile */
+
+        @media (max-width: 640px) {
+
+            .hero {
+                min-height: 100svh;
+                background-position: center;
+            }
+
+            .hero h1 {
+                font-size: 4rem;
+                line-height: 1.1;
+            }
+
+            .hero h2 {
+                font-size: 0.9rem;
+            }
+
+            .countdown-number {
+                font-size: 1.6rem;
+            }
+
+            .countdown-box {
+                min-width: 55px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         PORTADA
+    ====================================================== -->
+
+    <section class="hero">
+
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content text-white">
+
+            <p class="uppercase tracking-widest text-sm mb-4">
+                Estamos felices de anunciar
+            </p>
+
+            <h1 class="title-font text-6xl md:text-8xl mb-3">
+                Eunice & David
+            </h1>
+
+            <h2 class="uppercase tracking-widest text-lg md:text-xl">
+                Nos Casamos
+            </h2>
+
+            <div class="decorative-line bg-white mt-6"></div>
+
+            <p class="mt-5 text-sm tracking-widest">
+                ¡Te esperamos para celebrar juntos!
+            </p>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         MÚSICA
+    ====================================================== -->
+
+    <section class="py-10 text-center bg-white">
+
+        <h3 class="section-title text-sm uppercase mb-5">
+            Nuestra música
+        </h3>
+
+        <audio controls>
+            <source src="assets/musica.mp3" type="audio/mpeg">
+            Tu navegador no soporta el reproductor de audio.
+        </audio>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         CUENTA REGRESIVA
+    ====================================================== -->
+
+    <section class="py-14 text-center">
+
+        <h2 class="text-2xl mb-3">
+            Falta muy poco
+        </h2>
+
+        <div class="decorative-line"></div>
+
+        <p class="text-sm text-gray-500 mb-8">
+            Para nuestro gran día
+        </p>
+
+
+        <div
+            id="countdown"
+            class="flex justify-center gap-4 sm:gap-8"
+        >
+
+            <div class="countdown-box">
+                <div id="days" class="countdown-number">
+                    00
+                </div>
+
+                <div class="countdown-label">
+                    Días
+                </div>
+            </div>
+
+
+            <div class="countdown-box">
+                <div id="hours" class="countdown-number">
+                    00
+                </div>
+
+                <div class="countdown-label">
+                    Horas
+                </div>
+            </div>
+
+
+            <div class="countdown-box">
+                <div id="minutes" class="countdown-number">
+                    00
+                </div>
+
+                <div class="countdown-label">
+                    Minutos
+                </div>
+            </div>
+
+
+            <div class="countdown-box">
+                <div id="seconds" class="countdown-number">
+                    00
+                </div>
+
+                <div class="countdown-label">
+                    Segundos
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         FECHA
+    ====================================================== -->
+
+    <section class="py-16 bg-white text-center">
+
+        <h2 class="title-font text-5xl mb-4">
+            Nuestro gran día
+        </h2>
+
+        <div class="decorative-line"></div>
+
+        <!-- CAMBIAR FECHA -->
+
+        <p class="text-2xl mt-6">
+            Sábado 15 de noviembre
+        </p>
+
+        <p class="text-gray-500 mt-2">
+            2026
+        </p>
+
+        <p class="mt-6 text-gray-600">
+            Ceremonia y celebración
+        </p>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         UBICACIÓN
+    ====================================================== -->
+
+    <section class="py-16 text-center px-6">
+
+        <h2 class="section-title uppercase text-sm mb-3">
+            Lugar
+        </h2>
+
+        <div class="decorative-line"></div>
+
+        <h3 class="text-2xl mt-6">
+            Salón de Celebraciones
+        </h3>
+
+        <p class="text-gray-500 mt-2">
+            Dirección del salón
+        </p>
+
+
+        <!--
+            REEMPLAZAR EL # POR EL LINK
+            DE GOOGLE MAPS
+        -->
+
+        <a
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn bg-stone-700 text-white mt-7"
+        >
+            📍 Ver ubicación
+        </a>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         MENSAJE
+    ====================================================== -->
+
+    <section class="py-16 bg-stone-100 text-center px-6">
+
+        <h2 class="title-font text-5xl mb-6">
+            Queremos compartirlo con vos
+        </h2>
+
+        <p class="max-w-xl mx-auto leading-relaxed text-gray-600">
+
+            Hay momentos en la vida que se vuelven
+            inolvidables cuando los compartimos con
+            las personas que queremos.
+
+            <br><br>
+
+            Por eso queremos que seas parte de este
+            día tan especial para nosotros.
+
+        </p>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         CONFIRMACIÓN
+    ====================================================== -->
+
+    <section class="py-16 text-center px-6 bg-white">
+
+        <h2 class="section-title uppercase text-sm mb-3">
+            Confirmación
+        </h2>
+
+        <div class="decorative-line"></div>
+
+        <h3 class="text-2xl mt-6">
+            ¿Nos acompañás?
+        </h3>
+
+        <p class="text-gray-500 mt-3 mb-7">
+            Confirmá tu asistencia por WhatsApp.
+        </p>
+
+
+        <!--
+            CAMBIAR EL NÚMERO
+
+            Formato:
+            código de país + número
+
+            Argentina:
+            549 + código de área + número
+
+            Ejemplo:
+            5493442123456
+        -->
+
+        <a
+            href="https://wa.me/5493442123456?text=Hola%20Eunice%20y%20David%2C%20confirmo%20mi%20asistencia%20a%20su%20casamiento."
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn bg-green-600 text-white"
+        >
+            💬 Confirmar asistencia
+        </a>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         CIERRE
+    ====================================================== -->
+
+    <section
+        class="py-20 text-center bg-stone-100 px-6"
+    >
+
+        <p class="text-sm uppercase tracking-widest">
+            Con mucho amor
+        </p>
+
+        <h2 class="title-font text-6xl mt-3">
+            Eunice & David
+        </h2>
+
+        <p class="mt-6 text-sm text-gray-500">
+            ¡Los esperamos!
+        </p>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="py-6 text-center bg-stone-800 text-white">
+
+        <p class="text-xs opacity-70">
+            Eunice & David · 2026
+        </p>
+
+    </footer>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+         CUENTA REGRESIVA
+    ====================================================== -->
+
+    <script>
+
+        /*
+         * ==================================================
+         * CONFIGURACIÓN
+         * ==================================================
+         *
+         * CAMBIAR ESTA FECHA POR LA FECHA REAL
+         * DEL CASAMIENTO.
+         *
+         * Formato:
+         * Año, mes - 1, día, hora, minutos
+         *
+         * Ejemplo:
+         *
+         * new Date(2026, 10, 15, 20, 0, 0)
+         *
+         * El mes empieza en 0:
+         *
+         * Enero     = 0
+         * Febrero   = 1
+         * Marzo     = 2
+         * ...
+         * Noviembre = 10
+         * Diciembre = 11
+         *
+         */
+
+        const fechaCasamiento =
+            new Date(2026, 10, 15, 20, 0, 0);
+
+
+        function actualizarCuentaRegresiva() {
+
+            const ahora = new Date();
+
+            const diferencia =
+                fechaCasamiento - ahora;
+
+
+            /*
+             * Si la fecha ya pasó
+             */
+
+            if (diferencia <= 0) {
+
+                document.getElementById("days").textContent = "00";
+                document.getElementById("hours").textContent = "00";
+                document.getElementById("minutes").textContent = "00";
+                document.getElementById("seconds").textContent = "00";
+
+                return;
+            }
+
+
+            const dias =
+                Math.floor(
+                    diferencia / (1000 * 60 * 60 * 24)
+                );
+
+
+            const horas =
+                Math.floor(
+                    (diferencia /
+                    (1000 * 60 * 60)) % 24
+                );
+
+
+            const minutos =
+                Math.floor(
+                    (diferencia /
+                    (1000 * 60)) % 60
+                );
+
+
+            const segundos =
+                Math.floor(
+                    (diferencia / 1000) % 60
+                );
+
+
+            document.getElementById("days").textContent =
+                String(dias).padStart(2, "0");
+
+
+            document.getElementById("hours").textContent =
+                String(horas).padStart(2, "0");
+
+
+            document.getElementById("minutes").textContent =
+                String(minutos).padStart(2, "0");
+
+
+            document.getElementById("seconds").textContent =
+                String(segundos).padStart(2, "0");
+
+        }
+
+
+        /*
+         * Actualizar inmediatamente
+         */
+
+        actualizarCuentaRegresiva();
+
+
+        /*
+         * Actualizar cada segundo
+         */
+
+        setInterval(
+            actualizarCuentaRegresiva,
+            1000
+        );
+
+    </script>
+
+
+</body>
+
+</html>
+```
