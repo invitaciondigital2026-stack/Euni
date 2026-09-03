@@ -1567,50 +1567,112 @@
         previewCamara.load();
 
         modalCamara.classList.add("hidden");
+        document.body.style.overflow = "";
         restaurarControlesCamara();
     }
 
     async function abrirCamara(modo) {
         modoCamara = modo;
         videoListoParaSubir = null;
+        partesVideoCamara = [];
+        mediaRecorderCamara = null;
 
         modalCamara.classList.remove("hidden");
         tituloCamara.textContent = "Comparte un momento especial";
         estadoCamara.textContent = "Solicitando permiso para usar la cámara" + (modo === "video" ? " y el micrófono…" : "…");
         restaurarControlesCamara();
+        document.body.style.overflow = "hidden";
 
         try {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 throw new Error("Este navegador no permite acceder directamente a la cámara.");
             }
 
-            streamCamara = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: { ideal: "environment" },
-                    width: { ideal: 1920 },
-                    height: { ideal: 1080 }
-                },
-                audio: modo === "video"
-            });
+            const restriccionesVideo = {
+                facingMode: { ideal: "environment" },
+                width: { ideal: 1280, max: 1920 },
+                height: { ideal: 720, max: 1080 },
+                frameRate: { ideal: 30, max: 30 }
+            };
+
+            try {
+                streamCamara = await navigator.mediaDevices.getUserMedia({
+                    video: restriccionesVideo,
+                    audio: modo === "video"
+                });
+            } catch (primerError) {
+                // Algunos celulares permiten la cámara pero rechazan el micrófono.
+                // En ese caso seguimos con video para no dejar inutilizada la función.
+                if (modo !== "video") throw primerError;
+
+                console.warn("No se pudo abrir el micrófono. Reintentando solo con cámara.", primerError);
+                streamCamara = await navigator.mediaDevices.getUserMedia({
+                    video: restriccionesVideo,
+                    audio: false
+                });
+            }
 
             previewCamara.srcObject = streamCamara;
+            previewCamara.muted = true;
+            previewCamara.playsInline = true;
             await previewCamara.play();
 
-            estadoCamara.textContent = "";
+            // Si el sistema del celular corta la pista inesperadamente,
+            // lo informamos y nunca convertimos ese corte en una subida automática.
+            streamCamara.getTracks().forEach(function(track) {
+                track.onended = function() {
+                    if (mediaRecorderCamara && mediaRecorderCamara.state === "recording") {
+                        console.warn("La pista de cámara/micrófono terminó inesperadamente.");
+                        estadoCamara.textContent = "La cámara se interrumpió. El video no se subirá automáticamente.";
+                    }
+                };
+            });
+
+            if (modo === "video" && streamCamara.getAudioTracks().length === 0) {
+                estadoCamara.textContent = "Cámara lista. Se grabará el video sin audio.";
+            } else {
+                estadoCamara.textContent = "";
+            }
+
         } catch (error) {
             console.error("Error al abrir cámara:", error);
+            document.body.style.overflow = "";
             estadoCamara.textContent = "No pudimos acceder a la cámara. Revisá los permisos del navegador y volvé a intentarlo.";
         }
     }
 
+    function esIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    }
+
+    function esAndroid() {
+        return /Android/i.test(navigator.userAgent);
+    }
+
     function obtenerFormatoGrabacionCamara() {
-        const formatos = [
+        const formatosIOS = [
             "video/mp4;codecs=h264,aac",
-            "video/mp4",
-            "video/webm;codecs=vp9,opus",
-            "video/webm;codecs=vp8,opus",
-            "video/webm"
+            "video/mp4"
         ];
+
+        const formatosAndroid = [
+            "video/webm;codecs=vp8,opus",
+            "video/webm",
+            "video/mp4;codecs=h264,aac",
+            "video/mp4"
+        ];
+
+        const formatosGenerales = [
+            "video/webm;codecs=vp8,opus",
+            "video/webm",
+            "video/mp4;codecs=h264,aac",
+            "video/mp4"
+        ];
+
+        const formatos = esIOS()
+            ? formatosIOS
+            : (esAndroid() ? formatosAndroid : formatosGenerales);
 
         for (const formato of formatos) {
             if (window.MediaRecorder && MediaRecorder.isTypeSupported(formato)) {
@@ -1627,8 +1689,10 @@
         datos.append("tags", GALERIA_TAG);
         datos.append("folder", "boda-eunice-david");
 
+        const recurso = blob.type && blob.type.startsWith("video/") ? "video" : "image";
+
         const respuesta = await fetch(
-            "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/auto/upload",
+            "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/" + recurso + "/upload",
             { method: "POST", body: datos }
         );
 
@@ -1691,20 +1755,50 @@
     }
 
     function iniciarGrabacionCamara() {
-        if (!streamCamara || !window.MediaRecorder) {
+        if (!streamCamara) {
+            estadoCamara.textContent = "La cámara todavía no está lista.";
+            return;
+        }
+
+        if (!window.MediaRecorder) {
             estadoCamara.textContent = "Este navegador no permite grabar video desde la página.";
+            return;
+        }
+
+        const pistasVideo = streamCamara.getVideoTracks();
+        if (!pistasVideo.length || pistasVideo[0].readyState !== "live") {
+            estadoCamara.textContent = "La cámara se desconectó. Cerrá y volvé a abrirla.";
             return;
         }
 
         const mimeType = obtenerFormatoGrabacionCamara();
 
         try {
-            mediaRecorderCamara = mimeType
-                ? new MediaRecorder(streamCamara, { mimeType: mimeType })
-                : new MediaRecorder(streamCamara);
+            const opcionesGrabacion = mimeType ? { mimeType: mimeType } : {};
+
+            // Una tasa moderada es más estable en celulares y mantiene
+            // archivos razonables para subir por datos móviles.
+            opcionesGrabacion.videoBitsPerSecond = esCelular ? 1800000 : 2500000;
+
+            mediaRecorderCamara = new MediaRecorder(streamCamara, opcionesGrabacion);
 
             partesVideoCamara = [];
             videoListoParaSubir = null;
+
+            mediaRecorderCamara.onstart = function() {
+                grabacionInicio = Date.now();
+                temporizadorCamara.classList.remove("hidden");
+                actualizarTemporizador();
+
+                if (temporizadorIntervalo) clearInterval(temporizadorIntervalo);
+                temporizadorIntervalo = setInterval(actualizarTemporizador, 250);
+
+                btnIniciarGrabacionCamara.classList.add("hidden");
+                btnDetenerGrabacionCamara.classList.remove("hidden");
+                btnSubirVideo.classList.add("hidden");
+                textoControlCamara.textContent = "Tocá el cuadrado para terminar";
+                estadoCamara.textContent = "";
+            };
 
             mediaRecorderCamara.ondataavailable = function(event) {
                 if (event.data && event.data.size > 0) {
@@ -1715,15 +1809,14 @@
             mediaRecorderCamara.onerror = function(event) {
                 console.error("Error de MediaRecorder:", event.error || event);
                 detenerTemporizador();
-                estadoCamara.textContent = "Hubo un problema con la grabación. Intentá nuevamente.";
-                btnIniciarGrabacionCamara.classList.remove("hidden");
                 btnDetenerGrabacionCamara.classList.add("hidden");
                 btnSubirVideo.classList.add("hidden");
+                btnIniciarGrabacionCamara.classList.remove("hidden");
+                estadoCamara.textContent = "El celular tuvo un problema con la grabación. Volvé a intentarlo.";
             };
 
             mediaRecorderCamara.onstop = function() {
-                // IMPORTANTE: el video SOLO queda listo cuando el usuario
-                // toca el cuadrado para detener la grabación.
+                // Detener SOLO prepara el video. Nunca inicia la subida.
                 const tipo = mediaRecorderCamara.mimeType || mimeType || "video/webm";
                 videoListoParaSubir = partesVideoCamara.length
                     ? new Blob(partesVideoCamara, { type: tipo })
@@ -1734,6 +1827,7 @@
                 btnDetenerGrabacionCamara.classList.add("hidden");
 
                 if (videoListoParaSubir && videoListoParaSubir.size > 0) {
+                    btnSubirVideo.disabled = false;
                     btnSubirVideo.classList.remove("hidden");
                     textoControlCamara.textContent = "Tocá la flecha azul para subir";
                     estadoCamara.textContent = "Video listo";
@@ -1743,22 +1837,13 @@
                 }
             };
 
-            // Sin timeslice: algunos celulares pueden detener o fragmentar
-            // de forma inesperada la grabación cuando se usa start(500).
-            // Así la grabación continúa hasta que el usuario pulse el cuadrado.
-            mediaRecorderCamara.start();
-            grabacionInicio = Date.now();
-            temporizadorCamara.classList.remove("hidden");
-            actualizarTemporizador();
-            temporizadorIntervalo = setInterval(actualizarTemporizador, 250);
+            // Los fragmentos cada segundo son SOLO datos parciales.
+            // La grabación continúa hasta que el usuario toca el cuadrado.
+            mediaRecorderCamara.start(1000);
 
-            btnIniciarGrabacionCamara.classList.add("hidden");
-            btnDetenerGrabacionCamara.classList.remove("hidden");
-            textoControlCamara.textContent = "Tocá el cuadrado para terminar";
-            estadoCamara.textContent = "";
         } catch (error) {
             console.error("Error al iniciar grabación:", error);
-            estadoCamara.textContent = "No se pudo iniciar la grabación.";
+            estadoCamara.textContent = "No se pudo iniciar la grabación en este celular.";
         }
     }
 
