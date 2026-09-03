@@ -162,10 +162,6 @@
 
 <script>
 
-    // =====================================================
-    // CONFIGURACIÓN CLOUDINARY
-    // =====================================================
-
     const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
     const CLOUDINARY_UPLOAD_PRESET = "euni_upload";
@@ -175,111 +171,106 @@
     // CREAR WIDGET
     // =====================================================
 
-    const widgetCloudinary = cloudinary.createUploadWidget(
+    const widgetCloudinary =
+        cloudinary.createUploadWidget(
 
-        {
-            cloudName: CLOUDINARY_CLOUD_NAME,
+            {
 
-            uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+                cloudName:
+                    CLOUDINARY_CLOUD_NAME,
 
-            sources: [
-                "local",
-                "camera"
-            ],
+                uploadPreset:
+                    CLOUDINARY_UPLOAD_PRESET,
 
-            multiple: true,
 
-            maxFiles: 20,
+                // Fuentes disponibles
+                sources: [
+                    "local",
+                    "camera"
+                ],
 
-            resourceType: "auto",
 
-            clientAllowedFormats: [
-                "jpg",
-                "jpeg",
-                "png",
-                "webp",
-                "mp4",
-                "mov",
-                "webm"
-            ],
+                // Permitir varios archivos
+                multiple: true,
 
-            maxFileSize: 100000000,
 
-            showAdvancedOptions: false,
+                // Máximo de archivos por tanda
+                maxFiles: 20,
 
-            cropping: false,
 
-            showSkipCropButton: false,
+                // Fotos + videos
+                resourceType: "auto",
 
-            folder: "boda-eunice-david",
 
-            language: "es",
+                // Formatos permitidos
+                clientAllowedFormats: [
+                    "jpg",
+                    "jpeg",
+                    "png",
+                    "webp",
+                    "heic",
+                    "mp4",
+                    "mov",
+                    "webm"
+                ],
 
-            text: {
-                "es": {
-                    "or": "o",
-                    "local": {
-                        "browse": "Elegir fotos o videos",
-                        "dd_title_single": "Arrastrá un archivo acá",
-                        "dd_title_multi": "Arrastrá tus fotos o videos acá"
-                    },
-                    "camera": {
-                        "capture": "Tomar foto"
-                    }
+
+                // Máximo 100 MB por archivo
+                maxFileSize: 100000000,
+
+
+                // Carpeta dentro de Cloudinary
+                folder: "boda-eunice-david",
+
+
+                cropping: false,
+
+                showAdvancedOptions: false,
+
+                showSkipCropButton: false,
+
+
+                language: "es"
+
+            },
+
+
+            function(error, result) {
+
+                // =================================================
+                // ERROR
+                // =================================================
+
+                if (error) {
+
+                    console.error(
+                        "Error Cloudinary:",
+                        error
+                    );
+
+                    return;
                 }
+
+
+                // =================================================
+                // ARCHIVO SUBIDO
+                // =================================================
+
+                if (
+                    result &&
+                    result.event === "success"
+                ) {
+
+                    console.log(
+                        "Archivo subido correctamente:",
+                        result.info
+                    );
+
+                }
+
             }
 
-        },
-
-        function(error, result) {
-
-            if (error) {
-
-                console.error(
-                    "Error Cloudinary:",
-                    error
-                );
-
-                document.getElementById(
-                    "mensajeSubida"
-                ).textContent =
-                    "No se pudo realizar la subida.";
-
-                document.getElementById(
-                    "mensajeSubida"
-                ).style.display = "block";
-
-                return;
-            }
-
-
-            // =================================================
-            // SUBIDA COMPLETADA
-            // =================================================
-
-            if (
-                result &&
-                result.event === "success"
-            ) {
-
-                console.log(
-                    "Archivo subido:",
-                    result.info
-                );
-
-                document.getElementById(
-                    "mensajeSubida"
-                ).textContent =
-                    "❤️ ¡Gracias por compartir este recuerdo!";
-
-                document.getElementById(
-                    "mensajeSubida"
-                ).style.display = "block";
-            }
-
-        }
-
-    );
+        );
 
 
     // =====================================================
@@ -288,11 +279,16 @@
 
     document
         .getElementById("btnFotos")
-        .addEventListener("click", function() {
+        .addEventListener(
+            "click",
+            function() {
 
-            widgetCloudinary.open();
+                widgetCloudinary.open();
 
-        });
+            }
+        );
+
+
 
 </script>
 
