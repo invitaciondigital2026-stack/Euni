@@ -154,6 +154,92 @@
 
         }
 
+        /* GALERÍA EN VIVO */
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 14px;
+            background: #e7e5e4;
+            aspect-ratio: 1 / 1;
+            cursor: pointer;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .gallery-item img,
+        .gallery-item video {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .gallery-video-icon {
+            position: absolute;
+            left: 10px;
+            bottom: 10px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.65);
+            color: white;
+            font-size: 15px;
+            pointer-events: none;
+        }
+
+        .gallery-empty {
+            grid-column: 1 / -1;
+            padding: 30px 20px;
+            text-align: center;
+            color: #78716c;
+        }
+
+        .gallery-status {
+            min-height: 22px;
+            margin-top: 12px;
+            font-size: 0.82rem;
+            color: #78716c;
+        }
+
+        .gallery-refresh {
+            border: 0;
+            background: transparent;
+            color: #57534e;
+            text-decoration: underline;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.82rem;
+            margin-top: 4px;
+        }
+
+        .gallery-refresh:hover {
+            color: #292524;
+        }
+
+        @media (min-width: 640px) {
+            .gallery-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 14px;
+            }
+        }
+
+        @media (min-width: 900px) {
+            .gallery-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
     </style>
 
 </head>
@@ -471,6 +557,50 @@
 </section>
 
     <!-- =====================================================
+         GALERÍA EN VIVO
+    ====================================================== -->
+
+    <section class="py-16 bg-white text-center px-6">
+
+        <h2 class="section-title uppercase text-sm mb-3">
+            Recuerdos compartidos
+        </h2>
+
+        <div class="decorative-line"></div>
+
+        <h3 class="title-font text-5xl mt-5">
+            📷 Nuestra galería
+        </h3>
+
+        <p class="text-gray-600 max-w-md mx-auto mt-5 mb-6">
+            Las fotos y videos que compartan nuestros invitados
+            aparecerán aquí automáticamente.
+        </p>
+
+        <div id="galleryStatus" class="gallery-status">
+            Cargando recuerdos...
+        </div>
+
+        <button
+            id="btnActualizarGaleria"
+            type="button"
+            class="gallery-refresh"
+        >
+            ↻ Actualizar galería
+        </button>
+
+        <div
+            id="galeria"
+            class="gallery-grid mt-6"
+        >
+            <div class="gallery-empty">
+                Cargando fotos y videos...
+            </div>
+        </div>
+
+    </section>
+
+    <!-- =====================================================
          CIERRE
     ====================================================== -->
 
@@ -694,6 +824,9 @@
                 // Carpeta dentro de Cloudinary
                 folder: "boda-eunice-david",
 
+                // Etiqueta utilizada por la galería pública
+                tags: ["boda-eunice-david"],
+
 
                 cropping: false,
 
@@ -738,11 +871,335 @@
                         result.info
                     );
 
+                    const mensaje =
+                        document.getElementById("mensajeSubida");
+
+                    if (mensaje) {
+                        mensaje.textContent =
+                            "❤️ ¡Gracias por compartir este recuerdo!";
+                        mensaje.style.display = "block";
+                    }
+
+                }
+
+                // Cuando termina toda la tanda de archivos,
+                // actualizamos la galería.
+                if (
+                    result &&
+                    result.event === "queues-end"
+                ) {
+                    setTimeout(cargarGaleria, 2000);
                 }
 
             }
 
         );
+
+
+    // =====================================================
+    // GALERÍA EN VIVO
+    // =====================================================
+
+    const GALERIA_TAG = "boda-eunice-david";
+
+    const URL_LISTA_IMAGENES =
+        "https://res.cloudinary.com/" +
+        CLOUDINARY_CLOUD_NAME +
+        "/image/list/" +
+        GALERIA_TAG +
+        ".json";
+
+    const URL_LISTA_VIDEOS =
+        "https://res.cloudinary.com/" +
+        CLOUDINARY_CLOUD_NAME +
+        "/video/list/" +
+        GALERIA_TAG +
+        ".json";
+
+
+    function crearUrlCloudinary(recurso) {
+
+        const tipo =
+            recurso.resource_type === "video"
+                ? "video"
+                : "image";
+
+        return (
+            "https://res.cloudinary.com/" +
+            CLOUDINARY_CLOUD_NAME +
+            "/" +
+            tipo +
+            "/upload/" +
+            recurso.public_id +
+            "." +
+            recurso.format
+        );
+
+    }
+
+
+    function mostrarGaleria(recursos) {
+
+        const galeria =
+            document.getElementById("galeria");
+
+        const estado =
+            document.getElementById("galleryStatus");
+
+
+        if (!galeria) {
+            return;
+        }
+
+
+        galeria.innerHTML = "";
+
+
+        if (!recursos.length) {
+
+            galeria.innerHTML = `
+                <div class="gallery-empty">
+                    <div style="font-size:2.2rem; margin-bottom:8px;">
+                        📸
+                    </div>
+                    <div>
+                        Todavía no hay recuerdos compartidos.
+                    </div>
+                    <div style="font-size:0.8rem; margin-top:5px;">
+                        ¡Sé el primero en compartir una foto!
+                    </div>
+                </div>
+            `;
+
+            if (estado) {
+                estado.textContent =
+                    "Todavía no hay fotos ni videos.";
+            }
+
+            return;
+        }
+
+
+        recursos.forEach(function(recurso) {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "gallery-item";
+
+
+            const url =
+                crearUrlCloudinary(recurso);
+
+
+            if (recurso.resource_type === "video") {
+
+                const video =
+                    document.createElement("video");
+
+                video.src = url;
+
+                video.controls = true;
+
+                video.preload = "metadata";
+
+                video.playsInline = true;
+
+                video.setAttribute(
+                    "aria-label",
+                    "Video compartido en la boda"
+                );
+
+                item.appendChild(video);
+
+
+                const icon =
+                    document.createElement("div");
+
+                icon.className =
+                    "gallery-video-icon";
+
+                icon.textContent = "▶";
+
+                item.appendChild(icon);
+
+            } else {
+
+                const imagen =
+                    document.createElement("img");
+
+                imagen.src = url;
+
+                imagen.alt =
+                    "Foto compartida en la boda";
+
+                imagen.loading = "lazy";
+
+                imagen.decoding = "async";
+
+
+                // Al tocar una foto, abrirla en una pestaña
+                // nueva para verla en tamaño completo.
+                imagen.addEventListener(
+                    "click",
+                    function() {
+                        window.open(
+                            url,
+                            "_blank",
+                            "noopener,noreferrer"
+                        );
+                    }
+                );
+
+
+                item.appendChild(imagen);
+
+            }
+
+
+            galeria.appendChild(item);
+
+        });
+
+
+        if (estado) {
+
+            estado.textContent =
+                recursos.length +
+                (
+                    recursos.length === 1
+                        ? " recuerdo compartido"
+                        : " recuerdos compartidos"
+                );
+
+        }
+
+    }
+
+
+    async function obtenerLista(url, tipo) {
+
+        try {
+
+            const respuesta =
+                await fetch(
+                    url +
+                    "?v=" +
+                    Math.floor(
+                        Date.now() / 60000
+                    )
+                );
+
+
+            if (!respuesta.ok) {
+                return [];
+            }
+
+
+            const datos =
+                await respuesta.json();
+
+
+            return (datos.resources || []).map(
+                function(recurso) {
+
+                    return {
+                        ...recurso,
+                        resource_type: tipo
+                    };
+
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "No se pudo cargar la lista:",
+                error
+            );
+
+            return [];
+
+        }
+
+    }
+
+
+    async function cargarGaleria() {
+
+        const estado =
+            document.getElementById("galleryStatus");
+
+        if (estado) {
+            estado.textContent =
+                "Actualizando recuerdos...";
+        }
+
+
+        const resultados =
+            await Promise.all([
+                obtenerLista(
+                    URL_LISTA_IMAGENES,
+                    "image"
+                ),
+                obtenerLista(
+                    URL_LISTA_VIDEOS,
+                    "video"
+                )
+            ]);
+
+
+        const recursos =
+            resultados[0].concat(resultados[1]);
+
+
+        // Más recientes primero
+        recursos.sort(
+            function(a, b) {
+
+                return (
+                    new Date(b.created_at || 0) -
+                    new Date(a.created_at || 0)
+                );
+
+            }
+        );
+
+
+        mostrarGaleria(recursos);
+
+    }
+
+
+    // Botón de actualización manual
+    const btnActualizarGaleria =
+        document.getElementById(
+            "btnActualizarGaleria"
+        );
+
+
+    if (btnActualizarGaleria) {
+
+        btnActualizarGaleria.addEventListener(
+            "click",
+            cargarGaleria
+        );
+
+    }
+
+
+    // Primera carga
+    cargarGaleria();
+
+
+    // Actualizar automáticamente cada minuto.
+    // Cloudinary mantiene la lista en caché aproximadamente
+    // 60 segundos.
+    setInterval(
+        cargarGaleria,
+        60000
+    );
 
 
     // =====================================================
@@ -764,4 +1221,3 @@
 
 </script>
 </html>
-
