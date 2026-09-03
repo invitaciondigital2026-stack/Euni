@@ -158,6 +158,146 @@
 
 </head>
 
+<script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+
+<script>
+
+    // =====================================================
+    // CONFIGURACIÓN CLOUDINARY
+    // =====================================================
+
+    const CLOUDINARY_CLOUD_NAME = "entbx2xv";
+
+    const CLOUDINARY_UPLOAD_PRESET = "euni_upload";
+
+
+    // =====================================================
+    // CREAR WIDGET
+    // =====================================================
+
+    const widgetCloudinary = cloudinary.createUploadWidget(
+
+        {
+            cloudName: CLOUDINARY_CLOUD_NAME,
+
+            uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+
+            sources: [
+                "local",
+                "camera"
+            ],
+
+            multiple: true,
+
+            maxFiles: 20,
+
+            resourceType: "auto",
+
+            clientAllowedFormats: [
+                "jpg",
+                "jpeg",
+                "png",
+                "webp",
+                "mp4",
+                "mov",
+                "webm"
+            ],
+
+            maxFileSize: 100000000,
+
+            showAdvancedOptions: false,
+
+            cropping: false,
+
+            showSkipCropButton: false,
+
+            folder: "boda-eunice-david",
+
+            language: "es",
+
+            text: {
+                "es": {
+                    "or": "o",
+                    "local": {
+                        "browse": "Elegir fotos o videos",
+                        "dd_title_single": "Arrastrá un archivo acá",
+                        "dd_title_multi": "Arrastrá tus fotos o videos acá"
+                    },
+                    "camera": {
+                        "capture": "Tomar foto"
+                    }
+                }
+            }
+
+        },
+
+        function(error, result) {
+
+            if (error) {
+
+                console.error(
+                    "Error Cloudinary:",
+                    error
+                );
+
+                document.getElementById(
+                    "mensajeSubida"
+                ).textContent =
+                    "No se pudo realizar la subida.";
+
+                document.getElementById(
+                    "mensajeSubida"
+                ).style.display = "block";
+
+                return;
+            }
+
+
+            // =================================================
+            // SUBIDA COMPLETADA
+            // =================================================
+
+            if (
+                result &&
+                result.event === "success"
+            ) {
+
+                console.log(
+                    "Archivo subido:",
+                    result.info
+                );
+
+                document.getElementById(
+                    "mensajeSubida"
+                ).textContent =
+                    "❤️ ¡Gracias por compartir este recuerdo!";
+
+                document.getElementById(
+                    "mensajeSubida"
+                ).style.display = "block";
+            }
+
+        }
+
+    );
+
+
+    // =====================================================
+    // BOTÓN
+    // =====================================================
+
+    document
+        .getElementById("btnFotos")
+        .addEventListener("click", function() {
+
+            widgetCloudinary.open();
+
+        });
+
+</script>
+
+
+
 
 <body>
 
