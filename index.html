@@ -1712,19 +1712,41 @@
                 }
             };
 
+            mediaRecorderCamara.onerror = function(event) {
+                console.error("Error de MediaRecorder:", event.error || event);
+                detenerTemporizador();
+                estadoCamara.textContent = "Hubo un problema con la grabación. Intentá nuevamente.";
+                btnIniciarGrabacionCamara.classList.remove("hidden");
+                btnDetenerGrabacionCamara.classList.add("hidden");
+                btnSubirVideo.classList.add("hidden");
+            };
+
             mediaRecorderCamara.onstop = function() {
+                // IMPORTANTE: el video SOLO queda listo cuando el usuario
+                // toca el cuadrado para detener la grabación.
                 const tipo = mediaRecorderCamara.mimeType || mimeType || "video/webm";
-                videoListoParaSubir = new Blob(partesVideoCamara, { type: tipo });
+                videoListoParaSubir = partesVideoCamara.length
+                    ? new Blob(partesVideoCamara, { type: tipo })
+                    : null;
 
                 detenerTemporizador();
                 temporizadorCamara.classList.add("hidden");
                 btnDetenerGrabacionCamara.classList.add("hidden");
-                btnSubirVideo.classList.remove("hidden");
-                textoControlCamara.textContent = "Tocá la flecha azul para subir";
-                estadoCamara.textContent = "Video listo";
+
+                if (videoListoParaSubir && videoListoParaSubir.size > 0) {
+                    btnSubirVideo.classList.remove("hidden");
+                    textoControlCamara.textContent = "Tocá la flecha azul para subir";
+                    estadoCamara.textContent = "Video listo";
+                } else {
+                    btnIniciarGrabacionCamara.classList.remove("hidden");
+                    estadoCamara.textContent = "No se pudo preparar el video. Intentá nuevamente.";
+                }
             };
 
-            mediaRecorderCamara.start(500);
+            // Sin timeslice: algunos celulares pueden detener o fragmentar
+            // de forma inesperada la grabación cuando se usa start(500).
+            // Así la grabación continúa hasta que el usuario pulse el cuadrado.
+            mediaRecorderCamara.start();
             grabacionInicio = Date.now();
             temporizadorCamara.classList.remove("hidden");
             actualizarTemporizador();
