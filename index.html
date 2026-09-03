@@ -158,146 +158,16 @@
 
 </head>
 
-<script src="https://upload-widget.cloudinary.com/global/all.js"></script>
-
-<script>
-
-    const CLOUDINARY_CLOUD_NAME = "entbx2xv";
-
-    const CLOUDINARY_UPLOAD_PRESET = "euni_upload";
-
-
-    // =====================================================
-    // CREAR WIDGET
-    // =====================================================
-
-    const widgetCloudinary =
-        cloudinary.createUploadWidget(
-
-            {
-
-                cloudName:
-                    CLOUDINARY_CLOUD_NAME,
-
-                uploadPreset:
-                    CLOUDINARY_UPLOAD_PRESET,
-
-
-                // Fuentes disponibles
-                sources: [
-                    "local",
-                    "camera"
-                ],
-
-
-                // Permitir varios archivos
-                multiple: true,
-
-
-                // Máximo de archivos por tanda
-                maxFiles: 20,
-
-
-                // Fotos + videos
-                resourceType: "auto",
-
-
-                // Formatos permitidos
-                clientAllowedFormats: [
-                    "jpg",
-                    "jpeg",
-                    "png",
-                    "webp",
-                    "heic",
-                    "mp4",
-                    "mov",
-                    "webm"
-                ],
-
-
-                // Máximo 100 MB por archivo
-                maxFileSize: 100000000,
-
-
-                // Carpeta dentro de Cloudinary
-                folder: "boda-eunice-david",
-
-
-                cropping: false,
-
-                showAdvancedOptions: false,
-
-                showSkipCropButton: false,
-
-
-                language: "es"
-
-            },
-
-
-            function(error, result) {
-
-                // =================================================
-                // ERROR
-                // =================================================
-
-                if (error) {
-
-                    console.error(
-                        "Error Cloudinary:",
-                        error
-                    );
-
-                    return;
-                }
-
-
-                // =================================================
-                // ARCHIVO SUBIDO
-                // =================================================
-
-                if (
-                    result &&
-                    result.event === "success"
-                ) {
-
-                    console.log(
-                        "Archivo subido correctamente:",
-                        result.info
-                    );
-
-                }
-
-            }
-
-        );
-
-
-    // =====================================================
-    // BOTÓN
-    // =====================================================
-
-    document
-        .getElementById("btnFotos")
-        .addEventListener(
-            "click",
-            function() {
-
-                widgetCloudinary.open();
-
-            }
-        );
 
 
 
-</script>
 
 
 
 
 <body>
 
-
+<script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <!-- =====================================================
          PORTADA
     ====================================================== -->
@@ -762,6 +632,136 @@
 
 
 </body>
+<script>
 
+    const CLOUDINARY_CLOUD_NAME = "entbx2xv";
+
+    const CLOUDINARY_UPLOAD_PRESET = "euni_upload";
+
+
+    // =====================================================
+    // CREAR WIDGET
+    // =====================================================
+
+    const widgetCloudinary =
+        cloudinary.createUploadWidget(
+
+            {
+
+                cloudName:
+                    CLOUDINARY_CLOUD_NAME,
+
+                uploadPreset:
+                    CLOUDINARY_UPLOAD_PRESET,
+
+
+                // Fuentes disponibles
+                sources: [
+                    "local",
+                    "camera"
+                ],
+
+
+                // Permitir varios archivos
+                multiple: true,
+
+
+                // Máximo de archivos por tanda
+                maxFiles: 20,
+
+
+                // Fotos + videos
+                resourceType: "auto",
+
+
+                // Formatos permitidos
+                clientAllowedFormats: [
+                    "jpg",
+                    "jpeg",
+                    "png",
+                    "webp",
+                    "heic",
+                    "mp4",
+                    "mov",
+                    "webm"
+                ],
+
+
+                // Máximo 100 MB por archivo
+                maxFileSize: 100000000,
+
+
+                // Carpeta dentro de Cloudinary
+                folder: "boda-eunice-david",
+
+
+                cropping: false,
+
+                showAdvancedOptions: false,
+
+                showSkipCropButton: false,
+
+
+                language: "es"
+
+            },
+
+
+            function(error, result) {
+
+                // =================================================
+                // ERROR
+                // =================================================
+
+                if (error) {
+
+                    console.error(
+                        "Error Cloudinary:",
+                        error
+                    );
+
+                    return;
+                }
+
+
+                // =================================================
+                // ARCHIVO SUBIDO
+                // =================================================
+
+                if (
+                    result &&
+                    result.event === "success"
+                ) {
+
+                    console.log(
+                        "Archivo subido correctamente:",
+                        result.info
+                    );
+
+                }
+
+            }
+
+        );
+
+
+    // =====================================================
+    // BOTÓN
+    // =====================================================
+
+    document
+        .getElementById("btnFotos")
+        .addEventListener(
+            "click",
+            function() {
+
+                widgetCloudinary.open();
+
+            }
+        );
+
+
+
+</script>
 </html>
-```
+
