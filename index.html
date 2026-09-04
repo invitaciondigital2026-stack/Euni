@@ -156,6 +156,74 @@
 
         /* GALERÍA EN VIVO */
 
+        /* VISOR DE FOTOS A PANTALLA COMPLETA */
+        .gallery-lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,.96);
+            padding: 18px;
+        }
+        .gallery-lightbox.hidden { display: none; }
+        .gallery-lightbox img {
+            max-width: 100%;
+            max-height: calc(100vh - 80px);
+            max-height: calc(100dvh - 80px);
+            object-fit: contain;
+            border-radius: 6px;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+        .gallery-lightbox-close, .gallery-lightbox-nav {
+            position: absolute;
+            z-index: 2;
+            border: 0;
+            color: white;
+            background: rgba(0,0,0,.45);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .gallery-lightbox-close {
+            top: 14px; right: 14px;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            font-size: 30px;
+            line-height: 1;
+        }
+        .gallery-lightbox-nav {
+            top: 50%;
+            transform: translateY(-50%);
+            width: 52px; height: 72px;
+            border-radius: 14px;
+            font-size: 42px;
+            line-height: 1;
+        }
+        .gallery-lightbox-prev { left: 12px; }
+        .gallery-lightbox-next { right: 12px; }
+        .gallery-lightbox-counter {
+            position: absolute;
+            bottom: 14px; left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            background: rgba(0,0,0,.45);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: .8rem;
+        }
+        @media (max-width: 640px) {
+            .gallery-lightbox { padding: 8px; }
+            .gallery-lightbox img { max-height: calc(100dvh - 65px); }
+            .gallery-lightbox-nav { width: 44px; height: 60px; font-size: 34px; background: rgba(0,0,0,.32); }
+            .gallery-lightbox-prev { left: 5px; }
+            .gallery-lightbox-next { right: 5px; }
+        }
+
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -753,6 +821,17 @@
 </div>
 
 <!-- =====================================================
+     VISOR DE GALERÍA A PANTALLA COMPLETA
+====================================================== -->
+<div id="galleryLightbox" class="gallery-lightbox hidden" role="dialog" aria-modal="true" aria-label="Foto en pantalla completa">
+    <button id="galleryLightboxClose" class="gallery-lightbox-close" type="button" aria-label="Cerrar">×</button>
+    <button id="galleryLightboxPrev" class="gallery-lightbox-nav gallery-lightbox-prev" type="button" aria-label="Foto anterior">‹</button>
+    <img id="galleryLightboxImage" src="" alt="Foto de la boda">
+    <button id="galleryLightboxNext" class="gallery-lightbox-nav gallery-lightbox-next" type="button" aria-label="Foto siguiente">›</button>
+    <div id="galleryLightboxCounter" class="gallery-lightbox-counter"></div>
+</div>
+
+<!-- =====================================================
      CÁMARA A PANTALLA COMPLETA PARA CELULARES
 ====================================================== -->
 <div id="modalCamara" class="camera-fullscreen hidden">
@@ -1214,6 +1293,58 @@
     }
 
 
+    let fotosGaleria = [];
+    let indiceFotoGaleria = 0;
+
+    const galleryLightbox = document.getElementById("galleryLightbox");
+    const galleryLightboxImage = document.getElementById("galleryLightboxImage");
+    const galleryLightboxClose = document.getElementById("galleryLightboxClose");
+    const galleryLightboxPrev = document.getElementById("galleryLightboxPrev");
+    const galleryLightboxNext = document.getElementById("galleryLightboxNext");
+    const galleryLightboxCounter = document.getElementById("galleryLightboxCounter");
+
+    function actualizarVisorGaleria() {
+        if (!fotosGaleria.length || !galleryLightboxImage) return;
+        const recurso = fotosGaleria[indiceFotoGaleria];
+        galleryLightboxImage.src = crearUrlCloudinary(recurso);
+        galleryLightboxCounter.textContent = (indiceFotoGaleria + 1) + " / " + fotosGaleria.length;
+    }
+
+    function abrirVisorGaleria(indice) {
+        if (!fotosGaleria.length) return;
+        indiceFotoGaleria = (indice + fotosGaleria.length) % fotosGaleria.length;
+        actualizarVisorGaleria();
+        galleryLightbox.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+    }
+
+    function cerrarVisorGaleria() {
+        galleryLightbox.classList.add("hidden");
+        galleryLightboxImage.src = "";
+        document.body.style.overflow = "";
+    }
+
+    function fotoAnteriorGaleria() {
+        abrirVisorGaleria(indiceFotoGaleria - 1);
+    }
+
+    function fotoSiguienteGaleria() {
+        abrirVisorGaleria(indiceFotoGaleria + 1);
+    }
+
+    galleryLightboxClose.addEventListener("click", cerrarVisorGaleria);
+    galleryLightboxPrev.addEventListener("click", fotoAnteriorGaleria);
+    galleryLightboxNext.addEventListener("click", fotoSiguienteGaleria);
+    galleryLightbox.addEventListener("click", function(e) {
+        if (e.target === galleryLightbox) cerrarVisorGaleria();
+    });
+    document.addEventListener("keydown", function(e) {
+        if (galleryLightbox.classList.contains("hidden")) return;
+        if (e.key === "Escape") cerrarVisorGaleria();
+        if (e.key === "ArrowLeft") fotoAnteriorGaleria();
+        if (e.key === "ArrowRight") fotoSiguienteGaleria();
+    });
+
     function mostrarGaleria(recursos) {
 
         const galeria =
@@ -1230,6 +1361,9 @@
 
         galeria.innerHTML = "";
 
+        fotosGaleria = recursos.filter(function(r) {
+            return r.resource_type === "image";
+        });
 
         if (!recursos.length) {
 
@@ -1315,19 +1449,11 @@
                 imagen.decoding = "async";
 
 
-                // Al tocar una foto, abrirla en una pestaña
-                // nueva para verla en tamaño completo.
-                imagen.addEventListener(
-                    "click",
-                    function() {
-                        window.open(
-                            url,
-                            "_blank",
-                            "noopener,noreferrer"
-                        );
-                    }
-                );
-
+                // Al tocar una foto, abrir el visor con navegación.
+                const indiceFoto = fotosGaleria.indexOf(recurso);
+                imagen.addEventListener("click", function() {
+                    abrirVisorGaleria(indiceFoto);
+                });
 
                 item.appendChild(imagen);
 
@@ -1746,9 +1872,7 @@
             );
 
             estadoCamara.textContent = "❤️ ¡Foto subida!";
-            btnCapturarFoto.disabled = false;
-            textoControlCamara.textContent = "Tocá para sacar otra foto";
-            setTimeout(() => { estadoCamara.textContent = ""; }, 1200);
+            setTimeout(cerrarCamara, 900);
         } catch (error) {
             console.error("Error al subir foto:", error);
             estadoCamara.textContent = "No se pudo subir la foto. Intentá nuevamente.";
@@ -1780,7 +1904,9 @@
 
             // Una tasa moderada es más estable en celulares y mantiene
             // archivos razonables para subir por datos móviles.
-            opcionesGrabacion.videoBitsPerSecond = esCelular ? 1800000 : 2500000;
+            opcionesGrabacion.videoBitsPerSecond = esCelular ? 1400000 : 2000000;
+    // Un timeslice más largo reduce trabajo de codificación y cortes perceptibles durante la captura.
+    const intervaloChunks = esCelular ? 2000 : 1500;
 
             mediaRecorderCamara = new MediaRecorder(streamCamara, opcionesGrabacion);
 
@@ -1841,7 +1967,7 @@
 
             // Los fragmentos cada segundo son SOLO datos parciales.
             // La grabación continúa hasta que el usuario toca el cuadrado.
-            mediaRecorderCamara.start(1000);
+            mediaRecorderCamara.start(intervaloChunks);
 
         } catch (error) {
             console.error("Error al iniciar grabación:", error);
