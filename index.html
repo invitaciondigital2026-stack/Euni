@@ -827,7 +827,6 @@
     <button id="galleryLightboxClose" class="gallery-lightbox-close" type="button" aria-label="Cerrar">×</button>
     <button id="galleryLightboxPrev" class="gallery-lightbox-nav gallery-lightbox-prev" type="button" aria-label="Foto anterior">‹</button>
     <img id="galleryLightboxImage" src="" alt="Foto de la boda">
-    <video id="galleryLightboxVideo" controls playsinline preload="metadata" style="display:none; max-width:100%; max-height:calc(100vh - 80px); max-height:calc(100dvh - 80px); border-radius:6px;"></video>
     <button id="galleryLightboxNext" class="gallery-lightbox-nav gallery-lightbox-next" type="button" aria-label="Foto siguiente">›</button>
     <div id="galleryLightboxCounter" class="gallery-lightbox-counter"></div>
 </div>
@@ -1299,34 +1298,15 @@
 
     const galleryLightbox = document.getElementById("galleryLightbox");
     const galleryLightboxImage = document.getElementById("galleryLightboxImage");
-    const galleryLightboxVideo = document.getElementById("galleryLightboxVideo");
     const galleryLightboxClose = document.getElementById("galleryLightboxClose");
     const galleryLightboxPrev = document.getElementById("galleryLightboxPrev");
     const galleryLightboxNext = document.getElementById("galleryLightboxNext");
     const galleryLightboxCounter = document.getElementById("galleryLightboxCounter");
 
     function actualizarVisorGaleria() {
-        if (!fotosGaleria.length) return;
+        if (!fotosGaleria.length || !galleryLightboxImage) return;
         const recurso = fotosGaleria[indiceFotoGaleria];
-        const url = crearUrlCloudinary(recurso);
-
-        // El visor admite tanto fotos como videos para que la navegación
-        // avance por todos los recuerdos sin saltearse los videos.
-        if (recurso.resource_type === "video") {
-            galleryLightboxImage.style.display = "none";
-            galleryLightboxImage.src = "";
-            galleryLightboxVideo.style.display = "block";
-            galleryLightboxVideo.src = url;
-            galleryLightboxVideo.currentTime = 0;
-            galleryLightboxVideo.load();
-        } else {
-            galleryLightboxVideo.pause();
-            galleryLightboxVideo.style.display = "none";
-            galleryLightboxVideo.src = "";
-            galleryLightboxImage.style.display = "block";
-            galleryLightboxImage.src = url;
-        }
-
+        galleryLightboxImage.src = crearUrlCloudinary(recurso);
         galleryLightboxCounter.textContent = (indiceFotoGaleria + 1) + " / " + fotosGaleria.length;
     }
 
@@ -1341,8 +1321,6 @@
     function cerrarVisorGaleria() {
         galleryLightbox.classList.add("hidden");
         galleryLightboxImage.src = "";
-        galleryLightboxVideo.pause();
-        galleryLightboxVideo.src = "";
         document.body.style.overflow = "";
     }
 
@@ -1383,8 +1361,9 @@
 
         galeria.innerHTML = "";
 
-        // Guardamos fotos Y videos en el mismo orden de la galería.
-        fotosGaleria = recursos.slice();
+        fotosGaleria = recursos.filter(function(r) {
+            return r.resource_type === "image";
+        });
 
         if (!recursos.length) {
 
@@ -1443,14 +1422,6 @@
                 );
 
                 item.appendChild(video);
-
-                // Al tocar un video, abrir el mismo visor de pantalla completa.
-                const indiceVideo = fotosGaleria.indexOf(recurso);
-                video.addEventListener("click", function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    abrirVisorGaleria(indiceVideo);
-                });
 
 
                 const icon =
