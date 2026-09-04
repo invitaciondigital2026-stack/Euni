@@ -559,7 +559,7 @@
             Nuestra música
         </h3>
 
-        <audio id="musicaBoda" controls autoplay preload="auto">
+        <audio id="musicaBoda" controls autoplay>
             <source src="assets/snv_S_087.mp3" type="audio/mpeg">
             Tu navegador no soporta el reproductor de audio.
         </audio>
@@ -654,7 +654,7 @@
         <!-- CAMBIAR FECHA -->
 
         <p class="text-2xl mt-6">
-            Viernes 28 de agosto
+            Viernes 28 de noviembre
         </p>
 
         <p class="text-gray-500 mt-2">
@@ -1032,7 +1032,7 @@
          *
          * Ejemplo:
          *
-         * new Date(2026, 7, 28, 20, 0, 0)
+         * new Date(2026, 10, 15, 20, 0, 0)
          *
          * El mes empieza en 0:
          *
@@ -1046,7 +1046,7 @@
          */
 
         const fechaCasamiento =
-            new Date(2026, 7, 28, 20, 0, 0);
+            new Date(2026, 10, 28, 20, 0, 0);
 
 
         function actualizarCuentaRegresiva() {
@@ -1134,31 +1134,6 @@
 
     </script>
 
-    <!-- MÚSICA: intenta reproducir automáticamente y, si el navegador la bloquea,
-         comienza con el primer toque/clic del visitante. -->
-    <script>
-        (function() {
-            const musica = document.getElementById("musicaBoda");
-            if (!musica) return;
-
-            musica.volume = 1;
-
-            function iniciarMusica() {
-                musica.play().then(function() {
-                    document.removeEventListener("click", iniciarMusica);
-                    document.removeEventListener("touchstart", iniciarMusica);
-                    document.removeEventListener("pointerdown", iniciarMusica);
-                }).catch(function() {
-                    // El navegador sigue bloqueando el autoplay hasta una interacción.
-                });
-            }
-
-            window.addEventListener("load", iniciarMusica);
-            document.addEventListener("click", iniciarMusica, { passive: true });
-            document.addEventListener("touchstart", iniciarMusica, { passive: true });
-            document.addEventListener("pointerdown", iniciarMusica, { passive: true });
-        })();
-    </script>
 
 </body>
 <script>
