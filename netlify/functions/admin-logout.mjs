@@ -1,0 +1,1 @@
+import { clear } from './_auth.mjs'; export default async()=>new Response(JSON.stringify({ok:true}),{headers:{'Content-Type':'application/json','Set-Cookie':clear}}); export const config={path:'/.netlify/functions/admin-logout'};

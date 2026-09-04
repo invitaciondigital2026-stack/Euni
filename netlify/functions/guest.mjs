@@ -1,0 +1,3 @@
+import { getDatabase } from '@netlify/database'; const db=getDatabase();
+export default async req=>{const code=new URL(req.url).searchParams.get('i')?.trim().toUpperCase();if(!code)return Response.json({error:'Falta el código de invitación.'},{status:400});const rows=await db.sql`SELECT codigo,nombre,lugares,estado,confirmados FROM invitados WHERE codigo=${code} LIMIT 1`;if(!rows.length)return Response.json({error:'No encontramos esta invitación.'},{status:404});return Response.json(rows[0]);};
+export const config={path:'/.netlify/functions/guest'};

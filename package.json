@@ -1,0 +1,6 @@
+{
+  "name": "invitacion-confirmacion-eunice-david",
+  "private": true,
+  "type": "module",
+  "dependencies": { "@netlify/database": "latest" }
+}
