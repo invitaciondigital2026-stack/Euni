@@ -1637,7 +1637,7 @@
     // CÁMARA DIRECTA EN CELULARES
     // =====================================================
 
-    const esCelular = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const esCelular = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
 
     const btnFotos = document.getElementById("btnFotos");
     const btnGrabarVideo = document.getElementById("btnGrabarVideo");
@@ -1900,10 +1900,17 @@
                 "❤️ ¡Foto subida!"
             );
 
+            // IMPORTANTE: después de subir la foto NO se cierra la cámara.
+            // El mismo stream queda activo para sacar otra foto inmediatamente.
             estadoCamara.textContent = "❤️ ¡Foto subida!";
             btnCapturarFoto.disabled = false;
+            btnCapturarFoto.classList.remove("hidden");
             textoControlCamara.textContent = "Tocá para sacar otra foto";
-            setTimeout(function() { estadoCamara.textContent = ""; }, 1200);
+            setTimeout(function() {
+                if (modalCamara && !modalCamara.classList.contains("hidden")) {
+                    estadoCamara.textContent = "";
+                }
+            }, 1200);
         } catch (error) {
             console.error("Error al subir foto:", error);
             estadoCamara.textContent = "No se pudo subir la foto. Intentá nuevamente.";
@@ -2029,6 +2036,8 @@
                 "❤️ ¡Video subido!"
             );
 
+            // IMPORTANTE: después de subir el video NO se cierra la cámara.
+            // El stream queda activo y el botón rojo vuelve a estar disponible.
             estadoCamara.textContent = "❤️ ¡Video subido! Podés grabar otro.";
             videoListoParaSubir = null;
             partesVideoCamara = [];
