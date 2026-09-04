@@ -1,19 +1,378 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Panel de invitados | Eunice & David</title><script src="https://cdn.tailwindcss.com"></script></head><body class="bg-stone-50 text-stone-800 min-h-screen"><main class="max-w-6xl mx-auto p-5 md:p-8"><header class="flex items-center justify-between gap-4 mb-6"><div><div class="text-xs uppercase tracking-widest text-stone-500">Eunice & David</div><h1 class="text-3xl md:text-4xl mt-1">Gestión de invitados</h1></div><button id="logout" class="hidden text-sm underline">Cerrar sesión</button></header><section id="login" class="max-w-sm mx-auto bg-white rounded-2xl shadow-sm p-6"><h2 class="text-xl mb-4">Acceso privado</h2><input id="password" type="password" placeholder="Contraseña" class="w-full border rounded-xl p-3"><button id="loginBtn" class="w-full mt-3 rounded-xl bg-stone-700 text-white p-3">Entrar</button><div id="loginError" class="text-red-700 text-sm mt-3"></div></section><section id="app" class="hidden"><div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"><div class="bg-white rounded-2xl p-4"><div class="text-xs text-stone-500">Invitados totales</div><div id="sTotal" class="text-2xl">0</div></div><div class="bg-white rounded-2xl p-4"><div class="text-xs text-stone-500">Conferencia · invitados</div><div id="sConferenceGuests" class="text-2xl">0</div></div><div class="bg-white rounded-2xl p-4"><div class="text-xs text-stone-500">Fiesta · invitados</div><div id="sPartyGuests" class="text-2xl">0</div></div><div class="bg-white rounded-2xl p-4"><div class="text-xs text-stone-500">Fiesta · no invitados</div><div id="sNoPartyGuests" class="text-2xl">0</div></div><div class="bg-white rounded-2xl p-4"><div class="text-xs text-stone-500">Conferencia · confirmados</div><div id="sConferencePeople" class="text-2xl">0</div></div><div class="bg-white rounded-2xl p-4"><div class="text-xs text-stone-500">Fiesta · confirmados</div><div id="sPartyPeople" class="text-2xl">0</div></div><div class="bg-white rounded-2xl p-4"><div class="text-xs text-stone-500">Pendientes</div><div id="sPending" class="text-2xl">0</div></div><div class="bg-white rounded-2xl p-4"><div class="text-xs text-stone-500">No asisten</div><div id="sNo" class="text-2xl">0</div></div></div><div class="bg-white rounded-2xl shadow-sm p-5 mb-6"><h2 class="text-xl mb-4">Agregar invitado</h2><div class="grid md:grid-cols-5 gap-3 items-center"><input id="newName" placeholder="Nombre / familia" class="border rounded-xl p-3"><input id="newPhone" placeholder="WhatsApp: 549..." class="border rounded-xl p-3"><input id="newSeats" type="number" min="1" value="1" class="border rounded-xl p-3"><label class="flex items-center gap-2 rounded-xl border p-3 bg-stone-50"><input id="newParty" type="checkbox" class="w-4 h-4"><span>Invitado a la fiesta</span></label><button id="addBtn" class="rounded-xl bg-stone-700 text-white p-3">Agregar y generar enlace</button></div><div id="addMsg" class="text-sm mt-3"></div></div><div class="flex flex-col md:flex-row gap-3 mb-4"><input id="search" placeholder="Buscar invitado..." class="border rounded-xl p-3 bg-white flex-1"><select id="filter" class="border rounded-xl p-3 bg-white"><option value="todos">Todos</option><option value="pendiente">Pendientes</option><option value="confirmado">Confirmados</option><option value="no_asiste">No asisten</option></select></div><div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-stone-100"><tr><th class="text-left p-3">Invitado</th><th class="p-3">Lugares</th><th class="p-3">Fiesta</th><th class="p-3">Estado</th><th class="p-3">Conf.</th><th class="p-3">Código</th><th class="p-3">Acciones</th></tr></thead><tbody id="rows"></tbody></table></div></section></main><script>
-let invitados=[];
-const $=id=>document.getElementById(id);
-function esc(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
-function wa(g){const u=location.origin+'/?i='+g.codigo,m=`Hola ${g.nombre}, somos Eunice y David ❤️\nTe compartimos nuestra invitación: ${u}`;return 'https://wa.me/'+g.telefono.replace(/\D/g,'')+'?text='+encodeURIComponent(m)}
-function st(s){return s==='confirmado'?'🟢 Confirmó':s==='no_asiste'?'🔴 No asiste':'🟡 Pendiente'}
-function render(){const q=$('search').value.toLowerCase(),f=$('filter').value,list=invitados.filter(g=>(f==='todos'||g.estado===f)&&g.nombre.toLowerCase().includes(q));$('rows').innerHTML=list.map(g=>`<tr class="border-t"><td class="p-3"><div class="font-medium">${esc(g.nombre)}</div><div class="text-xs text-stone-500">${esc(g.telefono||'Sin WhatsApp')}</div></td><td class="p-3 text-center">${g.lugares}</td><td class="p-3 text-center"><label class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" ${g.invitado_fiesta?'checked':''} onchange="toggleParty(${g.id},this.checked)" class="w-4 h-4"><span class="text-xs">${g.invitado_fiesta?'🎉 Sí':'— No'}</span></label></td><td class="p-3 text-center">${st(g.estado)}</td><td class="p-3 text-center">${g.confirmados||0}</td><td class="p-3 text-center font-mono">${g.codigo}</td><td class="p-3"><div class="flex flex-wrap gap-2 justify-center"><a class="px-3 py-2 rounded-lg bg-green-600 text-white" target="_blank" href="${wa(g)}">WhatsApp</a><button class="px-3 py-2 rounded-lg bg-stone-200" onclick="copyLink('${g.codigo}')">Copiar enlace</button><button class="px-3 py-2 rounded-lg text-red-700" onclick="delGuest(${g.id})">Eliminar</button></div></td></tr>`).join('')||'<tr><td colspan="7" class="p-8 text-center text-stone-500">No hay invitados para mostrar.</td></tr>';$('sTotal').textContent=invitados.length;$('sConferenceGuests').textContent=invitados.length;$('sPartyGuests').textContent=invitados.filter(g=>g.invitado_fiesta).length;$('sNoPartyGuests').textContent=invitados.filter(g=>!g.invitado_fiesta).length;$('sConferencePeople').textContent=invitados.reduce((a,g)=>a+(g.confirmados_conferencia||0),0);$('sPartyPeople').textContent=invitados.reduce((a,g)=>a+(g.confirmados_fiesta||0),0);$('sPending').textContent=invitados.filter(g=>g.estado==='pendiente').length;$('sNo').textContent=invitados.filter(g=>g.estado==='no_asiste').length)}
-async function load(){const r=await fetch('/.netlify/functions/admin-guests');if(r.status===401){showLogin();return}const d=await r.json();invitados=d.invitados||[];render()}
-function showLogin(){$('login').classList.remove('hidden');$('app').classList.add('hidden');$('logout').classList.add('hidden')}
-function showApp(){$('login').classList.add('hidden');$('app').classList.remove('hidden');$('logout').classList.remove('hidden');load()}
-$('loginBtn').onclick=async()=>{const r=await fetch('/.netlify/functions/admin-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('password').value})});if(r.ok)showApp();else $('loginError').textContent=(await r.json()).error||'No se pudo ingresar.'};
-$('password').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn').click()});
-$('logout').onclick=async()=>{await fetch('/.netlify/functions/admin-logout',{method:'POST'});showLogin()};
-$('addBtn').onclick=async()=>{const r=await fetch('/.netlify/functions/admin-guests',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre:$('newName').value,telefono:$('newPhone').value,lugares:Number($('newSeats').value),invitado_fiesta:$('newParty').checked})});const d=await r.json();if(!r.ok){$('addMsg').textContent=d.error||'Error';return}invitados.push(d);$('newName').value='';$('newPhone').value='';$('newSeats').value=1;$('newParty').checked=false;$('addMsg').textContent='Invitado agregado. Código: '+d.codigo;render()};
-$('search').oninput=render;$('filter').onchange=render;
-window.copyLink=async c=>{await navigator.clipboard.writeText(location.origin+'/?i='+c);alert('Enlace copiado.')};
-window.toggleParty=async(id,checked)=>{const g=invitados.find(x=>x.id===id);if(!g)return;const r=await fetch('/.netlify/functions/admin-guests',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:g.id,nombre:g.nombre,telefono:g.telefono,lugares:g.lugares,invitado_fiesta:checked})});if(r.ok){const d=await r.json();invitados=invitados.map(x=>x.id===id?d:x);render()}else{alert('No se pudo actualizar la invitación a la fiesta.');render()}};
-window.delGuest=async id=>{if(!confirm('¿Eliminar este invitado?'))return;const r=await fetch('/.netlify/functions/admin-guests',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});if(r.ok){invitados=invitados.filter(g=>g.id!==id);render()}};
-load();</script></body></html>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Panel de invitados | Eunice & David</title><script src="https://cdn.tailwindcss.com"></script></head><body class="bg-stone-50 text-stone-800 min-h-screen"><main class="max-w-6xl mx-auto p-5 md:p-8"><header class="flex items-center justify-between gap-4 mb-6"><div><div class="text-xs uppercase tracking-widest text-stone-500">Eunice & David</div><h1 class="text-3xl md:text-4xl mt-1">Gestión de invitados</h1></div><button id="logout" class="hidden text-sm underline">Cerrar sesión</button></header><section id="login" class="max-w-sm mx-auto bg-white rounded-2xl shadow-sm p-6"><h2 class="text-xl mb-4">Acceso privado</h2><input id="password" type="password" placeholder="Contraseña" class="w-full border rounded-xl p-3"><button id="loginBtn" class="w-full mt-3 rounded-xl bg-stone-700 text-white p-3">Entrar</button><div id="loginError" class="text-red-700 text-sm mt-3"></div></section><section id="app" class="hidden"><div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"><div class="bg-white rounded-2xl p-4"><div class="text-xs text-stone-500">Invitados totales</div><div id="sTotal" class="text-2xl">0</div></div><div class="bg-white rounded-2xl p-4"><div class="text-xs text-stone-500">Conferencia · invitados</div><div id="sConferenceGuests" class="text-2xl">0</div></div><div class="bg-white rounded-2xl p-4"><div class="text-xs text-stone-500">Fiesta · invitados</div><div id="sPartyGuests" class="text-2xl">0</div></div><div class="bg-white rounded-2xl p-4"><div class="text-xs text-stone-500">Fiesta · no invitados</div><div id="sNoPartyGuests" class="text-2xl">0</div></div><div class="bg-white rounded-2xl p-4"><div class="text-xs text-stone-500">Conferencia · confirmados</div><div id="sConferencePeople" class="text-2xl">0</div></div><div class="bg-white rounded-2xl p-4"><div class="text-xs text-stone-500">Fiesta · confirmados</div><div id="sPartyPeople" class="text-2xl">0</div></div><div class="bg-white rounded-2xl p-4"><div class="text-xs text-stone-500">Pendientes</div><div id="sPending" class="text-2xl">0</div></div><div class="bg-white rounded-2xl p-4"><div class="text-xs text-stone-500">No asisten</div><div id="sNo" class="text-2xl">0</div></div></div><div class="bg-white rounded-2xl shadow-sm p-5 mb-6"><h2 class="text-xl mb-4">Agregar invitado</h2><div class="grid md:grid-cols-5 gap-3 items-center"><input id="newName" placeholder="Nombre / familia" class="border rounded-xl p-3"><input id="newPhone" placeholder="WhatsApp: 549..." class="border rounded-xl p-3"><input id="newSeats" type="number" min="1" value="1" class="border rounded-xl p-3"><label class="flex items-center gap-2 rounded-xl border p-3 bg-stone-50"><input id="newParty" type="checkbox" class="w-4 h-4"><span>Invitado a la fiesta</span></label><button id="addBtn" class="rounded-xl bg-stone-700 text-white p-3">Agregar y generar enlace</button></div><div id="addMsg" class="text-sm mt-3"></div></div><div class="flex flex-col md:flex-row gap-3 mb-4"><input id="search" placeholder="Buscar invitado..." class="border rounded-xl p-3 bg-white flex-1"><select id="filter" class="border rounded-xl p-3 bg-white"><option value="todos">Todos</option><option value="pendiente">Pendientes</option><option value="confirmado">Confirmados</option><option value="no_asiste">No asisten</option></select></div><div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-stone-100"><tr><th class="text-left p-3">Invitado</th><th class="p-3">Lugares</th><th class="p-3">Fiesta</th><th class="p-3">Estado</th><th class="p-3">Conf.</th><th class="p-3">Código</th><th class="p-3">Acciones</th></tr></thead><tbody id="rows"></tbody></table></div></section></main>
+
+
+<script>
+const $ = (s) => document.querySelector(s);
+
+let invitados = [];
+
+function esc(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+async function api(url, options = {}) {
+  const response = await fetch(url, {
+    credentials: 'same-origin',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    }
+  });
+
+  let data = {};
+  try {
+    data = await response.json();
+  } catch (_) {}
+
+  if (!response.ok) {
+    throw new Error(data.error || 'Ocurrió un error.');
+  }
+
+  return data;
+}
+
+async function cargarInvitados() {
+  try {
+    const data = await api('/.netlify/functions/admin-guests');
+    invitados = data.invitados || [];
+    render();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+function render() {
+  const total = invitados.length;
+
+  const invitadosFiesta = invitados.filter(
+    g => Boolean(g.invitado_fiesta)
+  ).length;
+
+  const noInvitadosFiesta = total - invitadosFiesta;
+
+  const confirmadosConferencia = invitados.reduce(
+    (sum, g) => sum + Number(g.confirmados_conferencia || 0),
+    0
+  );
+
+  const confirmadosFiesta = invitados.reduce(
+    (sum, g) => sum + Number(g.confirmados_fiesta || 0),
+    0
+  );
+
+  const pendientes = invitados.filter(
+    g => !g.asistencia_eventos || g.asistencia_eventos === 'pendiente'
+  ).length;
+
+  const noAsisten = invitados.filter(
+    g => g.asistencia_eventos === 'no'
+  ).length;
+
+  const stats = $('#stats');
+
+  if (stats) {
+    stats.innerHTML = `
+      <div class="stat">
+        <strong>${total}</strong>
+        <span>Invitados totales</span>
+      </div>
+
+      <div class="stat">
+        <strong>${total}</strong>
+        <span>Conferencia · invitados</span>
+      </div>
+
+      <div class="stat">
+        <strong>${invitadosFiesta}</strong>
+        <span>Fiesta · invitados</span>
+      </div>
+
+      <div class="stat">
+        <strong>${noInvitadosFiesta}</strong>
+        <span>Fiesta · no invitados</span>
+      </div>
+
+      <div class="stat">
+        <strong>${confirmadosConferencia}</strong>
+        <span>Conferencia · confirmados</span>
+      </div>
+
+      <div class="stat">
+        <strong>${confirmadosFiesta}</strong>
+        <span>Fiesta · confirmados</span>
+      </div>
+
+      <div class="stat">
+        <strong>${pendientes}</strong>
+        <span>Pendientes</span>
+      </div>
+
+      <div class="stat">
+        <strong>${noAsisten}</strong>
+        <span>No asisten</span>
+      </div>
+    `;
+  }
+
+  const tbody = $('#tbody');
+
+  if (!tbody) return;
+
+  if (!invitados.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align:center;padding:30px;">
+          No hay invitados cargados.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = invitados.map(g => {
+    const estado = g.asistencia_eventos || 'pendiente';
+
+    let estadoTexto = 'Pendiente';
+
+    if (estado === 'conferencia') {
+      estadoTexto = 'Conferencia';
+    }
+
+    if (estado === 'ambos') {
+      estadoTexto = 'Conferencia + Fiesta';
+    }
+
+    if (estado === 'no') {
+      estadoTexto = 'No asiste';
+    }
+
+    return `
+      <tr>
+        <td>
+          <strong>${esc(g.nombre)}</strong>
+          <div style="font-size:12px;opacity:.65;">
+            ${esc(g.telefono || '')}
+          </div>
+        </td>
+
+        <td>
+          ${Number(g.lugares || 0)}
+        </td>
+
+        <td>
+          <label style="display:flex;align-items:center;gap:7px;">
+            <input
+              type="checkbox"
+              ${g.invitado_fiesta ? 'checked' : ''}
+              onchange="toggleParty(${Number(g.id)}, this.checked)"
+            >
+            <span>
+              ${g.invitado_fiesta ? 'Sí' : 'No'}
+            </span>
+          </label>
+        </td>
+
+        <td>
+          ${esc(estadoTexto)}
+        </td>
+
+        <td>
+          ${Number(g.confirmados_conferencia || 0)}
+        </td>
+
+        <td>
+          ${Number(g.confirmados_fiesta || 0)}
+        </td>
+
+        <td>
+          <strong>${esc(g.codigo)}</strong>
+        </td>
+
+        <td>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+
+            <button
+              type="button"
+              onclick="wa(${Number(g.id)})"
+              title="WhatsApp"
+            >
+              WhatsApp
+            </button>
+
+            <button
+              type="button"
+              onclick="copyLink(${Number(g.id)})"
+              title="Copiar enlace"
+            >
+              Copiar
+            </button>
+
+            <button
+              type="button"
+              onclick="deleteGuest(${Number(g.id)})"
+              title="Eliminar"
+            >
+              Eliminar
+            </button>
+
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function toggleParty(id, checked) {
+  const guest = invitados.find(g => Number(g.id) === Number(id));
+
+  if (!guest) return;
+
+  try {
+    await api('/.netlify/functions/admin-guests', {
+      method: 'PUT',
+      body: JSON.stringify({
+        id: Number(id),
+        nombre: guest.nombre,
+        telefono: guest.telefono || '',
+        lugares: Number(guest.lugares || 1),
+        invitado_fiesta: Boolean(checked)
+      })
+    });
+
+    await cargarInvitados();
+  } catch (error) {
+    alert(error.message);
+    render();
+  }
+}
+
+async function addGuest(event) {
+  event.preventDefault();
+
+  const nombre = $('#newName')?.value.trim() || '';
+  const telefono = $('#newPhone')?.value.trim() || '';
+  const lugares = Number($('#newSeats')?.value || 1);
+  const invitado_fiesta = Boolean($('#newParty')?.checked);
+
+  if (!nombre) {
+    alert('Ingresá el nombre del invitado.');
+    return;
+  }
+
+  try {
+    await api('/.netlify/functions/admin-guests', {
+      method: 'POST',
+      body: JSON.stringify({
+        nombre,
+        telefono,
+        lugares,
+        invitado_fiesta
+      })
+    });
+
+    const form = $('#addForm');
+
+    if (form) {
+      form.reset();
+    }
+
+    await cargarInvitados();
+
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+async function deleteGuest(id) {
+  const guest = invitados.find(g => Number(g.id) === Number(id));
+
+  if (!guest) return;
+
+  const ok = confirm(
+    `¿Seguro que querés eliminar a ${guest.nombre}?`
+  );
+
+  if (!ok) return;
+
+  try {
+    await api('/.netlify/functions/admin-guests', {
+      method: 'DELETE',
+      body: JSON.stringify({
+        id: Number(id)
+      })
+    });
+
+    await cargarInvitados();
+
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+function getInvitationUrl(g) {
+  return `${window.location.origin}/?i=${encodeURIComponent(g.codigo)}`;
+}
+
+function wa(id) {
+  const guest = invitados.find(g => Number(g.id) === Number(id));
+
+  if (!guest) return;
+
+  const url = getInvitationUrl(guest);
+
+  const message =
+    'Hola ' +
+    guest.nombre +
+    ', somos Eunice y David ❤️\n' +
+    'Te compartimos nuestra invitación:\n' +
+    url;
+
+  const whatsappUrl =
+    'https://wa.me/' +
+    String(guest.telefono || '').replace(/\D/g, '') +
+    '?text=' +
+    encodeURIComponent(message);
+
+  window.open(whatsappUrl, '_blank');
+}
+
+async function copyLink(id) {
+  const guest = invitados.find(g => Number(g.id) === Number(id));
+
+  if (!guest) return;
+
+  const url = getInvitationUrl(guest);
+
+  try {
+    await navigator.clipboard.writeText(url);
+    alert('Enlace copiado.');
+  } catch (_) {
+    prompt('Copiá este enlace:', url);
+  }
+}
+
+function logout() {
+  window.location.href = '/';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  const form = $('#addForm');
+
+  if (form) {
+    form.addEventListener('submit', addGuest);
+  }
+
+  cargarInvitados();
+
+});
+</script>
+
+
+</body></html>
