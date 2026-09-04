@@ -653,7 +653,7 @@
         <!-- CAMBIAR FECHA -->
 
         <p class="text-2xl mt-6">
-            Viernes 28 de noviembre
+            Sábado 15 de noviembre
         </p>
 
         <p class="text-gray-500 mt-2">
@@ -817,6 +817,22 @@
     >
         🎥 Grabar video
     </button>
+
+    <button
+        id="btnSubirGaleriaCelular"
+        type="button"
+        class="btn bg-stone-700 text-white text-base shadow-lg w-full"
+    >
+        🖼️ Subir fotos y videos del celular
+    </button>
+
+    <input
+        id="inputGaleriaCelular"
+        type="file"
+        accept="image/*,video/*"
+        multiple
+        class="hidden"
+    >
 
 </div>
 
@@ -1028,7 +1044,7 @@
          */
 
         const fechaCasamiento =
-            new Date(2026, 10, 28, 20, 0, 0);
+            new Date(2026, 10, 15, 20, 0, 0);
 
 
         function actualizarCuentaRegresiva() {
@@ -2073,5 +2089,51 @@
     btnSubirVideo.addEventListener("click", subirVideoPreparado);
     cerrarModalCamara.addEventListener("click", cerrarCamara);
 
+
+
+    // Subir fotos y videos existentes desde la galería del celular
+    const btnSubirGaleriaCelular = document.getElementById("btnSubirGaleriaCelular");
+    const inputGaleriaCelular = document.getElementById("inputGaleriaCelular");
+
+    btnSubirGaleriaCelular.addEventListener("click", function() {
+        inputGaleriaCelular.value = "";
+        inputGaleriaCelular.click();
+    });
+
+    inputGaleriaCelular.addEventListener("change", async function() {
+        const archivos = Array.from(inputGaleriaCelular.files || []);
+        if (!archivos.length) return;
+
+        btnSubirGaleriaCelular.disabled = true;
+        btnSubirGaleriaCelular.textContent = "☁️ Subiendo…";
+
+        let subidos = 0;
+        let errores = 0;
+
+        for (const archivo of archivos) {
+            try {
+                await subirArchivoDirecto(
+                    archivo,
+                    archivo.name,
+                    "❤️ ¡Archivo subido!"
+                );
+                subidos++;
+            } catch (error) {
+                console.error("Error al subir archivo de galería:", error);
+                errores++;
+            }
+        }
+
+        btnSubirGaleriaCelular.disabled = false;
+        btnSubirGaleriaCelular.textContent = "🖼️ Subir fotos y videos del celular";
+
+        if (errores) {
+            alert("Se subieron " + subidos + " archivo(s). " + errores + " no pudieron subirse.");
+        } else {
+            alert("❤️ ¡Se subieron " + subidos + " archivo(s) correctamente!");
+        }
+
+        cargarGaleria();
+    });
 </script>
 </html>
