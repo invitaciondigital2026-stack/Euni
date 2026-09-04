@@ -1247,6 +1247,169 @@ audio {
 
 }
 
+
+
+.party-only[hidden],
+.party-only.hidden {
+    display: none !important;
+}
+
+/* =====================================================
+   REGALO + PREGUNTAS FRECUENTES
+====================================================== */
+
+.gift-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(35, 31, 28, .52);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.gift-modal.hidden {
+    display: none;
+}
+
+.gift-modal-card {
+    width: min(430px, 100%);
+    background: rgba(255,255,255,.94);
+    border: 1px solid rgba(255,255,255,.75);
+    border-radius: 26px;
+    padding: 30px 24px 26px;
+    text-align: center;
+    box-shadow: 0 22px 60px rgba(0,0,0,.20);
+    position: relative;
+}
+
+.gift-modal-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #f5f2ed;
+    font-size: 32px;
+}
+
+.gift-modal-title {
+    font-size: 23px;
+    font-weight: 500;
+    margin: 0 0 12px;
+}
+
+.gift-modal-text {
+    margin: 0;
+    color: #78716c;
+    line-height: 1.7;
+    font-size: 14px;
+}
+
+.gift-modal-alias {
+    margin-top: 18px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: #f5f2ed;
+    color: #443f3a;
+    font-weight: 600;
+    letter-spacing: .03em;
+}
+
+.gift-modal-close {
+    margin-top: 20px;
+    border: 0;
+    border-radius: 999px;
+    padding: 11px 24px;
+    background: #443f3a;
+    color: white;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.gift-modal-x {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    border: 0;
+    background: transparent;
+    color: #78716c;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.floating-toolbar .toolbar-regalo,
+.floating-toolbar .toolbar-faq {
+    color: #443f3a !important;
+}
+
+.floating-toolbar .toolbar-regalo svg,
+.floating-toolbar .toolbar-faq svg {
+    opacity: .72 !important;
+}
+
+/* =====================================================
+   RSVP: TRES BOTONES
+====================================================== */
+
+.rsvp-choice-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.rsvp-choice.rsvp-party {
+    border-color: #d9c8a8;
+    color: #8a6f3f;
+}
+
+.rsvp-party .rsvp-choice-icon {
+    background: #f7f1e6;
+    color: #a1814d;
+}
+
+.rsvp-party.selected {
+    background: #fbf7ef;
+    border-color: #a1814d;
+}
+
+.rsvp-choice.disabled {
+    opacity: .38;
+    filter: grayscale(.35);
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.rsvp-choice:disabled {
+    opacity: .38;
+    cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+    .rsvp-choice-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .rsvp-choice {
+        min-height: 150px;
+        padding: 12px 5px;
+    }
+
+    .rsvp-choice-title {
+        font-size: 12px;
+        line-height: 1.25;
+    }
+
+    .rsvp-choice-subtitle {
+        font-size: 9px;
+        line-height: 1.25;
+    }
+}
+
 </style>
 </head>
 
@@ -1263,43 +1426,106 @@ audio {
         id="btnBarraConfirmar"
         class="toolbar-confirmar"
         type="button"
-        aria-label="Aceptar invitación"
-        title="Aceptar invitación"
+        aria-label="Confirmar asistencia"
+        title="Confirmar asistencia"
     >
-
-        <svg
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-        >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M20 6 9 17l-5-5"></path>
         </svg>
-
-        <span>Aceptar</span>
-
+        <span>Confirmar</span>
     </button>
 
-
-    <a
+    <button
+        id="btnBarraUbicacion"
         class="toolbar-ubicacion"
-        href="https://maps.app.goo.gl/CLjByKmHYeeR6gnGA?g_st=aw"
-        target="_blank"
-        rel="noopener noreferrer"
+        type="button"
         aria-label="Ver ubicación"
         title="Ver ubicación"
     >
-
-        <svg
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-        >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"></path>
             <circle cx="12" cy="10" r="2.5"></circle>
         </svg>
-
         <span>Ubicación</span>
+    </button>
+    <button
+        id="btnBarraFoto"
+        class="toolbar-action party-only"
+        type="button"
+        aria-label="Abrir cámara de fotos"
+        title="Cámara"
+        hidden
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7.5h3l1.5-2h7L17 7.5h3v11H4z"></path>
+            <circle cx="12" cy="13" r="3.5"></circle>
+        </svg>
+        <span>Cámara</span>
+    </button>
 
-    </a>
+    <button
+        id="btnBarraVideo"
+        class="toolbar-action party-only"
+        type="button"
+        aria-label="Abrir cámara de video"
+        title="Filmadora"
+        hidden
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7.5h10.5A1.5 1.5 0 0 1 16 9v6a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 15V9A1.5 1.5 0 0 1 4 7.5z"></path>
+            <path d="m16 10 5-2.5v9L16 14z"></path>
+        </svg>
+        <span>Filmadora</span>
+    </button>
 
+    <button
+        id="btnBarraSubir"
+        class="toolbar-action party-only"
+        type="button"
+        aria-label="Subir fotos y videos"
+        title="Subir archivo"
+        hidden
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 16V4"></path>
+            <path d="m7 9 5-5 5 5"></path>
+            <path d="M5 20h14"></path>
+        </svg>
+        <span>Subir archivo</span>
+    </button>
+
+
+    <button
+        id="btnBarraRegalo"
+        class="toolbar-regalo"
+        type="button"
+        aria-label="Regalo"
+        title="Regalo"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20 12v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8"></path>
+            <path d="M3 8h18v4H3z"></path>
+            <path d="M12 8v13"></path>
+            <path d="M12 8H8.5A2.5 2.5 0 1 1 11 5.5C11 7 12 8 12 8Z"></path>
+            <path d="M12 8h3.5A2.5 2.5 0 1 0 13 5.5C13 7 12 8 12 8Z"></path>
+        </svg>
+        <span>Regalo</span>
+    </button>
+
+    <button
+        id="btnBarraFAQ"
+        class="toolbar-faq"
+        type="button"
+        aria-label="Preguntas frecuentes"
+        title="Preguntas frecuentes"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M9.7 9a2.5 2.5 0 1 1 4.1 1.9c-1 .8-1.8 1.2-1.8 2.6"></path>
+            <path d="M12 17h.01"></path>
+        </svg>
+        <span>Preguntas</span>
+    </button>
 
     <button
         id="btnBarraMusica"
@@ -1309,18 +1535,12 @@ audio {
         aria-pressed="true"
         title="Pausar música"
     >
-
-        <svg
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-        >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M9 18V5l10-2v13"></path>
             <circle cx="6" cy="18" r="3"></circle>
             <circle cx="16" cy="16" r="3"></circle>
         </svg>
-
         <span>Música</span>
-
     </button>
 
 </nav>
@@ -1489,7 +1709,7 @@ audio {
     <div class="decorative-line"></div>
 
     <p class="text-2xl mt-6">
-        Viernes 28 de noviembre
+        Viernes 27 de noviembre
     </p>
 
     <p class="text-gray-500 mt-2">
@@ -1505,36 +1725,115 @@ audio {
 
 
 <!-- =====================================================
-     UBICACIÓN
+     AGENDA / ACTIVIDADES
 ====================================================== -->
 
-<section class="py-16 text-center px-6">
+<section id="ubicacion" class="py-16 text-center px-6 bg-stone-50">
 
     <h2 class="section-title uppercase text-sm mb-3">
-        Lugar
+        Agenda
     </h2>
 
     <div class="decorative-line"></div>
 
-    <h3 class="text-2xl mt-6">
-        Salón de Celebraciones
+    <h3 class="title-font text-5xl mt-5">
+        Nuestros momentos
     </h3>
 
-    <p class="text-gray-500 mt-2">
-        Dirección del salón
+    <p class="text-gray-600 max-w-xl mx-auto mt-5 mb-10 leading-relaxed">
+        Queremos compartir con vos cada momento especial de este fin de semana.
     </p>
 
-    <a
-        href="https://maps.app.goo.gl/CLjByKmHYeeR6gnGA?g_st=aw"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="btn bg-stone-700 text-white mt-7"
-    >
-        📍 Ver ubicación
-    </a>
+    <div class="max-w-2xl mx-auto grid gap-5 text-left">
+
+        <article class="bg-white rounded-3xl p-6 shadow-sm border border-stone-100">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <div class="text-xs uppercase tracking-widest text-stone-500">
+                        Viernes 27 de noviembre
+                    </div>
+                    <h4 class="text-2xl mt-2">Civil</h4>
+                </div>
+                <div class="text-right">
+                    <div class="text-lg font-medium">11:00 hs</div>
+                </div>
+            </div>
+
+            <p class="text-gray-500 mt-4 leading-relaxed">
+                Comenzamos este día tan especial compartiendo la ceremonia civil.
+            </p>
+
+            <a
+                href="https://maps.app.goo.gl/f7ExfMdDLktbgNXE8?g_st=aw"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn bg-stone-700 text-white mt-5"
+            >
+                📍 Ver punto GPS
+            </a>
+        </article>
+
+        <article class="bg-white rounded-3xl p-6 shadow-sm border border-stone-100">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <div class="text-xs uppercase tracking-widest text-stone-500">
+                        Viernes 27 de noviembre
+                    </div>
+                    <h4 class="text-2xl mt-2">Conferencia</h4>
+                </div>
+                <div class="text-right">
+                    <div class="text-lg font-medium">20:00 hs</div>
+                </div>
+            </div>
+
+            <p class="text-gray-500 mt-4 leading-relaxed">
+                El encuentro principal donde queremos compartir este momento con todos nuestros invitados.
+            </p>
+
+            <a
+                href="https://maps.app.goo.gl/CLjByKmHYeeR6gnGA?g_st=aw"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn bg-stone-700 text-white mt-5"
+            >
+                📍 Ver punto GPS
+            </a>
+        </article>
+
+        <article
+            id="eventoFiesta"
+            class="party-only hidden bg-white rounded-3xl p-6 shadow-sm border border-stone-100"
+            hidden
+        >
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <div class="text-xs uppercase tracking-widest text-stone-500">
+                        Domingo 29 de noviembre
+                    </div>
+                    <h4 class="text-2xl mt-2">Fiesta</h4>
+                </div>
+                <div class="text-right">
+                    <div class="text-lg font-medium">09:00 hs</div>
+                </div>
+            </div>
+
+            <p class="text-gray-500 mt-4 leading-relaxed">
+                Un encuentro especial para celebrar, compartir y disfrutar juntos.
+            </p>
+
+            <a
+                href="https://maps.app.goo.gl/CLjByKmHYeeR6gnGA?g_st=aw"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn bg-stone-700 text-white mt-5"
+            >
+                📍 Ver punto GPS
+            </a>
+        </article>
+
+    </div>
 
 </section>
-
 
 
 <!-- =====================================================
@@ -1631,8 +1930,6 @@ audio {
                 class="text-sm text-gray-500 mt-1"
             ></div>
 
-            <div id="eventosInvitado" class="mt-4 text-sm"></div>
-
         </div>
 
 
@@ -1650,67 +1947,32 @@ audio {
 
 
             <div
-                id="rsvpChoiceGrid"
                 class="rsvp-choice-grid"
                 role="group"
                 aria-label="Confirmación de asistencia"
             >
 
-
-                <!-- SÍ -->
-
                 <button
-                    id="btnAsistire"
+                    id="btnConferencia"
                     type="button"
                     class="rsvp-choice rsvp-yes"
                     aria-pressed="false"
                 >
-
-                    <span
-                        class="rsvp-choice-icon"
-                        aria-hidden="true"
-                    >
-                        ✓
-                    </span>
-
-                    <span class="rsvp-choice-title">
-                        Sí, confirmo
-                    </span>
-
-                    <span class="rsvp-choice-subtitle">
-                        ¡Nos vemos!
-                    </span>
-
-                </button>
-
-
-                <!-- SOLO CONFERENCIA -->
-
-                <button
-                    id="btnSoloConferencia"
-                    type="button"
-                    class="rsvp-choice rsvp-conference"
-                    aria-pressed="false"
-                >
-                    <span class="rsvp-choice-icon" aria-hidden="true">🕊</span>
-                    <span class="rsvp-choice-title">Solo conferencia</span>
+                    <span class="rsvp-choice-icon" aria-hidden="true">✓</span>
+                    <span class="rsvp-choice-title">Conferencia</span>
                     <span class="rsvp-choice-subtitle">20:00 hs</span>
                 </button>
 
-                <!-- CONFERENCIA + FIESTA -->
-
                 <button
-                    id="btnAmbos"
+                    id="btnFiesta"
                     type="button"
-                    class="rsvp-choice rsvp-both hidden"
+                    class="rsvp-choice rsvp-party"
                     aria-pressed="false"
                 >
-                    <span class="rsvp-choice-icon" aria-hidden="true">🥂</span>
-                    <span class="rsvp-choice-title">Conferencia + fiesta</span>
-                    <span class="rsvp-choice-subtitle">20:00 hs + celebración</span>
+                    <span class="rsvp-choice-icon" aria-hidden="true">♥</span>
+                    <span class="rsvp-choice-title">Fiesta</span>
+                    <span id="fiestaSubtitle" class="rsvp-choice-subtitle">Después de la conferencia</span>
                 </button>
-
-                <!-- NO -->
 
                 <button
                     id="btnNoAsistire"
@@ -1718,28 +1980,19 @@ audio {
                     class="rsvp-choice rsvp-no"
                     aria-pressed="false"
                 >
-
-                    <span
-                        class="rsvp-choice-icon"
-                        aria-hidden="true"
-                    >
-                        ×
-                    </span>
-
-                    <span class="rsvp-choice-title">
-                        No podré asistir
-                    </span>
-
-                    <span class="rsvp-choice-subtitle">
-                        Gracias por avisar
-                    </span>
-
+                    <span class="rsvp-choice-icon" aria-hidden="true">×</span>
+                    <span class="rsvp-choice-title">No podré asistir</span>
+                    <span class="rsvp-choice-subtitle">Gracias por avisar</span>
                 </button>
 
             </div>
 
-
-            <!-- Valor: conferencia, ambos o no -->
+            <p
+                id="rsvpAyuda"
+                class="text-center text-xs text-gray-500 mt-4"
+            >
+                Podés confirmar conferencia, fiesta o ambas.
+            </p>
 
             <input
                 type="hidden"
@@ -1855,6 +2108,96 @@ audio {
 
 
 <!-- =====================================================
+     PREGUNTAS FRECUENTES
+====================================================== -->
+
+<section
+    id="preguntas-frecuentes"
+    class="py-16 bg-white text-center px-6"
+>
+
+    <h2 class="section-title uppercase text-sm mb-3">
+        Preguntas frecuentes
+    </h2>
+
+    <div class="decorative-line"></div>
+
+    <div class="max-w-xl mx-auto mt-8 text-left">
+
+        <div class="rounded-2xl bg-stone-100 p-5">
+
+            <h3 class="text-lg font-medium">
+                ¿Cuál es la vestimenta?
+            </h3>
+
+            <p class="text-gray-600 mt-2 leading-relaxed">
+                Vestimenta formal.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     MODAL REGALO
+====================================================== -->
+
+<div
+    id="giftModal"
+    class="gift-modal hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="giftModalTitle"
+>
+
+    <div class="gift-modal-card">
+
+        <button
+            id="giftModalX"
+            type="button"
+            class="gift-modal-x"
+            aria-label="Cerrar"
+        >
+            ×
+        </button>
+
+        <div class="gift-modal-icon" aria-hidden="true">
+            🎁
+        </div>
+
+        <h2
+            id="giftModalTitle"
+            class="gift-modal-title"
+        >
+            Tu presencia es el mejor regalo
+        </h2>
+
+        <p class="gift-modal-text">
+            Lo más importante para nosotros es compartir este día con vos.
+            Si además querés regalarnos algo, te dejamos nuestro alias para que puedas hacerlo de la manera que te resulte más cómoda.
+        </p>
+
+        <div class="gift-modal-alias">
+            Alias: <strong>TU.ALIAS.AQUI</strong>
+        </div>
+
+        <button
+            id="giftModalClose"
+            type="button"
+            class="gift-modal-close"
+        >
+            Cerrar
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
      CIERRE
 ====================================================== -->
 
@@ -1879,6 +2222,202 @@ audio {
 
 
 <!-- =====================================================
+     COMPARTIR FOTOS Y VIDEOS
+====================================================== -->
+
+<section id="recuerdosCompartidos" class="party-only hidden py-16 bg-stone-100 text-center px-6" hidden>
+
+    <h2 class="section-title uppercase text-sm mb-3">
+        Compartí tus recuerdos
+    </h2>
+
+    <div class="decorative-line"></div>
+
+    <h3 class="title-font text-5xl mt-5">
+        📸 Fotos y videos
+    </h3>
+
+    <p class="text-gray-600 max-w-md mx-auto mt-5 mb-7">
+        ¿Sacaste una foto o un video durante nuestra boda?
+        ¡Compartilo con nosotros!
+    </p>
+
+<div class="flex flex-col items-center gap-3 w-full max-w-md mx-auto">
+
+    <button
+        id="btnFotos"
+        type="button"
+        class="btn bg-stone-700 text-white text-base shadow-lg w-full"
+    >
+        📷 Compartir fotos y videos
+    </button>
+
+    <button
+        id="btnGrabarVideo"
+        type="button"
+        class="btn bg-stone-700 text-white text-base shadow-lg w-full"
+    >
+        🎥 Grabar video
+    </button>
+
+    <button
+        id="btnSubirGaleriaCelular"
+        type="button"
+        class="btn bg-stone-700 text-white text-base shadow-lg w-full"
+        style="display:block !important; visibility:visible !important; opacity:1 !important;"
+    >
+        🖼️ Subir fotos y videos del celular
+    </button>
+
+    <input
+        id="inputGaleriaCelular"
+        type="file"
+        accept="image/*,video/*"
+        multiple
+        class="hidden"
+    >
+
+</div>
+
+<!-- =====================================================
+     VISOR DE GALERÍA A PANTALLA COMPLETA
+====================================================== -->
+<div id="galleryLightbox" class="gallery-lightbox hidden" role="dialog" aria-modal="true" aria-label="Foto en pantalla completa">
+    <button id="galleryLightboxClose" class="gallery-lightbox-close" type="button" aria-label="Cerrar">×</button>
+    <button id="galleryLightboxPrev" class="gallery-lightbox-nav gallery-lightbox-prev" type="button" aria-label="Foto anterior">‹</button>
+    <img id="galleryLightboxImage" src="" alt="Foto de la boda">
+    <video id="galleryLightboxVideo" controls playsinline preload="metadata" style="display:none; max-width:100%; max-height:calc(100vh - 80px); max-height:calc(100dvh - 80px); border-radius:6px;"></video>
+    <button id="galleryLightboxNext" class="gallery-lightbox-nav gallery-lightbox-next" type="button" aria-label="Foto siguiente">›</button>
+    <div id="galleryLightboxCounter" class="gallery-lightbox-counter"></div>
+</div>
+
+<!-- =====================================================
+     CÁMARA A PANTALLA COMPLETA PARA CELULARES
+====================================================== -->
+<div id="modalCamara" class="camera-fullscreen hidden">
+
+    <!-- Vista de cámara -->
+    <video
+        id="previewCamara"
+        class="camera-preview"
+        autoplay
+        muted
+        playsinline
+    ></video>
+
+    <!-- Capa oscura suave para que el texto se lea sin ponerle fondo -->
+    <div class="camera-vignette"></div>
+
+    <!-- Texto superior, sin fondo -->
+    <div class="camera-topbar">
+        <button
+            id="cerrarModalCamara"
+            type="button"
+            class="camera-close"
+            aria-label="Cerrar cámara"
+        >×</button>
+
+        <div class="camera-title-wrap">
+            <h3 id="tituloCamara" class="camera-title">Comparte un momento especial</h3>
+            <div id="temporizadorCamara" class="camera-timer hidden">00:00</div>
+        </div>
+    </div>
+
+    <canvas id="canvasFoto" class="hidden"></canvas>
+
+    <!-- Mensajes -->
+    <div id="estadoCamara" class="camera-status">
+        Preparando cámara…
+    </div>
+
+    <!-- Controles inferiores -->
+    <div class="camera-controls">
+        <!-- Foto: círculo blanco -->
+        <button
+            id="btnCapturarFoto"
+            type="button"
+            class="camera-shutter camera-shutter-photo"
+            aria-label="Sacar foto"
+        ></button>
+
+        <!-- Video: círculo rojo -->
+        <button
+            id="btnIniciarGrabacionCamara"
+            type="button"
+            class="camera-shutter camera-shutter-video hidden"
+            aria-label="Iniciar grabación"
+        ></button>
+
+        <!-- Video grabando: cuadrado -->
+        <button
+            id="btnDetenerGrabacionCamara"
+            type="button"
+            class="camera-shutter camera-shutter-stop hidden"
+            aria-label="Detener grabación"
+        ><span></span></button>
+
+        <!-- Después de detener: flecha azul para subir -->
+        <button
+            id="btnSubirVideo"
+            type="button"
+            class="camera-upload hidden"
+            aria-label="Subir video"
+        >↑</button>
+
+        <div id="textoControlCamara" class="camera-control-text">
+            Tocá para sacar la foto
+        </div>
+    </div>
+</div>
+</section>
+
+    <!-- =====================================================
+         GALERÍA EN VIVO
+    ====================================================== -->
+
+    <section class="py-16 bg-white text-center px-6">
+
+        <h2 class="section-title uppercase text-sm mb-3">
+            Recuerdos compartidos
+        </h2>
+
+        <div class="decorative-line"></div>
+
+        <h3 class="title-font text-5xl mt-5">
+            📷 Nuestra galería
+        </h3>
+
+        <p class="text-gray-600 max-w-md mx-auto mt-5 mb-6">
+            Las fotos y videos que compartan nuestros invitados
+            aparecerán aquí automáticamente.
+        </p>
+
+        <div id="galleryStatus" class="gallery-status">
+            Cargando recuerdos...
+        </div>
+
+        <button
+            id="btnActualizarGaleria"
+            type="button"
+            class="gallery-refresh"
+        >
+            ↻ Actualizar galería
+        </button>
+
+        <div
+            id="galeria"
+            class="gallery-grid mt-6"
+        >
+            <div class="gallery-empty">
+                Cargando fotos y videos...
+            </div>
+        </div>
+
+    </section>
+
+    
+
+<!-- =====================================================
      FOOTER
 ====================================================== -->
 
@@ -1892,6 +2431,1039 @@ audio {
 
 
 
+<script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+
+<script>
+/* =====================================================
+   FOTOS / VIDEOS
+   Funciones reutilizadas de la botonera original.
+====================================================== */
+
+const CLOUDINARY_CLOUD_NAME = "entbx2xv";
+
+    const CLOUDINARY_UPLOAD_PRESET = "euni_upload";
+
+
+    // =====================================================
+    // CREAR WIDGET
+    // =====================================================
+
+    const widgetCloudinary =
+        cloudinary.createUploadWidget(
+
+            {
+
+                cloudName:
+                    CLOUDINARY_CLOUD_NAME,
+
+                uploadPreset:
+                    CLOUDINARY_UPLOAD_PRESET,
+
+
+                // Fuentes disponibles
+                sources: [
+                    "local",
+                    "camera"
+                ],
+
+
+                // Permitir varios archivos
+                multiple: true,
+
+
+                // Máximo de archivos por tanda
+                maxFiles: 20,
+
+
+                // Fotos + videos
+                resourceType: "auto",
+
+
+                // Formatos permitidos
+                clientAllowedFormats: [
+                    "jpg",
+                    "jpeg",
+                    "png",
+                    "webp",
+                    "heic",
+                    "mp4",
+                    "mov",
+                    "webm"
+                ],
+
+
+                // Máximo 100 MB por archivo
+                maxFileSize: 100000000,
+
+
+                // Carpeta dentro de Cloudinary
+                folder: "boda-eunice-david",
+
+                // Etiqueta utilizada por la galería pública
+                tags: ["boda-eunice-david"],
+
+
+                cropping: false,
+
+                showAdvancedOptions: false,
+
+                showSkipCropButton: false,
+
+
+                language: "es"
+
+            },
+
+
+            function(error, result) {
+
+                // =================================================
+                // ERROR
+                // =================================================
+
+                if (error) {
+
+                    console.error(
+                        "Error Cloudinary:",
+                        error
+                    );
+
+                    return;
+                }
+
+
+                // =================================================
+                // ARCHIVO SUBIDO
+                // =================================================
+
+                if (
+                    result &&
+                    result.event === "success"
+                ) {
+
+                    console.log(
+                        "Archivo subido correctamente:",
+                        result.info
+                    );
+
+                    const mensaje =
+                        document.getElementById("mensajeSubida");
+
+                    if (mensaje) {
+                        mensaje.textContent =
+                            "❤️ ¡Gracias por compartir este recuerdo!";
+                        mensaje.style.display = "block";
+                    }
+
+                }
+
+                // Cuando termina toda la tanda de archivos,
+                // actualizamos la galería.
+                if (
+                    result &&
+                    result.event === "queues-end"
+                ) {
+                    setTimeout(cargarGaleria, 2000);
+                }
+
+            }
+
+        );
+
+
+    // =====================================================
+    // GALERÍA EN VIVO
+    // =====================================================
+
+    const GALERIA_TAG = "boda-eunice-david";
+
+    const URL_LISTA_IMAGENES =
+        "https://res.cloudinary.com/" +
+        CLOUDINARY_CLOUD_NAME +
+        "/image/list/" +
+        GALERIA_TAG +
+        ".json";
+
+    const URL_LISTA_VIDEOS =
+        "https://res.cloudinary.com/" +
+        CLOUDINARY_CLOUD_NAME +
+        "/video/list/" +
+        GALERIA_TAG +
+        ".json";
+
+
+    function crearUrlCloudinary(recurso) {
+
+        const tipo =
+            recurso.resource_type === "video"
+                ? "video"
+                : "image";
+
+        return (
+            "https://res.cloudinary.com/" +
+            CLOUDINARY_CLOUD_NAME +
+            "/" +
+            tipo +
+            "/upload/" +
+            recurso.public_id +
+            "." +
+            recurso.format
+        );
+
+    }
+
+
+    let fotosGaleria = [];
+    let indiceFotoGaleria = 0;
+
+    const galleryLightbox = document.getElementById("galleryLightbox");
+    const galleryLightboxImage = document.getElementById("galleryLightboxImage");
+    const galleryLightboxVideo = document.getElementById("galleryLightboxVideo");
+    const galleryLightboxClose = document.getElementById("galleryLightboxClose");
+    const galleryLightboxPrev = document.getElementById("galleryLightboxPrev");
+    const galleryLightboxNext = document.getElementById("galleryLightboxNext");
+    const galleryLightboxCounter = document.getElementById("galleryLightboxCounter");
+
+    function actualizarVisorGaleria() {
+        if (!fotosGaleria.length) return;
+        const recurso = fotosGaleria[indiceFotoGaleria];
+        const url = crearUrlCloudinary(recurso);
+
+        // El visor admite tanto fotos como videos para que la navegación
+        // avance por todos los recuerdos sin saltearse los videos.
+        if (recurso.resource_type === "video") {
+            galleryLightboxImage.style.display = "none";
+            galleryLightboxImage.src = "";
+            galleryLightboxVideo.style.display = "block";
+            galleryLightboxVideo.src = url;
+            galleryLightboxVideo.currentTime = 0;
+            galleryLightboxVideo.load();
+        } else {
+            galleryLightboxVideo.pause();
+            galleryLightboxVideo.style.display = "none";
+            galleryLightboxVideo.src = "";
+            galleryLightboxImage.style.display = "block";
+            galleryLightboxImage.src = url;
+        }
+
+        galleryLightboxCounter.textContent = (indiceFotoGaleria + 1) + " / " + fotosGaleria.length;
+    }
+
+    function abrirVisorGaleria(indice) {
+        if (!fotosGaleria.length) return;
+        indiceFotoGaleria = (indice + fotosGaleria.length) % fotosGaleria.length;
+        actualizarVisorGaleria();
+        galleryLightbox.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+    }
+
+    function cerrarVisorGaleria() {
+        galleryLightbox.classList.add("hidden");
+        galleryLightboxImage.src = "";
+        galleryLightboxVideo.pause();
+        galleryLightboxVideo.src = "";
+        document.body.style.overflow = "";
+    }
+
+    function fotoAnteriorGaleria() {
+        abrirVisorGaleria(indiceFotoGaleria - 1);
+    }
+
+    function fotoSiguienteGaleria() {
+        abrirVisorGaleria(indiceFotoGaleria + 1);
+    }
+
+    galleryLightboxClose.addEventListener("click", cerrarVisorGaleria);
+    galleryLightboxPrev.addEventListener("click", fotoAnteriorGaleria);
+    galleryLightboxNext.addEventListener("click", fotoSiguienteGaleria);
+    galleryLightbox.addEventListener("click", function(e) {
+        if (e.target === galleryLightbox) cerrarVisorGaleria();
+    });
+    document.addEventListener("keydown", function(e) {
+        if (galleryLightbox.classList.contains("hidden")) return;
+        if (e.key === "Escape") cerrarVisorGaleria();
+        if (e.key === "ArrowLeft") fotoAnteriorGaleria();
+        if (e.key === "ArrowRight") fotoSiguienteGaleria();
+    });
+
+    function mostrarGaleria(recursos) {
+
+        const galeria =
+            document.getElementById("galeria");
+
+        const estado =
+            document.getElementById("galleryStatus");
+
+
+        if (!galeria) {
+            return;
+        }
+
+
+        galeria.innerHTML = "";
+
+        // Guardamos fotos Y videos en el mismo orden de la galería.
+        fotosGaleria = recursos.slice();
+
+        if (!recursos.length) {
+
+            galeria.innerHTML = `
+                <div class="gallery-empty">
+                    <div style="font-size:2.2rem; margin-bottom:8px;">
+                        📸
+                    </div>
+                    <div>
+                        Todavía no hay recuerdos compartidos.
+                    </div>
+                    <div style="font-size:0.8rem; margin-top:5px;">
+                        ¡Sé el primero en compartir una foto!
+                    </div>
+                </div>
+            `;
+
+            if (estado) {
+                estado.textContent =
+                    "Todavía no hay fotos ni videos.";
+            }
+
+            return;
+        }
+
+
+        recursos.forEach(function(recurso) {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "gallery-item";
+
+
+            const url =
+                crearUrlCloudinary(recurso);
+
+
+            if (recurso.resource_type === "video") {
+
+                const video =
+                    document.createElement("video");
+
+                video.src = url;
+
+                video.controls = true;
+
+                video.preload = "metadata";
+
+                video.playsInline = true;
+
+                video.setAttribute(
+                    "aria-label",
+                    "Video compartido en la boda"
+                );
+
+                item.appendChild(video);
+
+                // Al tocar un video, abrir el mismo visor de pantalla completa.
+                const indiceVideo = fotosGaleria.indexOf(recurso);
+                video.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    abrirVisorGaleria(indiceVideo);
+                });
+
+
+                const icon =
+                    document.createElement("div");
+
+                icon.className =
+                    "gallery-video-icon";
+
+                icon.textContent = "▶";
+
+                item.appendChild(icon);
+
+            } else {
+
+                const imagen =
+                    document.createElement("img");
+
+                imagen.src = url;
+
+                imagen.alt =
+                    "Foto compartida en la boda";
+
+                imagen.loading = "lazy";
+
+                imagen.decoding = "async";
+
+
+                // Al tocar una foto, abrir el visor con navegación.
+                const indiceFoto = fotosGaleria.indexOf(recurso);
+                imagen.addEventListener("click", function() {
+                    abrirVisorGaleria(indiceFoto);
+                });
+
+                item.appendChild(imagen);
+
+            }
+
+
+            galeria.appendChild(item);
+
+        });
+
+
+        if (estado) {
+
+            estado.textContent =
+                recursos.length +
+                (
+                    recursos.length === 1
+                        ? " recuerdo compartido"
+                        : " recuerdos compartidos"
+                );
+
+        }
+
+    }
+
+
+    async function obtenerLista(url, tipo) {
+
+        try {
+
+            const respuesta =
+                await fetch(
+                    url +
+                    "?v=" +
+                    Math.floor(
+                        Date.now() / 60000
+                    )
+                );
+
+
+            if (!respuesta.ok) {
+                return [];
+            }
+
+
+            const datos =
+                await respuesta.json();
+
+
+            return (datos.resources || []).map(
+                function(recurso) {
+
+                    return {
+                        ...recurso,
+                        resource_type: tipo
+                    };
+
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "No se pudo cargar la lista:",
+                error
+            );
+
+            return [];
+
+        }
+
+    }
+
+
+    async function cargarGaleria() {
+
+        const estado =
+            document.getElementById("galleryStatus");
+
+        if (estado) {
+            estado.textContent =
+                "Actualizando recuerdos...";
+        }
+
+
+        const resultados =
+            await Promise.all([
+                obtenerLista(
+                    URL_LISTA_IMAGENES,
+                    "image"
+                ),
+                obtenerLista(
+                    URL_LISTA_VIDEOS,
+                    "video"
+                )
+            ]);
+
+
+        const recursos =
+            resultados[0].concat(resultados[1]);
+
+
+        // Más recientes primero
+        recursos.sort(
+            function(a, b) {
+
+                return (
+                    new Date(b.created_at || 0) -
+                    new Date(a.created_at || 0)
+                );
+
+            }
+        );
+
+
+        mostrarGaleria(recursos);
+
+    }
+
+
+    // Botón de actualización manual
+    const btnActualizarGaleria =
+        document.getElementById(
+            "btnActualizarGaleria"
+        );
+
+
+    if (btnActualizarGaleria) {
+
+        btnActualizarGaleria.addEventListener(
+            "click",
+            cargarGaleria
+        );
+
+    }
+
+
+    // Primera carga
+    cargarGaleria();
+
+
+    // Actualizar automáticamente cada minuto.
+    // Cloudinary mantiene la lista en caché aproximadamente
+    // 60 segundos.
+    setInterval(
+        cargarGaleria,
+        60000
+    );
+
+
+    // =====================================================
+    // CÁMARA DIRECTA EN CELULARES
+    // =====================================================
+
+    const esCelular = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
+
+    const btnFotos = document.getElementById("btnFotos");
+    const btnGrabarVideo = document.getElementById("btnGrabarVideo");
+
+    const modalCamara = document.getElementById("modalCamara");
+    const cerrarModalCamara = document.getElementById("cerrarModalCamara");
+    const tituloCamara = document.getElementById("tituloCamara");
+    const previewCamara = document.getElementById("previewCamara");
+    const canvasFoto = document.getElementById("canvasFoto");
+    const estadoCamara = document.getElementById("estadoCamara");
+    const temporizadorCamara = document.getElementById("temporizadorCamara");
+    const textoControlCamara = document.getElementById("textoControlCamara");
+    const btnCapturarFoto = document.getElementById("btnCapturarFoto");
+    const btnIniciarGrabacionCamara = document.getElementById("btnIniciarGrabacionCamara");
+    const btnDetenerGrabacionCamara = document.getElementById("btnDetenerGrabacionCamara");
+    const btnSubirVideo = document.getElementById("btnSubirVideo");
+
+    let streamCamara = null;
+    let mediaRecorderCamara = null;
+    let partesVideoCamara = [];
+    let modoCamara = "foto";
+    let videoListoParaSubir = null;
+    let grabacionInicio = 0;
+    let temporizadorIntervalo = null;
+
+    function mostrarMensajeSubida(texto) {
+        const mensaje = document.getElementById("mensajeSubida");
+        if (mensaje) {
+            mensaje.textContent = texto;
+            mensaje.style.display = "block";
+        }
+    }
+
+    function actualizarTemporizador() {
+        if (!grabacionInicio) return;
+        const segundos = Math.floor((Date.now() - grabacionInicio) / 1000);
+        const min = String(Math.floor(segundos / 60)).padStart(2, "0");
+        const seg = String(segundos % 60).padStart(2, "0");
+        temporizadorCamara.textContent = min + ":" + seg;
+    }
+
+    function detenerTemporizador() {
+        if (temporizadorIntervalo) {
+            clearInterval(temporizadorIntervalo);
+            temporizadorIntervalo = null;
+        }
+        grabacionInicio = 0;
+    }
+
+    function restaurarControlesCamara() {
+        btnCapturarFoto.classList.toggle("hidden", modoCamara !== "foto");
+        btnIniciarGrabacionCamara.classList.toggle("hidden", modoCamara !== "video");
+        btnDetenerGrabacionCamara.classList.add("hidden");
+        btnSubirVideo.classList.add("hidden");
+        temporizadorCamara.classList.add("hidden");
+        textoControlCamara.textContent = modoCamara === "video"
+            ? "Tocá el círculo rojo para grabar"
+            : "Tocá el círculo blanco para sacar la foto";
+    }
+
+    function cerrarCamara() {
+        if (mediaRecorderCamara && mediaRecorderCamara.state !== "inactive") {
+            mediaRecorderCamara.onstop = null;
+            mediaRecorderCamara.stop();
+        }
+
+        detenerTemporizador();
+
+        if (streamCamara) {
+            streamCamara.getTracks().forEach(function(track) {
+                track.stop();
+            });
+        }
+
+        streamCamara = null;
+        mediaRecorderCamara = null;
+        partesVideoCamara = [];
+        videoListoParaSubir = null;
+        previewCamara.srcObject = null;
+        previewCamara.removeAttribute("src");
+        previewCamara.controls = false;
+        previewCamara.load();
+
+        modalCamara.classList.add("hidden");
+        document.body.style.overflow = "";
+        restaurarControlesCamara();
+    }
+
+    async function abrirCamara(modo) {
+        modoCamara = modo;
+        videoListoParaSubir = null;
+        partesVideoCamara = [];
+        mediaRecorderCamara = null;
+
+        modalCamara.classList.remove("hidden");
+        tituloCamara.textContent = "Comparte un momento especial";
+        estadoCamara.textContent = "Solicitando permiso para usar la cámara" + (modo === "video" ? " y el micrófono…" : "…");
+        restaurarControlesCamara();
+        document.body.style.overflow = "hidden";
+
+        try {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error("Este navegador no permite acceder directamente a la cámara.");
+            }
+
+            const restriccionesVideo = {
+                facingMode: { ideal: "environment" },
+                width: { ideal: 1280, max: 1920 },
+                height: { ideal: 720, max: 1080 },
+                frameRate: { ideal: 30, max: 30 }
+            };
+
+            try {
+                streamCamara = await navigator.mediaDevices.getUserMedia({
+                    video: restriccionesVideo,
+                    audio: modo === "video"
+                });
+            } catch (primerError) {
+                // Algunos celulares permiten la cámara pero rechazan el micrófono.
+                // En ese caso seguimos con video para no dejar inutilizada la función.
+                if (modo !== "video") throw primerError;
+
+                console.warn("No se pudo abrir el micrófono. Reintentando solo con cámara.", primerError);
+                streamCamara = await navigator.mediaDevices.getUserMedia({
+                    video: restriccionesVideo,
+                    audio: false
+                });
+            }
+
+            previewCamara.srcObject = streamCamara;
+            previewCamara.muted = true;
+            previewCamara.playsInline = true;
+            await previewCamara.play();
+
+            // Si el sistema del celular corta la pista inesperadamente,
+            // lo informamos y nunca convertimos ese corte en una subida automática.
+            streamCamara.getTracks().forEach(function(track) {
+                track.onended = function() {
+                    if (mediaRecorderCamara && mediaRecorderCamara.state === "recording") {
+                        console.warn("La pista de cámara/micrófono terminó inesperadamente.");
+                        estadoCamara.textContent = "La cámara se interrumpió. El video no se subirá automáticamente.";
+                    }
+                };
+            });
+
+            if (modo === "video" && streamCamara.getAudioTracks().length === 0) {
+                estadoCamara.textContent = "Cámara lista. Se grabará el video sin audio.";
+            } else {
+                estadoCamara.textContent = "";
+            }
+
+        } catch (error) {
+            console.error("Error al abrir cámara:", error);
+            document.body.style.overflow = "";
+            estadoCamara.textContent = "No pudimos acceder a la cámara. Revisá los permisos del navegador y volvé a intentarlo.";
+        }
+    }
+
+    function esIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    }
+
+    function esAndroid() {
+        return /Android/i.test(navigator.userAgent);
+    }
+
+    function obtenerFormatoGrabacionCamara() {
+        const formatosIOS = [
+            "video/mp4;codecs=h264,aac",
+            "video/mp4"
+        ];
+
+        const formatosAndroid = [
+            "video/webm;codecs=vp8,opus",
+            "video/webm",
+            "video/mp4;codecs=h264,aac",
+            "video/mp4"
+        ];
+
+        const formatosGenerales = [
+            "video/webm;codecs=vp8,opus",
+            "video/webm",
+            "video/mp4;codecs=h264,aac",
+            "video/mp4"
+        ];
+
+        const formatos = esIOS()
+            ? formatosIOS
+            : (esAndroid() ? formatosAndroid : formatosGenerales);
+
+        for (const formato of formatos) {
+            if (window.MediaRecorder && MediaRecorder.isTypeSupported(formato)) {
+                return formato;
+            }
+        }
+        return "";
+    }
+
+    async function subirArchivoDirecto(blob, nombre, mensajeExito) {
+        const datos = new FormData();
+        datos.append("file", blob, nombre);
+        datos.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+        datos.append("tags", GALERIA_TAG);
+        datos.append("folder", "boda-eunice-david");
+
+        const recurso = blob.type && blob.type.startsWith("video/") ? "video" : "image";
+
+        const respuesta = await fetch(
+            "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/" + recurso + "/upload",
+            { method: "POST", body: datos }
+        );
+
+        const info = await respuesta.json();
+
+        if (!respuesta.ok) {
+            throw new Error(
+                info.error && info.error.message
+                    ? info.error.message
+                    : "Cloudinary rechazó la subida."
+            );
+        }
+
+        console.log("Archivo subido correctamente:", info);
+        mostrarMensajeSubida(mensajeExito);
+        setTimeout(cargarGaleria, 1500);
+    }
+
+    async function capturarFotoDirecta() {
+        if (!streamCamara || btnCapturarFoto.disabled) return;
+
+        btnCapturarFoto.disabled = true;
+        estadoCamara.textContent = "☁️ Subiendo…";
+
+        try {
+            const ancho = previewCamara.videoWidth || 1280;
+            const alto = previewCamara.videoHeight || 720;
+            canvasFoto.width = ancho;
+            canvasFoto.height = alto;
+
+            const contexto = canvasFoto.getContext("2d");
+            contexto.drawImage(previewCamara, 0, 0, ancho, alto);
+
+            const blobFoto = await new Promise(function(resolve, reject) {
+                let terminado = false;
+                canvasFoto.toBlob(function(blob) {
+                    terminado = true;
+                    resolve(blob);
+                }, "image/jpeg", 0.92);
+                setTimeout(function() {
+                    if (!terminado) reject(new Error("No se pudo preparar la foto."));
+                }, 5000);
+            });
+
+            if (!blobFoto) throw new Error("No se pudo crear la foto.");
+
+            await subirArchivoDirecto(
+                blobFoto,
+                "foto-boda-" + Date.now() + ".jpg",
+                "❤️ ¡Foto subida!"
+            );
+
+            // IMPORTANTE: después de subir la foto NO se cierra la cámara.
+            // El mismo stream queda activo para sacar otra foto inmediatamente.
+            estadoCamara.textContent = "❤️ ¡Foto subida!";
+            btnCapturarFoto.disabled = false;
+            btnCapturarFoto.classList.remove("hidden");
+            textoControlCamara.textContent = "Tocá para sacar otra foto";
+            setTimeout(function() {
+                if (modalCamara && !modalCamara.classList.contains("hidden")) {
+                    estadoCamara.textContent = "";
+                }
+            }, 1200);
+        } catch (error) {
+            console.error("Error al subir foto:", error);
+            estadoCamara.textContent = "No se pudo subir la foto. Intentá nuevamente.";
+            btnCapturarFoto.disabled = false;
+        }
+    }
+
+    function iniciarGrabacionCamara() {
+        if (!streamCamara) {
+            estadoCamara.textContent = "La cámara todavía no está lista.";
+            return;
+        }
+
+        if (!window.MediaRecorder) {
+            estadoCamara.textContent = "Este navegador no permite grabar video desde la página.";
+            return;
+        }
+
+        const pistasVideo = streamCamara.getVideoTracks();
+        if (!pistasVideo.length || pistasVideo[0].readyState !== "live") {
+            estadoCamara.textContent = "La cámara se desconectó. Cerrá y volvé a abrirla.";
+            return;
+        }
+
+        const mimeType = obtenerFormatoGrabacionCamara();
+
+        try {
+            const opcionesGrabacion = mimeType ? { mimeType: mimeType } : {};
+
+            // Una tasa moderada es más estable en celulares y mantiene
+            // archivos razonables para subir por datos móviles.
+            opcionesGrabacion.videoBitsPerSecond = esCelular ? 1400000 : 2000000;
+    // Un timeslice más largo reduce trabajo de codificación y cortes perceptibles durante la captura.
+    const intervaloChunks = esCelular ? 2000 : 1500;
+
+            mediaRecorderCamara = new MediaRecorder(streamCamara, opcionesGrabacion);
+
+            partesVideoCamara = [];
+            videoListoParaSubir = null;
+
+            mediaRecorderCamara.onstart = function() {
+                grabacionInicio = Date.now();
+                temporizadorCamara.classList.remove("hidden");
+                actualizarTemporizador();
+
+                if (temporizadorIntervalo) clearInterval(temporizadorIntervalo);
+                temporizadorIntervalo = setInterval(actualizarTemporizador, 250);
+
+                btnIniciarGrabacionCamara.classList.add("hidden");
+                btnDetenerGrabacionCamara.classList.remove("hidden");
+                btnSubirVideo.classList.add("hidden");
+                textoControlCamara.textContent = "Tocá el cuadrado para terminar";
+                estadoCamara.textContent = "";
+            };
+
+            mediaRecorderCamara.ondataavailable = function(event) {
+                if (event.data && event.data.size > 0) {
+                    partesVideoCamara.push(event.data);
+                }
+            };
+
+            mediaRecorderCamara.onerror = function(event) {
+                console.error("Error de MediaRecorder:", event.error || event);
+                detenerTemporizador();
+                btnDetenerGrabacionCamara.classList.add("hidden");
+                btnSubirVideo.classList.add("hidden");
+                btnIniciarGrabacionCamara.classList.remove("hidden");
+                estadoCamara.textContent = "El celular tuvo un problema con la grabación. Volvé a intentarlo.";
+            };
+
+            mediaRecorderCamara.onstop = function() {
+                // Detener SOLO prepara el video. Nunca inicia la subida.
+                const tipo = mediaRecorderCamara.mimeType || mimeType || "video/webm";
+                videoListoParaSubir = partesVideoCamara.length
+                    ? new Blob(partesVideoCamara, { type: tipo })
+                    : null;
+
+                detenerTemporizador();
+                temporizadorCamara.classList.add("hidden");
+                btnDetenerGrabacionCamara.classList.add("hidden");
+
+                if (videoListoParaSubir && videoListoParaSubir.size > 0) {
+                    btnSubirVideo.disabled = false;
+                    btnSubirVideo.classList.remove("hidden");
+                    textoControlCamara.textContent = "Tocá la flecha azul para subir";
+                    estadoCamara.textContent = "Video listo";
+                } else {
+                    btnIniciarGrabacionCamara.classList.remove("hidden");
+                    estadoCamara.textContent = "No se pudo preparar el video. Intentá nuevamente.";
+                }
+            };
+
+            // Los fragmentos cada segundo son SOLO datos parciales.
+            // La grabación continúa hasta que el usuario toca el cuadrado.
+            mediaRecorderCamara.start(intervaloChunks);
+
+        } catch (error) {
+            console.error("Error al iniciar grabación:", error);
+            estadoCamara.textContent = "No se pudo iniciar la grabación en este celular.";
+        }
+    }
+
+    function detenerGrabacionCamara() {
+        if (mediaRecorderCamara && mediaRecorderCamara.state !== "inactive") {
+            mediaRecorderCamara.stop();
+        }
+    }
+
+    async function subirVideoPreparado() {
+        if (!videoListoParaSubir || btnSubirVideo.disabled) return;
+
+        btnSubirVideo.disabled = true;
+        estadoCamara.textContent = "☁️ Subiendo video…";
+        textoControlCamara.textContent = "Subiendo…";
+
+        try {
+            const tipo = videoListoParaSubir.type || "video/webm";
+            const extension = tipo.includes("mp4") ? "mp4" : "webm";
+
+            await subirArchivoDirecto(
+                videoListoParaSubir,
+                "video-boda-" + Date.now() + "." + extension,
+                "❤️ ¡Video subido!"
+            );
+
+            // IMPORTANTE: después de subir el video NO se cierra la cámara.
+            // El stream queda activo y el botón rojo vuelve a estar disponible.
+            estadoCamara.textContent = "❤️ ¡Video subido! Podés grabar otro.";
+            videoListoParaSubir = null;
+            partesVideoCamara = [];
+            mediaRecorderCamara = null;
+            btnSubirVideo.classList.add("hidden");
+            btnSubirVideo.disabled = false;
+            btnDetenerGrabacionCamara.classList.add("hidden");
+            btnIniciarGrabacionCamara.classList.remove("hidden");
+            textoControlCamara.textContent = "Tocá para grabar otro video";
+        } catch (error) {
+            console.error("Error al subir video:", error);
+            estadoCamara.textContent = "No se pudo subir el video. Intentá nuevamente.";
+            textoControlCamara.textContent = "Tocá la flecha azul para reintentar";
+            btnSubirVideo.disabled = false;
+        }
+    }
+
+    btnFotos.addEventListener("click", function() {
+        if (esCelular) {
+            abrirCamara("foto");
+        } else {
+            widgetCloudinary.open();
+        }
+    });
+
+    btnGrabarVideo.addEventListener("click", function() {
+        abrirCamara("video");
+    });
+
+    // La botonera superior reutiliza exactamente las funciones de cámara existentes.
+    const btnBarraFoto = document.getElementById("btnBarraFoto");
+    const btnBarraVideo = document.getElementById("btnBarraVideo");
+
+    if (btnBarraFoto) {
+        btnBarraFoto.addEventListener("click", function() {
+            if (btnFotos) btnFotos.click();
+        });
+    }
+
+    if (btnBarraVideo) {
+        btnBarraVideo.addEventListener("click", function() {
+            if (btnGrabarVideo) btnGrabarVideo.click();
+        });
+    }
+
+    btnCapturarFoto.addEventListener("click", capturarFotoDirecta);
+    btnIniciarGrabacionCamara.addEventListener("click", iniciarGrabacionCamara);
+    btnDetenerGrabacionCamara.addEventListener("click", detenerGrabacionCamara);
+    btnSubirVideo.addEventListener("click", subirVideoPreparado);
+    cerrarModalCamara.addEventListener("click", cerrarCamara);
+
+
+
+    // Subir fotos y videos existentes desde la galería del celular
+    const btnSubirGaleriaCelular = document.getElementById("btnSubirGaleriaCelular");
+    const inputGaleriaCelular = document.getElementById("inputGaleriaCelular");
+
+    btnSubirGaleriaCelular.addEventListener("click", function() {
+        inputGaleriaCelular.value = "";
+        inputGaleriaCelular.click();
+    });
+
+    // La botonera lateral reutiliza exactamente la misma función de subida.
+    const btnBarraSubir = document.getElementById("btnBarraSubir");
+    if (btnBarraSubir) {
+        btnBarraSubir.addEventListener("click", function() {
+            if (btnSubirGaleriaCelular) btnSubirGaleriaCelular.click();
+        });
+    }
+
+    inputGaleriaCelular.addEventListener("change", async function() {
+        const archivos = Array.from(inputGaleriaCelular.files || []);
+        if (!archivos.length) return;
+
+        btnSubirGaleriaCelular.disabled = true;
+        btnSubirGaleriaCelular.textContent = "☁️ Subiendo…";
+
+        let subidos = 0;
+        let errores = 0;
+
+        for (const archivo of archivos) {
+            try {
+                await subirArchivoDirecto(
+                    archivo,
+                    archivo.name,
+                    "❤️ ¡Archivo subido!"
+                );
+                subidos++;
+            } catch (error) {
+                console.error("Error al subir archivo de galería:", error);
+                errores++;
+            }
+        }
+
+        btnSubirGaleriaCelular.disabled = false;
+        btnSubirGaleriaCelular.textContent = "🖼️ Subir fotos y videos del celular";
+
+        if (errores) {
+            alert("Se subieron " + subidos + " archivo(s). " + errores + " no pudieron subirse.");
+        } else {
+            alert("❤️ ¡Se subieron " + subidos + " archivo(s) correctamente!");
+        }
+
+        cargarGaleria();
+    });
+</script>
+
 <script>
 
 
@@ -1902,7 +3474,7 @@ audio {
 (function(){
 
     const destino =
-        new Date(2026, 10, 28, 20, 0, 0);
+        new Date(2026, 10, 27, 20, 0, 0);
 
 
     function actualizarCuentaRegresiva(){
@@ -2092,11 +3664,12 @@ audio {
        RSVP
     ================================================= */
 
+    const publicCode =
+        (new URLSearchParams(location.search).get('i') || '').trim().toUpperCase();
 
-    const code =
-        new URLSearchParams(
-            location.search
-        ).get('i');
+    // 0 = conferencia solamente | 1 = conferencia + fiesta.
+    const partyFromCode = /^[A-F0-9]{9}1$/.test(publicCode);
+    const code = publicCode;
 
 
     const $ =
@@ -2151,97 +3724,195 @@ audio {
         $('confirmacion');
 
 
-    /* NUEVOS BOTONES */
+    const btnConference =
+        $('btnConferencia');
 
-    const btnYes =
-        $('btnAsistire');
+
+    const btnParty =
+        $('btnFiesta');
 
 
     const btnNo =
         $('btnNoAsistire');
 
-    const btnSoloConferencia = $('btnSoloConferencia');
-    const btnAmbos = $('btnAmbos');
+
+    const rsvpHelp =
+        $('rsvpAyuda');
+
 
     let guest;
 
 
-
-    /* =================================================
-       ERROR
-    ================================================= */
-
     function fail(m){
 
         load.classList.add('hidden');
-
         form.classList.add('hidden');
-
         err.textContent = m;
-
         err.classList.remove('hidden');
 
     }
 
 
+    function selectedEvents(){
 
-    /* =================================================
-       RENDER INVITADO
-    ================================================= */
+        const conference =
+            btnConference.classList.contains('selected');
 
-    function render(g){
-        guest=g;
-        load.classList.add('hidden');
-        form.classList.remove('hidden');
-        $('nombreInvitado').textContent=g.nombre;
-        $('lugaresInvitado').textContent=`${g.lugares} ${g.lugares===1?'lugar reservado':'lugares reservados'}`;
-        $('saludoInvitado').textContent=`¿Nos acompañás, ${g.nombre}?`;
-        $('eventosInvitado').innerHTML=g.invitado_fiesta
-            ? '<div class="rounded-xl bg-white border border-stone-200 p-4 text-left"><div class="font-medium">Tu invitación incluye:</div><div class="mt-2">🕊 <strong>Conferencia</strong> · 20:00 hs</div><div class="mt-1">🥂 <strong>Fiesta</strong> · celebración</div></div>'
-            : '<div class="rounded-xl bg-white border border-stone-200 p-4 text-left"><div class="font-medium">Tu invitación incluye:</div><div class="mt-2">🕊 <strong>Conferencia</strong> · 20:00 hs</div></div>';
-        btnAmbos.classList.toggle('hidden',!g.invitado_fiesta);
-        quantity.innerHTML='';
-        for(let n=1;n<=g.lugares;n++){const o=document.createElement('option');o.value=n;o.textContent=n===1?'1 persona':`${n} personas`;quantity.appendChild(o)}
-        const prev=g.asistencia_eventos||(g.estado==='confirmado'?'conferencia':g.estado==='no_asiste'?'no':'');
-        if(prev)elegirAsistencia(prev);
-        if(g.estado==='confirmado'||g.estado==='no_asiste'){
-            form.classList.add('hidden');thanks.classList.remove('hidden');
-            const conf=g.confirmados_conferencia||0,fiesta=g.confirmados_fiesta||0;
-            $('rsvpGraciasTexto').textContent=g.estado==='confirmado'
-                ? (g.asistencia_eventos==='ambos'?`Ya registramos ${conf} ${conf===1?'persona':'personas'} para la conferencia y ${fiesta} ${fiesta===1?'persona':'personas'} para la fiesta. ¡Nos vemos!`:`Ya registramos ${conf} ${conf===1?'persona':'personas'} para la conferencia. ¡Nos vemos a las 20:00 hs!`)
-                : 'Ya registramos que no podrán acompañarnos. Gracias por avisarnos.';
+        const party =
+            btnParty.classList.contains('selected');
+
+        return {
+            conference,
+            party
+        };
+
+    }
+
+
+    function updateAttendanceValue(){
+
+        if (btnNo.classList.contains('selected')) {
+            attendance.value = 'no';
+            return;
         }
+
+        const events = selectedEvents();
+
+        if (events.conference && events.party) {
+            attendance.value = 'ambos';
+        } else if (events.conference) {
+            attendance.value = 'conferencia';
+        } else if (events.party) {
+            attendance.value = 'fiesta';
+        } else {
+            attendance.value = '';
+        }
+
     }
 
 
-    /* =================================================
-       SELECCIÓN DE ASISTENCIA
-    ================================================= */
+    function updateRsvpUI(){
 
-    function elegirAsistencia(valor){
-        attendance.value=valor;
-        const esConf=valor==='conferencia',esAmbos=valor==='ambos',esSi=esConf||esAmbos;
-        btnSoloConferencia.classList.toggle('selected',esConf);
-        btnAmbos.classList.toggle('selected',esAmbos);
-        btnNo.classList.toggle('selected',valor==='no');
-        btnSoloConferencia.setAttribute('aria-pressed',String(esConf));
-        btnAmbos.setAttribute('aria-pressed',String(esAmbos));
-        btnNo.setAttribute('aria-pressed',String(valor==='no'));
-        qw.classList.toggle('hidden',!esSi);cw.classList.toggle('hidden',!esSi);quantity.required=esSi;state.textContent='';
+        const no =
+            btnNo.classList.contains('selected');
+
+        const events =
+            selectedEvents();
+
+        btnConference.disabled = no;
+        btnParty.disabled = no || !partyFromCode;
+
+        btnConference.classList.toggle(
+            'disabled',
+            no
+        );
+
+        btnParty.classList.toggle(
+            'disabled',
+            no || !partyFromCode
+        );
+
+        btnConference.setAttribute(
+            'aria-pressed',
+            String(events.conference)
+        );
+
+        btnParty.setAttribute(
+            'aria-pressed',
+            String(events.party)
+        );
+
+        btnNo.setAttribute(
+            'aria-pressed',
+            String(no)
+        );
+
+        qw.classList.toggle(
+            'hidden',
+            !events.conference && !events.party
+        );
+
+        cw.classList.toggle(
+            'hidden',
+            !events.conference && !events.party
+        );
+
+        quantity.required =
+            events.conference || events.party;
+
+        if (no) {
+            rsvpHelp.textContent =
+                'Al confirmar que no podrás asistir, se desactivan los demás eventos.';
+        } else if (events.conference && events.party) {
+            rsvpHelp.textContent =
+                'Confirmaste conferencia y fiesta.';
+        } else if (events.conference) {
+            rsvpHelp.textContent =
+                'Confirmaste tu asistencia a la conferencia.';
+        } else if (events.party) {
+            rsvpHelp.textContent =
+                'Confirmaste tu asistencia a la fiesta.';
+        } else {
+            rsvpHelp.textContent =
+                'Podés confirmar uno o ambos eventos.';
+        }
+
+        updateAttendanceValue();
+
     }
 
 
-    /* Click solo conferencia */
-    btnSoloConferencia.addEventListener('click',()=>elegirAsistencia('conferencia'));
-    /* Click conferencia + fiesta */
-    btnAmbos.addEventListener('click',()=>elegirAsistencia('ambos'));
-    /* Click botón NO */
+    function elegirEvento(evento){
+
+        if (btnNo.classList.contains('selected')) {
+            btnNo.classList.remove('selected');
+        }
+
+        if (evento === 'conferencia') {
+            btnConference.classList.toggle('selected');
+        }
+
+        if (evento === 'fiesta' && partyFromCode) {
+            btnParty.classList.toggle('selected');
+        }
+
+        updateRsvpUI();
+        state.textContent = '';
+
+    }
+
+
+    function elegirNo(){
+
+        btnNo.classList.toggle('selected');
+
+        if (btnNo.classList.contains('selected')) {
+            btnConference.classList.remove('selected');
+            btnParty.classList.remove('selected');
+        }
+
+        updateRsvpUI();
+        state.textContent = '';
+
+    }
+
+
+    btnConference.addEventListener(
+        'click',
+        () => elegirEvento('conferencia')
+    );
+
+
+    btnParty.addEventListener(
+        'click',
+        () => elegirEvento('fiesta')
+    );
+
 
     btnNo.addEventListener(
         'click',
-        () => elegirAsistencia('no')
+        elegirNo
     );
-
 
 
     /* =================================================
@@ -2254,109 +3925,194 @@ audio {
 
             e.preventDefault();
 
+            updateAttendanceValue();
 
-            if (
-                !guest ||
-                !attendance.value
-            ){
-
+            if (!guest || !attendance.value) {
+                state.textContent =
+                    'Seleccioná conferencia, fiesta o no podré asistir.';
                 return;
-
             }
 
+            const cantidad =
+                Number(quantity.value || 0);
+
+            if (
+                attendance.value !== 'no' &&
+                (!Number.isInteger(cantidad) || cantidad < 1)
+            ) {
+                state.textContent =
+                    'Seleccioná la cantidad de personas.';
+                return;
+            }
 
             send.disabled = true;
-
-
             state.textContent =
                 'Guardando confirmación…';
 
-
             try {
-
 
                 const r =
                     await fetch(
-                        '/.netlify/functions/rsvp',
+                        `${SERVER1_URL}/.netlify/functions/rsvp`,
                         {
                             method: 'POST',
-
                             headers: {
                                 'Content-Type':
                                     'application/json'
                             },
-
-                            body:
-                                JSON.stringify({
-
-                                    codigo:
-                                        guest.codigo,
-
-                                    asistencia:
-                                        attendance.value,
-
-                                    cantidad:
-                                        attendance.value !== 'no'
-                                            ? Number(quantity.value)
-                                            : 0,
-
-                                    acompanantes:
-                                        attendance.value !== 'no'
-                                            ? companions.value.trim()
-                                            : ''
-
-                                })
-
+                            body: JSON.stringify({
+                                codigo:
+                                    guest.codigo,
+                                asistencia:
+                                    attendance.value,
+                                cantidad:
+                                    attendance.value === 'no'
+                                        ? 0
+                                        : cantidad,
+                                acompanantes:
+                                    attendance.value === 'no'
+                                        ? ''
+                                        : companions.value.trim()
+                            })
                         }
                     );
-
 
                 const d =
                     await r.json();
 
-
                 if (!r.ok) {
-
                     throw Error(
                         d.error ||
                         'No pudimos guardar la confirmación.'
                     );
-
                 }
 
+                form.classList.add('hidden');
+                thanks.classList.remove('hidden');
 
-                form.classList.add(
-                    'hidden'
-                );
-
-
-                thanks.classList.remove(
-                    'hidden'
-                );
-
-
-                $('rsvpGraciasTexto').textContent =
-                    attendance.value === 'no'
-                        ? 'Registramos que no podrán acompañarnos. Gracias por avisarnos.'
-                        : attendance.value === 'ambos'
-                            ? `Registramos ${Number(quantity.value)} ${Number(quantity.value) === 1 ? 'persona' : 'personas'} para la conferencia y la fiesta. ¡Nos vemos!`
-                            : `Registramos ${Number(quantity.value)} ${Number(quantity.value) === 1 ? 'persona' : 'personas'} para la conferencia. ¡Nos vemos a las 20:00 hs!`;
-
+                if (attendance.value === 'ambos') {
+                    $('rsvpGraciasTexto').textContent =
+                        `Registramos ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la conferencia y la fiesta. ¡Nos vemos!`;
+                } else if (attendance.value === 'conferencia') {
+                    $('rsvpGraciasTexto').textContent =
+                        `Registramos ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la conferencia. ¡Nos vemos!`;
+                } else if (attendance.value === 'fiesta') {
+                    $('rsvpGraciasTexto').textContent =
+                        `Registramos ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la fiesta. ¡Nos vemos!`;
+                } else {
+                    $('rsvpGraciasTexto').textContent =
+                        'Registramos que no podrás acompañarnos. Gracias por avisarnos.';
+                }
 
             } catch (e) {
 
                 state.textContent =
                     e.message;
 
-
-                send.disabled =
-                    false;
+                send.disabled = false;
 
             }
 
         }
     );
 
+
+    /* =================================================
+       RENDER INVITADO
+    ================================================= */
+
+    function render(g){
+
+        guest = g;
+
+        load.classList.add('hidden');
+        form.classList.remove('hidden');
+
+        $('nombreInvitado').textContent =
+            g.nombre;
+
+        $('lugaresInvitado').textContent =
+            `${g.lugares} ${
+                g.lugares === 1
+                    ? 'lugar reservado'
+                    : 'lugares reservados'
+            }`;
+
+        $('saludoInvitado').textContent =
+            `¿Nos acompañás, ${g.nombre}?`;
+
+        quantity.innerHTML = '';
+
+        for (
+            let n = 1;
+            n <= g.lugares;
+            n++
+        ){
+
+            const o =
+                document.createElement('option');
+
+            o.value = n;
+
+            o.textContent =
+                n === 1
+                    ? '1 persona'
+                    : `${n} personas`;
+
+            quantity.appendChild(o);
+
+        }
+
+        const partyAllowed = partyFromCode;
+
+        /* El servidor determina si esta invitación incluye la fiesta.
+           Esto evita que alguien pueda modificar el código en el navegador
+           para obtener acceso a un evento que no le corresponde. */
+        document.querySelectorAll('.party-only').forEach(el => {
+            el.hidden = !partyAllowed;
+            el.classList.toggle('hidden', !partyAllowed);
+        });
+
+        btnParty.disabled = !partyAllowed;
+
+        if (!partyAllowed) {
+            btnParty.classList.remove('selected');
+            btnParty.classList.add('disabled');
+            $('fiestaSubtitle').textContent =
+                'No incluida en tu invitación';
+        } else {
+            btnParty.classList.remove('disabled');
+            $('fiestaSubtitle').textContent =
+                'Domingo · 09:00 hs';
+        }
+
+        updateRsvpUI();
+
+        if (
+            g.estado === 'confirmado' ||
+            g.estado === 'no_asiste'
+        ){
+
+            form.classList.add('hidden');
+            thanks.classList.remove('hidden');
+
+            if (g.asistencia_eventos === 'ambos') {
+                $('rsvpGraciasTexto').textContent =
+                    `Ya registramos tu confirmación para la conferencia y la fiesta. ¡Nos vemos!`;
+            } else if (g.asistencia_eventos === 'conferencia') {
+                $('rsvpGraciasTexto').textContent =
+                    `Ya registramos tu confirmación para la conferencia. ¡Nos vemos!`;
+            } else if (g.asistencia_eventos === 'fiesta') {
+                $('rsvpGraciasTexto').textContent =
+                    `Ya registramos tu confirmación para la fiesta. ¡Nos vemos!`;
+            } else {
+                $('rsvpGraciasTexto').textContent =
+                    'Ya registramos que no podrás acompañarnos. Gracias por avisarnos.';
+            }
+
+        }
+
+    }
 
 
     /* =================================================
@@ -2378,50 +4134,115 @@ audio {
 
 
     /* =================================================
-       CARGAR INVITADO
+       BOTONERA → UBICACIÓN
     ================================================= */
 
-    if (!code) {
+    $('btnBarraUbicacion').addEventListener(
+        'click',
+        () => {
+            $('ubicacion').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    );
 
+
+    /* =================================================
+       BOTONERA → REGALO
+    ================================================= */
+
+    const giftModal =
+        $('giftModal');
+
+    const openGiftModal = () => {
+        giftModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeGiftModal = () => {
+        giftModal.classList.add('hidden');
+        document.body.style.overflow = '';
+    };
+
+    $('btnBarraRegalo').addEventListener(
+        'click',
+        openGiftModal
+    );
+
+    $('giftModalClose').addEventListener(
+        'click',
+        closeGiftModal
+    );
+
+    $('giftModalX').addEventListener(
+        'click',
+        closeGiftModal
+    );
+
+    giftModal.addEventListener(
+        'click',
+        event => {
+            if (event.target === giftModal) {
+                closeGiftModal();
+            }
+        }
+    );
+
+    document.addEventListener(
+        'keydown',
+        event => {
+            if (event.key === 'Escape' && !giftModal.classList.contains('hidden')) {
+                closeGiftModal();
+            }
+        }
+    );
+
+
+    /* =================================================
+       BOTONERA → PREGUNTAS FRECUENTES
+    ================================================= */
+
+    $('btnBarraFAQ').addEventListener(
+        'click',
+        () => {
+            $('preguntas-frecuentes').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    );
+
+
+    /* =================================================
+       CARGAR INVITADO DESDE EL SERVIDOR 1
+       El servidor 2 no tiene DB. Consulta únicamente esta función
+       del servidor 1 para obtener nombre, lugares y estado.
+    ================================================= */
+
+    const SERVER1_URL = 'https://TU-SERVIDOR-1.netlify.app';
+
+    if (!/^[A-F0-9]{9}[01]$/.test(publicCode)) {
         fail(
             'Esta invitación necesita su enlace personalizado. Pedile a Eunice y David que te reenvíen la invitación.'
         );
-
         return;
-
     }
 
-
     fetch(
-        `/.netlify/functions/guest?i=${encodeURIComponent(code)}`
+        `${SERVER1_URL}/.netlify/functions/guest?i=${encodeURIComponent(publicCode)}`
     )
-
-    .then(
-        async r => {
-
-            const d =
-                await r.json();
-
-
-            if (!r.ok) {
-
-                throw Error(
-                    d.error ||
-                    'No encontramos esta invitación.'
-                );
-
-            }
-
-
-            render(d);
-
+    .then(async r => {
+        const d = await r.json();
+        if (!r.ok) {
+            throw Error(d.error || 'No encontramos esta invitación.');
         }
-    )
 
-    .catch(
-        e => fail(e.message)
-    );
-
+        // La fiesta se decide por el sufijo del enlace en el servidor 2.
+        d.invitado_fiesta = partyFromCode;
+        render(d);
+    })
+    .catch(e => fail(e.message));
 
 })();
 
