@@ -1746,9 +1746,7 @@
             );
 
             estadoCamara.textContent = "❤️ ¡Foto subida!";
-            btnCapturarFoto.disabled = false;
-            textoControlCamara.textContent = "Tocá para sacar otra foto";
-            setTimeout(() => { estadoCamara.textContent = ""; }, 1200);
+            setTimeout(cerrarCamara, 900);
         } catch (error) {
             console.error("Error al subir foto:", error);
             estadoCamara.textContent = "No se pudo subir la foto. Intentá nuevamente.";
@@ -1872,8 +1870,19 @@
                 "❤️ ¡Video subido!"
             );
 
-            estadoCamara.textContent = "❤️ ¡Video subido!";
-            setTimeout(cerrarCamara, 900);
+            estadoCamara.textContent = "❤️ ¡Video subido! Podés grabar otro.";
+
+            // Preparar inmediatamente la cámara para grabar otro video.
+            // La cámara sigue abierta y el stream no se cierra.
+            videoListoParaSubir = null;
+            partesVideoCamara = [];
+            mediaRecorderCamara = null;
+
+            btnSubirVideo.classList.add("hidden");
+            btnSubirVideo.disabled = false;
+            btnDetenerGrabacionCamara.classList.add("hidden");
+            btnIniciarGrabacionCamara.classList.remove("hidden");
+            textoControlCamara.textContent = "Tocá para grabar otro video";
         } catch (error) {
             console.error("Error al subir video:", error);
             estadoCamara.textContent = "No se pudo subir el video. Intentá nuevamente.";
