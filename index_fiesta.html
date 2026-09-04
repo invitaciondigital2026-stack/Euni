@@ -1,0 +1,2426 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%23f5f2ed%27/%3E%3Ccircle cx=%2725%27 cy=%2735%27 r=%2714%27 fill=%27none%27 stroke=%27%23443f3a%27 stroke-width=%276%27/%3E%3Ccircle cx=%2739%27 cy=%2735%27 r=%2714%27 fill=%27none%27 stroke=%27%237c7168%27 stroke-width=%276%27/%3E%3Cpath d=%27M32 14l2.5 5.5L40 22l-5.5 2.5L32 30l-2.5-5.5L24 22l5.5-2.5z%27 fill=%27%23b7a27a%27/%3E%3C/svg%3E" />
+
+    <!-- Responsive -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Eunice & David | Nos Casamos</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #fafaf9;
+            color: #44403c;
+        }
+
+        .title-font {
+            font-family: 'Great Vibes', cursive;
+        }
+
+        /* PORTADA */
+
+        .hero {
+            background-image: url("assets/portada.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            position: relative;
+        }
+
+        /* Oscurecer imagen */
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.40);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Títulos */
+
+        .section-title {
+            letter-spacing: 3px;
+        }
+
+        /* Línea decorativa */
+
+        .decorative-line {
+            width: 70px;
+            height: 1px;
+            background: #a8a29e;
+            margin: 15px auto;
+        }
+
+        /* Cuenta regresiva */
+
+        .countdown-box {
+            min-width: 70px;
+        }
+
+        .countdown-number {
+            font-size: 2rem;
+            font-weight: 500;
+        }
+
+        .countdown-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Botones */
+
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border-radius: 999px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Música */
+
+        audio {
+            max-width: 100%;
+        }
+
+        /* Mobile */
+
+        @media (max-width: 640px) {
+
+            .hero {
+                min-height: 100svh;
+                background-position: center;
+            }
+
+            .hero h1 {
+                font-size: 4rem;
+                line-height: 1.1;
+            }
+
+            .hero h2 {
+                font-size: 0.9rem;
+            }
+
+            .countdown-number {
+                font-size: 1.6rem;
+            }
+
+            .countdown-box {
+                min-width: 55px;
+            }
+
+        }
+
+        /* =====================================================
+           BOTONERA FLOTANTE LATERAL
+        ====================================================== */
+        .floating-toolbar {
+            position: fixed;
+            top: 50%;
+            right: 10px;
+            left: auto;
+            transform: translateY(-50%);
+            z-index: 9500;
+            width: 72px;
+            padding: 4px;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            box-sizing: border-box;
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .floating-toolbar button,
+        .floating-toolbar a {
+            position: relative;
+            width: 62px;
+            min-width: 62px;
+            max-width: 62px;
+            height: 58px;
+            min-height: 58px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            margin: 0;
+            padding: 5px 3px;
+            box-sizing: border-box;
+            border: 0;
+            border-radius: 18px;
+            background: transparent;
+            color: #443f3a;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform .15s ease, color .15s ease, opacity .15s ease;
+            font-family: 'Poppins', sans-serif;
+            font-size: 9px;
+            line-height: 1.1;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .floating-toolbar button:hover,
+        .floating-toolbar a:hover {
+            transform: translateY(-2px) scale(1.03);
+        }
+
+        .floating-toolbar button:active,
+        .floating-toolbar a:active {
+            transform: scale(.96);
+        }
+
+        .floating-toolbar svg {
+            width: 27px;
+            height: 27px;
+            flex: 0 0 auto;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: .70;
+            transition: color .18s ease, opacity .18s ease;
+        }
+
+        .floating-toolbar .toolbar-ubicacion {
+            color: #443f3a;
+        }
+
+        .floating-toolbar .toolbar-action:nth-child(2) {
+            color: #443f3a;
+        }
+
+        .floating-toolbar .toolbar-action:nth-child(3) {
+            color: #443f3a;
+        }
+
+        .floating-toolbar .toolbar-action:nth-child(4) {
+            color: #443f3a;
+        }
+
+        .floating-toolbar .toolbar-music {
+            color: #443f3a;
+        }
+
+        .floating-toolbar .toolbar-music.is-muted {
+            color: #e53935;
+        }
+
+        .floating-toolbar .toolbar-music.is-muted svg {
+            color: #e53935;
+            opacity: 1;
+        }
+
+        @media (max-width: 640px) {
+            .floating-toolbar {
+                right: 6px;
+                width: 64px;
+                padding: 2px;
+                gap: 3px;
+            }
+
+            .floating-toolbar button,
+            .floating-toolbar a {
+                width: 56px;
+                min-width: 56px;
+                max-width: 56px;
+                height: 53px;
+                min-height: 53px;
+                border-radius: 17px;
+                font-size: 8px;
+            }
+
+            .floating-toolbar svg {
+                width: 24px;
+                height: 24px;
+            }
+        }
+
+        /* =====================================================
+           MÚSICA: control flotante + fallback para autoplay
+        ====================================================== */
+        .music-toggle {
+            display: none;
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 9000;
+            width: 48px;
+            height: 48px;
+            border: 1px solid rgba(255,255,255,.75);
+            border-radius: 50%;
+            background: rgba(68, 63, 58, .88);
+            color: #fff;
+            font-size: 24px;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 5px 18px rgba(0,0,0,.18);
+            transition: transform .2s ease, opacity .2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .music-toggle:hover {
+            transform: scale(1.06);
+        }
+
+        .music-toggle.is-playing {
+            animation: musicPulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes musicPulse {
+            0%, 100% { box-shadow: 0 5px 18px rgba(0,0,0,.18); }
+            50% { box-shadow: 0 5px 24px rgba(183,162,122,.55); }
+        }
+
+        /* GALERÍA: imágenes sin animaciones para carga y scroll inmediatos */
+        .gallery-item,
+        .gallery-item img,
+        .gallery-item video {
+            opacity: 1;
+            transform: none;
+            filter: none;
+            clip-path: none;
+            animation: none !important;
+            transition: none !important;
+            will-change: auto;
+        }
+
+        /* GALERÍA EN VIVO */
+
+        /* VISOR DE FOTOS A PANTALLA COMPLETA */
+        .gallery-lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,.96);
+            padding: 18px;
+        }
+        .gallery-lightbox.hidden { display: none; }
+        .gallery-lightbox img {
+            max-width: 100%;
+            max-height: calc(100vh - 80px);
+            max-height: calc(100dvh - 80px);
+            object-fit: contain;
+            border-radius: 6px;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+        .gallery-lightbox-close, .gallery-lightbox-nav {
+            position: absolute;
+            z-index: 2;
+            border: 0;
+            color: white;
+            background: rgba(0,0,0,.45);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .gallery-lightbox-close {
+            top: 14px; right: 14px;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            font-size: 30px;
+            line-height: 1;
+        }
+        .gallery-lightbox-nav {
+            top: 50%;
+            transform: translateY(-50%);
+            width: 52px; height: 72px;
+            border-radius: 14px;
+            font-size: 42px;
+            line-height: 1;
+        }
+        .gallery-lightbox-prev { left: 12px; }
+        .gallery-lightbox-next { right: 12px; }
+        .gallery-lightbox-counter {
+            position: absolute;
+            bottom: 14px; left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            background: rgba(0,0,0,.45);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: .8rem;
+        }
+        @media (max-width: 640px) {
+            .gallery-lightbox { padding: 8px; }
+            .gallery-lightbox img { max-height: calc(100dvh - 65px); }
+            .gallery-lightbox-nav { width: 44px; height: 60px; font-size: 34px; background: rgba(0,0,0,.32); }
+            .gallery-lightbox-prev { left: 5px; }
+            .gallery-lightbox-next { right: 5px; }
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 14px;
+            background: #e7e5e4;
+            aspect-ratio: 1 / 1;
+            cursor: pointer;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .gallery-item img,
+        .gallery-item video {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .gallery-video-icon {
+            position: absolute;
+            left: 10px;
+            bottom: 10px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.65);
+            color: white;
+            font-size: 15px;
+            pointer-events: none;
+        }
+
+        .gallery-empty {
+            grid-column: 1 / -1;
+            padding: 30px 20px;
+            text-align: center;
+            color: #78716c;
+        }
+
+        .gallery-status {
+            min-height: 22px;
+            margin-top: 12px;
+            font-size: 0.82rem;
+            color: #78716c;
+        }
+
+        .gallery-refresh {
+            border: 0;
+            background: transparent;
+            color: #57534e;
+            text-decoration: underline;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.82rem;
+            margin-top: 4px;
+        }
+
+        .gallery-refresh:hover {
+            color: #292524;
+        }
+
+        @media (min-width: 640px) {
+            .gallery-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 14px;
+            }
+        }
+
+        @media (min-width: 900px) {
+            .gallery-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+    
+
+        /* =====================================================
+           CÁMARA FULLSCREEN
+        ====================================================== */
+        .camera-fullscreen {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            width: 100vw;
+            height: 100dvh;
+            background: #000;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .camera-preview {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+        }
+
+        .camera-vignette {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,.30) 0%,
+                rgba(0,0,0,0) 25%,
+                rgba(0,0,0,0) 68%,
+                rgba(0,0,0,.45) 100%
+            );
+        }
+
+        .camera-topbar {
+            position: absolute;
+            top: max(18px, env(safe-area-inset-top));
+            left: 0;
+            right: 0;
+            min-height: 80px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 10px 58px 0;
+            z-index: 3;
+        }
+
+        .camera-close {
+            position: absolute;
+            left: 18px;
+            top: 8px;
+            width: 46px;
+            height: 46px;
+            border: 0;
+            background: transparent;
+            color: #fff;
+            font-size: 42px;
+            line-height: 42px;
+            font-weight: 200;
+            cursor: pointer;
+            text-shadow: 0 1px 8px rgba(0,0,0,.6);
+        }
+
+        .camera-title-wrap {
+            text-align: center;
+            max-width: 90%;
+        }
+
+        .camera-title {
+            margin: 0;
+            color: #fff;
+            font-size: clamp(25px, 7vw, 42px);
+            line-height: 1.15;
+            font-weight: 400;
+            text-shadow: 0 2px 12px rgba(0,0,0,.75);
+            font-family: inherit;
+        }
+
+        .camera-timer {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 7px 14px;
+            border-radius: 999px;
+            color: #fff;
+            background: rgba(0,0,0,.55);
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: .04em;
+            text-shadow: none;
+        }
+
+        .camera-status {
+            position: absolute;
+            left: 20px;
+            right: 20px;
+            bottom: max(155px, calc(110px + env(safe-area-inset-bottom)));
+            z-index: 3;
+            color: #fff;
+            text-align: center;
+            font-size: 16px;
+            text-shadow: 0 2px 8px rgba(0,0,0,.9);
+            pointer-events: none;
+            min-height: 24px;
+        }
+
+        .camera-controls {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: max(24px, env(safe-area-inset-bottom));
+            z-index: 4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .camera-shutter {
+            width: 82px;
+            height: 82px;
+            border-radius: 50%;
+            border: 5px solid rgba(255,255,255,.95);
+            box-shadow: 0 3px 18px rgba(0,0,0,.45);
+            cursor: pointer;
+            padding: 0;
+            transition: transform .12s ease, border-radius .12s ease;
+        }
+
+        .camera-shutter:active,
+        .camera-upload:active {
+            transform: scale(.92);
+        }
+
+        .camera-shutter-photo {
+            background: #fff;
+        }
+
+        .camera-shutter-video {
+            background: #e53935;
+        }
+
+        .camera-shutter-stop {
+            background: transparent;
+        }
+
+        .camera-shutter-stop span {
+            display: block;
+            width: 29px;
+            height: 29px;
+            margin: auto;
+            border-radius: 5px;
+            background: #fff;
+        }
+
+        .camera-upload {
+            width: 72px;
+            height: 72px;
+            border: 0;
+            border-radius: 50%;
+            background: #1976f3;
+            color: #fff;
+            font-size: 50px;
+            line-height: 62px;
+            font-weight: 300;
+            box-shadow: 0 4px 20px rgba(0,0,0,.45);
+            cursor: pointer;
+        }
+
+        .camera-control-text {
+            color: #fff;
+            font-size: 14px;
+            text-shadow: 0 2px 8px rgba(0,0,0,.9);
+            min-height: 20px;
+        }
+
+        @media (min-width: 769px) {
+            .camera-fullscreen {
+                max-width: 100vw;
+                max-height: 100vh;
+            }
+            .camera-title {
+                font-size: 34px;
+            }
+        }
+
+
+/* ===== GALERÍA: sin revelado al hacer scroll ===== */
+.gallery-item,
+.gallery-item img,
+.gallery-item video,
+.gallery-item::after {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    clip-path: none !important;
+    animation: none !important;
+    transition: none !important;
+}
+.gallery-item::after {
+    display: none !important;
+}
+
+</style>
+
+</head>
+
+
+
+
+
+
+
+
+<body>
+
+    <!-- =====================================================
+         BOTONERA FLOTANTE LATERAL
+         Reutiliza las funciones existentes de cámara, galería y música.
+    ====================================================== -->
+    <nav class="floating-toolbar" aria-label="Controles rápidos">
+        <a
+            class="toolbar-action toolbar-ubicacion"
+            href="https://maps.app.goo.gl/CLjByKmHYeeR6gnGA?g_st=aw"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Ver ubicación"
+            title="Ver ubicación"
+        >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"></path>
+                <circle cx="12" cy="10" r="2.5"></circle>
+            </svg>
+            <span>Ubicación</span>
+        </a>
+
+        <button
+            id="btnBarraFoto"
+            class="toolbar-action"
+            type="button"
+            aria-label="Abrir cámara de fotos"
+            title="Cámara"
+        >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7.5h3l1.5-2h7L17 7.5h3v11H4z"></path>
+                <circle cx="12" cy="13" r="3.5"></circle>
+            </svg>
+            <span>Cámara</span>
+        </button>
+
+        <button
+            id="btnBarraVideo"
+            class="toolbar-action"
+            type="button"
+            aria-label="Abrir cámara de video"
+            title="Filmadora"
+        >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7.5h10.5A1.5 1.5 0 0 1 16 9v6a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 15V9A1.5 1.5 0 0 1 4 7.5z"></path>
+                <path d="m16 10 5-2.5v9L16 14z"></path>
+            </svg>
+            <span>Filmadora</span>
+        </button>
+
+        <button
+            id="btnBarraSubir"
+            class="toolbar-action"
+            type="button"
+            aria-label="Subir fotos y videos"
+            title="Subir archivo"
+        >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 16V4"></path>
+                <path d="m7 9 5-5 5 5"></path>
+                <path d="M5 20h14"></path>
+            </svg>
+            <span>Subir archivo</span>
+        </button>
+
+        <button
+            id="btnBarraMusica"
+            class="toolbar-action toolbar-music"
+            type="button"
+            aria-label="Pausar música"
+            aria-pressed="true"
+            title="Pausar música"
+        >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9 18V5l10-2v13"></path>
+                <circle cx="6" cy="18" r="3"></circle>
+                <circle cx="16" cy="16" r="3"></circle>
+            </svg>
+            <span>Música</span>
+        </button>
+    </nav>
+
+
+<script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+    <!-- =====================================================
+         PORTADA
+    ====================================================== -->
+
+    <section class="hero">
+
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content text-white">
+
+            <p class="uppercase tracking-widest text-sm mb-4">
+                Estamos felices de anunciar
+            </p>
+
+            <h1 class="title-font text-6xl md:text-8xl mb-3">
+                Eunice & David
+            </h1>
+
+            <h2 class="uppercase tracking-widest text-lg md:text-xl">
+                Nos Casamos
+            </h2>
+
+            <div class="decorative-line bg-white mt-6"></div>
+
+            <p class="mt-5 text-sm tracking-widest">
+                ¡Te esperamos para celebrar juntos!
+            </p>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         MÚSICA
+    ====================================================== -->
+
+    <section class="py-10 text-center bg-white">
+
+        <audio id="musicaBoda" loop preload="auto">
+            <source src="assets/osg_S_114.mp3" type="audio/mpeg">
+            Tu navegador no soporta el reproductor de audio.
+        </audio>
+
+        <button
+            id="btnMusica"
+            class="music-toggle"
+            type="button"
+            aria-label="Activar música"
+            aria-pressed="false"
+            title="Activar música"
+        >♪</button>
+
+    </section>
+
+
+    <!-- =====================================================
+         FECHA
+    ====================================================== -->
+
+    <section class="py-16 bg-white text-center">
+
+        <h2 class="title-font text-5xl mb-4">
+            Nuestro gran día
+        </h2>
+
+        <div class="decorative-line"></div>
+
+        <!-- CAMBIAR FECHA -->
+
+        <p class="text-2xl mt-6">
+            Viernes 28 de noviembre
+        </p>
+
+        <p class="text-gray-500 mt-2">
+            2026
+        </p>
+
+        <p class="mt-6 text-gray-600">
+            Ceremonia y celebración
+        </p>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         UBICACIÓN
+    ====================================================== -->
+
+    <section class="py-16 text-center px-6">
+
+        <h2 class="section-title uppercase text-sm mb-3">
+            Lugar
+        </h2>
+
+        <div class="decorative-line"></div>
+
+        <h3 class="text-2xl mt-6">
+            Salón de Celebraciones
+        </h3>
+
+        <p class="text-gray-500 mt-2">
+            Dirección del salón
+        </p>
+
+
+        <!--
+            REEMPLAZAR EL # POR EL LINK
+            DE GOOGLE MAPS
+        -->
+
+        <a
+            href="https://maps.app.goo.gl/CLjByKmHYeeR6gnGA?g_st=aw"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn bg-stone-700 text-white mt-7"
+        >
+            📍 Ver ubicación
+        </a>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         MENSAJE
+    ====================================================== -->
+
+    <section class="py-16 bg-stone-100 text-center px-6">
+
+        <h2 class="title-font text-5xl mb-6">
+            Crecimos juntos 
+            <br><br>
+            pero nuestra historia continua unidos...
+        </h2>
+
+        <p class="max-w-xl mx-auto leading-relaxed text-gray-600">
+
+            formamos un equipo 
+            y queremos que seas parte del comienzo de esta historia.
+
+        </p>
+
+    </section>
+
+
+<!-- =====================================================
+     COMPARTIR FOTOS Y VIDEOS
+====================================================== -->
+
+<section class="py-16 bg-stone-100 text-center px-6">
+
+    <h2 class="section-title uppercase text-sm mb-3">
+        Compartí tus recuerdos
+    </h2>
+
+    <div class="decorative-line"></div>
+
+    <h3 class="title-font text-5xl mt-5">
+        📸 Fotos y videos
+    </h3>
+
+    <p class="text-gray-600 max-w-md mx-auto mt-5 mb-7">
+        ¿Sacaste una foto o un video durante nuestra boda?
+        ¡Compartilo con nosotros!
+    </p>
+
+<div class="flex flex-col items-center gap-3 w-full max-w-md mx-auto">
+
+    <button
+        id="btnFotos"
+        type="button"
+        class="btn bg-stone-700 text-white text-base shadow-lg w-full"
+    >
+        📷 Compartir fotos y videos
+    </button>
+
+    <button
+        id="btnGrabarVideo"
+        type="button"
+        class="btn bg-stone-700 text-white text-base shadow-lg w-full"
+    >
+        🎥 Grabar video
+    </button>
+
+    <button
+        id="btnSubirGaleriaCelular"
+        type="button"
+        class="btn bg-stone-700 text-white text-base shadow-lg w-full"
+        style="display:block !important; visibility:visible !important; opacity:1 !important;"
+    >
+        🖼️ Subir fotos y videos del celular
+    </button>
+
+    <input
+        id="inputGaleriaCelular"
+        type="file"
+        accept="image/*,video/*"
+        multiple
+        class="hidden"
+    >
+
+</div>
+
+<!-- =====================================================
+     VISOR DE GALERÍA A PANTALLA COMPLETA
+====================================================== -->
+<div id="galleryLightbox" class="gallery-lightbox hidden" role="dialog" aria-modal="true" aria-label="Foto en pantalla completa">
+    <button id="galleryLightboxClose" class="gallery-lightbox-close" type="button" aria-label="Cerrar">×</button>
+    <button id="galleryLightboxPrev" class="gallery-lightbox-nav gallery-lightbox-prev" type="button" aria-label="Foto anterior">‹</button>
+    <img id="galleryLightboxImage" src="" alt="Foto de la boda">
+    <video id="galleryLightboxVideo" controls playsinline preload="metadata" style="display:none; max-width:100%; max-height:calc(100vh - 80px); max-height:calc(100dvh - 80px); border-radius:6px;"></video>
+    <button id="galleryLightboxNext" class="gallery-lightbox-nav gallery-lightbox-next" type="button" aria-label="Foto siguiente">›</button>
+    <div id="galleryLightboxCounter" class="gallery-lightbox-counter"></div>
+</div>
+
+<!-- =====================================================
+     CÁMARA A PANTALLA COMPLETA PARA CELULARES
+====================================================== -->
+<div id="modalCamara" class="camera-fullscreen hidden">
+
+    <!-- Vista de cámara -->
+    <video
+        id="previewCamara"
+        class="camera-preview"
+        autoplay
+        muted
+        playsinline
+    ></video>
+
+    <!-- Capa oscura suave para que el texto se lea sin ponerle fondo -->
+    <div class="camera-vignette"></div>
+
+    <!-- Texto superior, sin fondo -->
+    <div class="camera-topbar">
+        <button
+            id="cerrarModalCamara"
+            type="button"
+            class="camera-close"
+            aria-label="Cerrar cámara"
+        >×</button>
+
+        <div class="camera-title-wrap">
+            <h3 id="tituloCamara" class="camera-title">Comparte un momento especial</h3>
+            <div id="temporizadorCamara" class="camera-timer hidden">00:00</div>
+        </div>
+    </div>
+
+    <canvas id="canvasFoto" class="hidden"></canvas>
+
+    <!-- Mensajes -->
+    <div id="estadoCamara" class="camera-status">
+        Preparando cámara…
+    </div>
+
+    <!-- Controles inferiores -->
+    <div class="camera-controls">
+        <!-- Foto: círculo blanco -->
+        <button
+            id="btnCapturarFoto"
+            type="button"
+            class="camera-shutter camera-shutter-photo"
+            aria-label="Sacar foto"
+        ></button>
+
+        <!-- Video: círculo rojo -->
+        <button
+            id="btnIniciarGrabacionCamara"
+            type="button"
+            class="camera-shutter camera-shutter-video hidden"
+            aria-label="Iniciar grabación"
+        ></button>
+
+        <!-- Video grabando: cuadrado -->
+        <button
+            id="btnDetenerGrabacionCamara"
+            type="button"
+            class="camera-shutter camera-shutter-stop hidden"
+            aria-label="Detener grabación"
+        ><span></span></button>
+
+        <!-- Después de detener: flecha azul para subir -->
+        <button
+            id="btnSubirVideo"
+            type="button"
+            class="camera-upload hidden"
+            aria-label="Subir video"
+        >↑</button>
+
+        <div id="textoControlCamara" class="camera-control-text">
+            Tocá para sacar la foto
+        </div>
+    </div>
+</div>
+</section>
+
+    <!-- =====================================================
+         GALERÍA EN VIVO
+    ====================================================== -->
+
+    <section class="py-16 bg-white text-center px-6">
+
+        <h2 class="section-title uppercase text-sm mb-3">
+            Recuerdos compartidos
+        </h2>
+
+        <div class="decorative-line"></div>
+
+        <h3 class="title-font text-5xl mt-5">
+            📷 Nuestra galería
+        </h3>
+
+        <p class="text-gray-600 max-w-md mx-auto mt-5 mb-6">
+            Las fotos y videos que compartan nuestros invitados
+            aparecerán aquí automáticamente.
+        </p>
+
+        <div id="galleryStatus" class="gallery-status">
+            Cargando recuerdos...
+        </div>
+
+        <button
+            id="btnActualizarGaleria"
+            type="button"
+            class="gallery-refresh"
+        >
+            ↻ Actualizar galería
+        </button>
+
+        <div
+            id="galeria"
+            class="gallery-grid mt-6"
+        >
+            <div class="gallery-empty">
+                Cargando fotos y videos...
+            </div>
+        </div>
+
+    </section>
+
+    <!-- =====================================================
+         CIERRE
+    ====================================================== -->
+
+    <section
+        class="py-20 text-center bg-stone-100 px-6"
+    >
+
+        <p class="text-sm uppercase tracking-widest">
+            Con mucho amor
+        </p>
+
+        <h2 class="title-font text-6xl mt-3">
+            Eunice & David
+        </h2>
+
+        <p class="mt-6 text-sm text-gray-500">
+            ¡Los esperamos!
+        </p>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="py-6 text-center bg-stone-800 text-white">
+
+        <p class="text-xs opacity-70">
+            Eunice & David · 2026
+        </p>
+
+    </footer>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+         CUENTA REGRESIVA
+    ====================================================== -->
+
+    <script>
+
+        /*
+         * ==================================================
+         * CONFIGURACIÓN
+         * ==================================================
+         *
+         * CAMBIAR ESTA FECHA POR LA FECHA REAL
+         * DEL CASAMIENTO.
+         *
+         * Formato:
+         * Año, mes - 1, día, hora, minutos
+         *
+         * Ejemplo:
+         *
+         * new Date(2026, 10, 15, 20, 0, 0)
+         *
+         * El mes empieza en 0:
+         *
+         * Enero     = 0
+         * Febrero   = 1
+         * Marzo     = 2
+         * ...
+         * Noviembre = 10
+         * Diciembre = 11
+         *
+         */
+
+        const fechaCasamiento =
+            new Date(2026, 10, 28, 20, 0, 0);
+
+
+        function actualizarCuentaRegresiva() {
+
+            const ahora = new Date();
+
+            const diferencia =
+                fechaCasamiento - ahora;
+
+
+            /*
+             * Si la fecha ya pasó
+             */
+
+            if (diferencia <= 0) {
+
+                document.getElementById("days").textContent = "00";
+                document.getElementById("hours").textContent = "00";
+                document.getElementById("minutes").textContent = "00";
+                document.getElementById("seconds").textContent = "00";
+
+                return;
+            }
+
+
+            const dias =
+                Math.floor(
+                    diferencia / (1000 * 60 * 60 * 24)
+                );
+
+
+            const horas =
+                Math.floor(
+                    (diferencia /
+                    (1000 * 60 * 60)) % 24
+                );
+
+
+            const minutos =
+                Math.floor(
+                    (diferencia /
+                    (1000 * 60)) % 60
+                );
+
+
+            const segundos =
+                Math.floor(
+                    (diferencia / 1000) % 60
+                );
+
+
+            document.getElementById("days").textContent =
+                String(dias).padStart(2, "0");
+
+
+            document.getElementById("hours").textContent =
+                String(horas).padStart(2, "0");
+
+
+            document.getElementById("minutes").textContent =
+                String(minutos).padStart(2, "0");
+
+
+            document.getElementById("seconds").textContent =
+                String(segundos).padStart(2, "0");
+
+        }
+
+
+        /*
+         * Actualizar inmediatamente
+         */
+
+        actualizarCuentaRegresiva();
+
+
+        /*
+         * Actualizar cada segundo
+         */
+
+        setInterval(
+            actualizarCuentaRegresiva,
+            1000
+        );
+
+    </script>
+
+
+</body>
+<script>
+
+    // =====================================================
+    // MÚSICA: autoplay con fallback para las políticas del navegador
+    // =====================================================
+    const musicaBoda = document.getElementById("musicaBoda");
+    const btnMusica = document.getElementById("btnMusica");
+    const btnBarraMusica = document.getElementById("btnBarraMusica");
+
+    function actualizarBotonMusica() {
+        if (!musicaBoda) return;
+
+        const reproduciendo = !musicaBoda.paused;
+
+        if (btnMusica) {
+            btnMusica.classList.toggle("is-playing", reproduciendo);
+            btnMusica.textContent = reproduciendo ? "♫" : "♪";
+            btnMusica.setAttribute("aria-pressed", reproduciendo ? "true" : "false");
+            btnMusica.setAttribute("aria-label", reproduciendo ? "Pausar música" : "Activar música");
+            btnMusica.title = reproduciendo ? "Pausar música" : "Activar música";
+        }
+
+        if (btnBarraMusica) {
+            btnBarraMusica.classList.toggle("is-muted", !reproduciendo);
+            btnBarraMusica.setAttribute("aria-pressed", reproduciendo ? "true" : "false");
+            btnBarraMusica.setAttribute("aria-label", reproduciendo ? "Pausar música" : "Reanudar música");
+            btnBarraMusica.title = reproduciendo ? "Pausar música" : "Reanudar música";
+        }
+    }
+
+    async function intentarIniciarMusica() {
+        if (!musicaBoda) return;
+
+        try {
+            await musicaBoda.play();
+        } catch (error) {
+            // El navegador puede bloquear autoplay con sonido.
+            // En ese caso esperamos la primera interacción del visitante.
+            console.info("Autoplay bloqueado; se activará con la primera interacción.");
+        }
+
+        actualizarBotonMusica();
+    }
+
+    if (musicaBoda) {
+        musicaBoda.volume = 0.65;
+
+        musicaBoda.addEventListener("play", actualizarBotonMusica);
+        musicaBoda.addEventListener("pause", actualizarBotonMusica);
+        musicaBoda.addEventListener("ended", actualizarBotonMusica);
+
+        // Primer intento automático.
+        intentarIniciarMusica();
+
+        // Si el navegador bloqueó el autoplay, el primer toque/clic
+        // habilita la reproducción con sonido.
+        const activarConPrimeraInteraccion = function() {
+            intentarIniciarMusica();
+            document.removeEventListener("pointerdown", activarConPrimeraInteraccion);
+            document.removeEventListener("keydown", activarConPrimeraInteraccion);
+        };
+
+        document.addEventListener("pointerdown", activarConPrimeraInteraccion, { passive: true });
+        document.addEventListener("keydown", activarConPrimeraInteraccion, { passive: true });
+    }
+
+    if (btnMusica && musicaBoda) {
+        btnMusica.addEventListener("click", async function() {
+            try {
+                if (musicaBoda.paused) {
+                    await musicaBoda.play();
+                } else {
+                    musicaBoda.pause();
+                }
+            } catch (error) {
+                console.warn("No se pudo reproducir la música:", error);
+            }
+
+            actualizarBotonMusica();
+        });
+    }
+
+    // Botón de música de la botonera superior: pausa/reanuda sin reiniciar la canción.
+    if (btnBarraMusica && musicaBoda) {
+        btnBarraMusica.addEventListener("click", async function() {
+            try {
+                if (musicaBoda.paused) {
+                    await musicaBoda.play();
+                } else {
+                    musicaBoda.pause();
+                }
+            } catch (error) {
+                console.warn("No se pudo reproducir la música:", error);
+            }
+            actualizarBotonMusica();
+        });
+    }
+
+    
+/* ===== GALERÍA: sin activación por scroll ===== */
+
+const CLOUDINARY_CLOUD_NAME = "entbx2xv";
+
+    const CLOUDINARY_UPLOAD_PRESET = "euni_upload";
+
+
+    // =====================================================
+    // CREAR WIDGET
+    // =====================================================
+
+    const widgetCloudinary =
+        cloudinary.createUploadWidget(
+
+            {
+
+                cloudName:
+                    CLOUDINARY_CLOUD_NAME,
+
+                uploadPreset:
+                    CLOUDINARY_UPLOAD_PRESET,
+
+
+                // Fuentes disponibles
+                sources: [
+                    "local",
+                    "camera"
+                ],
+
+
+                // Permitir varios archivos
+                multiple: true,
+
+
+                // Máximo de archivos por tanda
+                maxFiles: 20,
+
+
+                // Fotos + videos
+                resourceType: "auto",
+
+
+                // Formatos permitidos
+                clientAllowedFormats: [
+                    "jpg",
+                    "jpeg",
+                    "png",
+                    "webp",
+                    "heic",
+                    "mp4",
+                    "mov",
+                    "webm"
+                ],
+
+
+                // Máximo 100 MB por archivo
+                maxFileSize: 100000000,
+
+
+                // Carpeta dentro de Cloudinary
+                folder: "boda-eunice-david",
+
+                // Etiqueta utilizada por la galería pública
+                tags: ["boda-eunice-david"],
+
+
+                cropping: false,
+
+                showAdvancedOptions: false,
+
+                showSkipCropButton: false,
+
+
+                language: "es"
+
+            },
+
+
+            function(error, result) {
+
+                // =================================================
+                // ERROR
+                // =================================================
+
+                if (error) {
+
+                    console.error(
+                        "Error Cloudinary:",
+                        error
+                    );
+
+                    return;
+                }
+
+
+                // =================================================
+                // ARCHIVO SUBIDO
+                // =================================================
+
+                if (
+                    result &&
+                    result.event === "success"
+                ) {
+
+                    console.log(
+                        "Archivo subido correctamente:",
+                        result.info
+                    );
+
+                    const mensaje =
+                        document.getElementById("mensajeSubida");
+
+                    if (mensaje) {
+                        mensaje.textContent =
+                            "❤️ ¡Gracias por compartir este recuerdo!";
+                        mensaje.style.display = "block";
+                    }
+
+                }
+
+                // Cuando termina toda la tanda de archivos,
+                // actualizamos la galería.
+                if (
+                    result &&
+                    result.event === "queues-end"
+                ) {
+                    setTimeout(cargarGaleria, 2000);
+                }
+
+            }
+
+        );
+
+
+    // =====================================================
+    // GALERÍA EN VIVO
+    // =====================================================
+
+    const GALERIA_TAG = "boda-eunice-david";
+
+    const URL_LISTA_IMAGENES =
+        "https://res.cloudinary.com/" +
+        CLOUDINARY_CLOUD_NAME +
+        "/image/list/" +
+        GALERIA_TAG +
+        ".json";
+
+    const URL_LISTA_VIDEOS =
+        "https://res.cloudinary.com/" +
+        CLOUDINARY_CLOUD_NAME +
+        "/video/list/" +
+        GALERIA_TAG +
+        ".json";
+
+
+    function crearUrlCloudinary(recurso) {
+
+        const tipo =
+            recurso.resource_type === "video"
+                ? "video"
+                : "image";
+
+        return (
+            "https://res.cloudinary.com/" +
+            CLOUDINARY_CLOUD_NAME +
+            "/" +
+            tipo +
+            "/upload/" +
+            recurso.public_id +
+            "." +
+            recurso.format
+        );
+
+    }
+
+
+    let fotosGaleria = [];
+    let indiceFotoGaleria = 0;
+
+    const galleryLightbox = document.getElementById("galleryLightbox");
+    const galleryLightboxImage = document.getElementById("galleryLightboxImage");
+    const galleryLightboxVideo = document.getElementById("galleryLightboxVideo");
+    const galleryLightboxClose = document.getElementById("galleryLightboxClose");
+    const galleryLightboxPrev = document.getElementById("galleryLightboxPrev");
+    const galleryLightboxNext = document.getElementById("galleryLightboxNext");
+    const galleryLightboxCounter = document.getElementById("galleryLightboxCounter");
+
+    function actualizarVisorGaleria() {
+        if (!fotosGaleria.length) return;
+        const recurso = fotosGaleria[indiceFotoGaleria];
+        const url = crearUrlCloudinary(recurso);
+
+        // El visor admite tanto fotos como videos para que la navegación
+        // avance por todos los recuerdos sin saltearse los videos.
+        if (recurso.resource_type === "video") {
+            galleryLightboxImage.style.display = "none";
+            galleryLightboxImage.src = "";
+            galleryLightboxVideo.style.display = "block";
+            galleryLightboxVideo.src = url;
+            galleryLightboxVideo.currentTime = 0;
+            galleryLightboxVideo.load();
+        } else {
+            galleryLightboxVideo.pause();
+            galleryLightboxVideo.style.display = "none";
+            galleryLightboxVideo.src = "";
+            galleryLightboxImage.style.display = "block";
+            galleryLightboxImage.src = url;
+        }
+
+        galleryLightboxCounter.textContent = (indiceFotoGaleria + 1) + " / " + fotosGaleria.length;
+    }
+
+    function abrirVisorGaleria(indice) {
+        if (!fotosGaleria.length) return;
+        indiceFotoGaleria = (indice + fotosGaleria.length) % fotosGaleria.length;
+        actualizarVisorGaleria();
+        galleryLightbox.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+    }
+
+    function cerrarVisorGaleria() {
+        galleryLightbox.classList.add("hidden");
+        galleryLightboxImage.src = "";
+        galleryLightboxVideo.pause();
+        galleryLightboxVideo.src = "";
+        document.body.style.overflow = "";
+    }
+
+    function fotoAnteriorGaleria() {
+        abrirVisorGaleria(indiceFotoGaleria - 1);
+    }
+
+    function fotoSiguienteGaleria() {
+        abrirVisorGaleria(indiceFotoGaleria + 1);
+    }
+
+    galleryLightboxClose.addEventListener("click", cerrarVisorGaleria);
+    galleryLightboxPrev.addEventListener("click", fotoAnteriorGaleria);
+    galleryLightboxNext.addEventListener("click", fotoSiguienteGaleria);
+    galleryLightbox.addEventListener("click", function(e) {
+        if (e.target === galleryLightbox) cerrarVisorGaleria();
+    });
+    document.addEventListener("keydown", function(e) {
+        if (galleryLightbox.classList.contains("hidden")) return;
+        if (e.key === "Escape") cerrarVisorGaleria();
+        if (e.key === "ArrowLeft") fotoAnteriorGaleria();
+        if (e.key === "ArrowRight") fotoSiguienteGaleria();
+    });
+
+    function mostrarGaleria(recursos) {
+
+        const galeria =
+            document.getElementById("galeria");
+
+        const estado =
+            document.getElementById("galleryStatus");
+
+
+        if (!galeria) {
+            return;
+        }
+
+
+        galeria.innerHTML = "";
+
+        // Guardamos fotos Y videos en el mismo orden de la galería.
+        fotosGaleria = recursos.slice();
+
+        if (!recursos.length) {
+
+            galeria.innerHTML = `
+                <div class="gallery-empty">
+                    <div style="font-size:2.2rem; margin-bottom:8px;">
+                        📸
+                    </div>
+                    <div>
+                        Todavía no hay recuerdos compartidos.
+                    </div>
+                    <div style="font-size:0.8rem; margin-top:5px;">
+                        ¡Sé el primero en compartir una foto!
+                    </div>
+                </div>
+            `;
+
+            if (estado) {
+                estado.textContent =
+                    "Todavía no hay fotos ni videos.";
+            }
+
+            return;
+        }
+
+
+        recursos.forEach(function(recurso) {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "gallery-item";
+
+
+            const url =
+                crearUrlCloudinary(recurso);
+
+
+            if (recurso.resource_type === "video") {
+
+                const video =
+                    document.createElement("video");
+
+                video.src = url;
+
+                video.controls = true;
+
+                video.preload = "metadata";
+
+                video.playsInline = true;
+
+                video.setAttribute(
+                    "aria-label",
+                    "Video compartido en la boda"
+                );
+
+                item.appendChild(video);
+
+                // Al tocar un video, abrir el mismo visor de pantalla completa.
+                const indiceVideo = fotosGaleria.indexOf(recurso);
+                video.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    abrirVisorGaleria(indiceVideo);
+                });
+
+
+                const icon =
+                    document.createElement("div");
+
+                icon.className =
+                    "gallery-video-icon";
+
+                icon.textContent = "▶";
+
+                item.appendChild(icon);
+
+            } else {
+
+                const imagen =
+                    document.createElement("img");
+
+                imagen.src = url;
+
+                imagen.alt =
+                    "Foto compartida en la boda";
+
+                imagen.loading = "lazy";
+
+                imagen.decoding = "async";
+
+
+                // Al tocar una foto, abrir el visor con navegación.
+                const indiceFoto = fotosGaleria.indexOf(recurso);
+                imagen.addEventListener("click", function() {
+                    abrirVisorGaleria(indiceFoto);
+                });
+
+                item.appendChild(imagen);
+
+            }
+
+
+            galeria.appendChild(item);
+
+        });
+
+
+        if (estado) {
+
+            estado.textContent =
+                recursos.length +
+                (
+                    recursos.length === 1
+                        ? " recuerdo compartido"
+                        : " recuerdos compartidos"
+                );
+
+        }
+
+    }
+
+
+    async function obtenerLista(url, tipo) {
+
+        try {
+
+            const respuesta =
+                await fetch(
+                    url +
+                    "?v=" +
+                    Math.floor(
+                        Date.now() / 60000
+                    )
+                );
+
+
+            if (!respuesta.ok) {
+                return [];
+            }
+
+
+            const datos =
+                await respuesta.json();
+
+
+            return (datos.resources || []).map(
+                function(recurso) {
+
+                    return {
+                        ...recurso,
+                        resource_type: tipo
+                    };
+
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "No se pudo cargar la lista:",
+                error
+            );
+
+            return [];
+
+        }
+
+    }
+
+
+    async function cargarGaleria() {
+
+        const estado =
+            document.getElementById("galleryStatus");
+
+        if (estado) {
+            estado.textContent =
+                "Actualizando recuerdos...";
+        }
+
+
+        const resultados =
+            await Promise.all([
+                obtenerLista(
+                    URL_LISTA_IMAGENES,
+                    "image"
+                ),
+                obtenerLista(
+                    URL_LISTA_VIDEOS,
+                    "video"
+                )
+            ]);
+
+
+        const recursos =
+            resultados[0].concat(resultados[1]);
+
+
+        // Más recientes primero
+        recursos.sort(
+            function(a, b) {
+
+                return (
+                    new Date(b.created_at || 0) -
+                    new Date(a.created_at || 0)
+                );
+
+            }
+        );
+
+
+        mostrarGaleria(recursos);
+
+    }
+
+
+    // Botón de actualización manual
+    const btnActualizarGaleria =
+        document.getElementById(
+            "btnActualizarGaleria"
+        );
+
+
+    if (btnActualizarGaleria) {
+
+        btnActualizarGaleria.addEventListener(
+            "click",
+            cargarGaleria
+        );
+
+    }
+
+
+    // Primera carga
+    cargarGaleria();
+
+
+    // Actualizar automáticamente cada minuto.
+    // Cloudinary mantiene la lista en caché aproximadamente
+    // 60 segundos.
+    setInterval(
+        cargarGaleria,
+        60000
+    );
+
+
+    // =====================================================
+    // CÁMARA DIRECTA EN CELULARES
+    // =====================================================
+
+    const esCelular = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
+
+    const btnFotos = document.getElementById("btnFotos");
+    const btnGrabarVideo = document.getElementById("btnGrabarVideo");
+
+    const modalCamara = document.getElementById("modalCamara");
+    const cerrarModalCamara = document.getElementById("cerrarModalCamara");
+    const tituloCamara = document.getElementById("tituloCamara");
+    const previewCamara = document.getElementById("previewCamara");
+    const canvasFoto = document.getElementById("canvasFoto");
+    const estadoCamara = document.getElementById("estadoCamara");
+    const temporizadorCamara = document.getElementById("temporizadorCamara");
+    const textoControlCamara = document.getElementById("textoControlCamara");
+    const btnCapturarFoto = document.getElementById("btnCapturarFoto");
+    const btnIniciarGrabacionCamara = document.getElementById("btnIniciarGrabacionCamara");
+    const btnDetenerGrabacionCamara = document.getElementById("btnDetenerGrabacionCamara");
+    const btnSubirVideo = document.getElementById("btnSubirVideo");
+
+    let streamCamara = null;
+    let mediaRecorderCamara = null;
+    let partesVideoCamara = [];
+    let modoCamara = "foto";
+    let videoListoParaSubir = null;
+    let grabacionInicio = 0;
+    let temporizadorIntervalo = null;
+
+    function mostrarMensajeSubida(texto) {
+        const mensaje = document.getElementById("mensajeSubida");
+        if (mensaje) {
+            mensaje.textContent = texto;
+            mensaje.style.display = "block";
+        }
+    }
+
+    function actualizarTemporizador() {
+        if (!grabacionInicio) return;
+        const segundos = Math.floor((Date.now() - grabacionInicio) / 1000);
+        const min = String(Math.floor(segundos / 60)).padStart(2, "0");
+        const seg = String(segundos % 60).padStart(2, "0");
+        temporizadorCamara.textContent = min + ":" + seg;
+    }
+
+    function detenerTemporizador() {
+        if (temporizadorIntervalo) {
+            clearInterval(temporizadorIntervalo);
+            temporizadorIntervalo = null;
+        }
+        grabacionInicio = 0;
+    }
+
+    function restaurarControlesCamara() {
+        btnCapturarFoto.classList.toggle("hidden", modoCamara !== "foto");
+        btnIniciarGrabacionCamara.classList.toggle("hidden", modoCamara !== "video");
+        btnDetenerGrabacionCamara.classList.add("hidden");
+        btnSubirVideo.classList.add("hidden");
+        temporizadorCamara.classList.add("hidden");
+        textoControlCamara.textContent = modoCamara === "video"
+            ? "Tocá el círculo rojo para grabar"
+            : "Tocá el círculo blanco para sacar la foto";
+    }
+
+    function cerrarCamara() {
+        if (mediaRecorderCamara && mediaRecorderCamara.state !== "inactive") {
+            mediaRecorderCamara.onstop = null;
+            mediaRecorderCamara.stop();
+        }
+
+        detenerTemporizador();
+
+        if (streamCamara) {
+            streamCamara.getTracks().forEach(function(track) {
+                track.stop();
+            });
+        }
+
+        streamCamara = null;
+        mediaRecorderCamara = null;
+        partesVideoCamara = [];
+        videoListoParaSubir = null;
+        previewCamara.srcObject = null;
+        previewCamara.removeAttribute("src");
+        previewCamara.controls = false;
+        previewCamara.load();
+
+        modalCamara.classList.add("hidden");
+        document.body.style.overflow = "";
+        restaurarControlesCamara();
+    }
+
+    async function abrirCamara(modo) {
+        modoCamara = modo;
+        videoListoParaSubir = null;
+        partesVideoCamara = [];
+        mediaRecorderCamara = null;
+
+        modalCamara.classList.remove("hidden");
+        tituloCamara.textContent = "Comparte un momento especial";
+        estadoCamara.textContent = "Solicitando permiso para usar la cámara" + (modo === "video" ? " y el micrófono…" : "…");
+        restaurarControlesCamara();
+        document.body.style.overflow = "hidden";
+
+        try {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error("Este navegador no permite acceder directamente a la cámara.");
+            }
+
+            const restriccionesVideo = {
+                facingMode: { ideal: "environment" },
+                width: { ideal: 1280, max: 1920 },
+                height: { ideal: 720, max: 1080 },
+                frameRate: { ideal: 30, max: 30 }
+            };
+
+            try {
+                streamCamara = await navigator.mediaDevices.getUserMedia({
+                    video: restriccionesVideo,
+                    audio: modo === "video"
+                });
+            } catch (primerError) {
+                // Algunos celulares permiten la cámara pero rechazan el micrófono.
+                // En ese caso seguimos con video para no dejar inutilizada la función.
+                if (modo !== "video") throw primerError;
+
+                console.warn("No se pudo abrir el micrófono. Reintentando solo con cámara.", primerError);
+                streamCamara = await navigator.mediaDevices.getUserMedia({
+                    video: restriccionesVideo,
+                    audio: false
+                });
+            }
+
+            previewCamara.srcObject = streamCamara;
+            previewCamara.muted = true;
+            previewCamara.playsInline = true;
+            await previewCamara.play();
+
+            // Si el sistema del celular corta la pista inesperadamente,
+            // lo informamos y nunca convertimos ese corte en una subida automática.
+            streamCamara.getTracks().forEach(function(track) {
+                track.onended = function() {
+                    if (mediaRecorderCamara && mediaRecorderCamara.state === "recording") {
+                        console.warn("La pista de cámara/micrófono terminó inesperadamente.");
+                        estadoCamara.textContent = "La cámara se interrumpió. El video no se subirá automáticamente.";
+                    }
+                };
+            });
+
+            if (modo === "video" && streamCamara.getAudioTracks().length === 0) {
+                estadoCamara.textContent = "Cámara lista. Se grabará el video sin audio.";
+            } else {
+                estadoCamara.textContent = "";
+            }
+
+        } catch (error) {
+            console.error("Error al abrir cámara:", error);
+            document.body.style.overflow = "";
+            estadoCamara.textContent = "No pudimos acceder a la cámara. Revisá los permisos del navegador y volvé a intentarlo.";
+        }
+    }
+
+    function esIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    }
+
+    function esAndroid() {
+        return /Android/i.test(navigator.userAgent);
+    }
+
+    function obtenerFormatoGrabacionCamara() {
+        const formatosIOS = [
+            "video/mp4;codecs=h264,aac",
+            "video/mp4"
+        ];
+
+        const formatosAndroid = [
+            "video/webm;codecs=vp8,opus",
+            "video/webm",
+            "video/mp4;codecs=h264,aac",
+            "video/mp4"
+        ];
+
+        const formatosGenerales = [
+            "video/webm;codecs=vp8,opus",
+            "video/webm",
+            "video/mp4;codecs=h264,aac",
+            "video/mp4"
+        ];
+
+        const formatos = esIOS()
+            ? formatosIOS
+            : (esAndroid() ? formatosAndroid : formatosGenerales);
+
+        for (const formato of formatos) {
+            if (window.MediaRecorder && MediaRecorder.isTypeSupported(formato)) {
+                return formato;
+            }
+        }
+        return "";
+    }
+
+    async function subirArchivoDirecto(blob, nombre, mensajeExito) {
+        const datos = new FormData();
+        datos.append("file", blob, nombre);
+        datos.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+        datos.append("tags", GALERIA_TAG);
+        datos.append("folder", "boda-eunice-david");
+
+        const recurso = blob.type && blob.type.startsWith("video/") ? "video" : "image";
+
+        const respuesta = await fetch(
+            "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/" + recurso + "/upload",
+            { method: "POST", body: datos }
+        );
+
+        const info = await respuesta.json();
+
+        if (!respuesta.ok) {
+            throw new Error(
+                info.error && info.error.message
+                    ? info.error.message
+                    : "Cloudinary rechazó la subida."
+            );
+        }
+
+        console.log("Archivo subido correctamente:", info);
+        mostrarMensajeSubida(mensajeExito);
+        setTimeout(cargarGaleria, 1500);
+    }
+
+    async function capturarFotoDirecta() {
+        if (!streamCamara || btnCapturarFoto.disabled) return;
+
+        btnCapturarFoto.disabled = true;
+        estadoCamara.textContent = "☁️ Subiendo…";
+
+        try {
+            const ancho = previewCamara.videoWidth || 1280;
+            const alto = previewCamara.videoHeight || 720;
+            canvasFoto.width = ancho;
+            canvasFoto.height = alto;
+
+            const contexto = canvasFoto.getContext("2d");
+            contexto.drawImage(previewCamara, 0, 0, ancho, alto);
+
+            const blobFoto = await new Promise(function(resolve, reject) {
+                let terminado = false;
+                canvasFoto.toBlob(function(blob) {
+                    terminado = true;
+                    resolve(blob);
+                }, "image/jpeg", 0.92);
+                setTimeout(function() {
+                    if (!terminado) reject(new Error("No se pudo preparar la foto."));
+                }, 5000);
+            });
+
+            if (!blobFoto) throw new Error("No se pudo crear la foto.");
+
+            await subirArchivoDirecto(
+                blobFoto,
+                "foto-boda-" + Date.now() + ".jpg",
+                "❤️ ¡Foto subida!"
+            );
+
+            // IMPORTANTE: después de subir la foto NO se cierra la cámara.
+            // El mismo stream queda activo para sacar otra foto inmediatamente.
+            estadoCamara.textContent = "❤️ ¡Foto subida!";
+            btnCapturarFoto.disabled = false;
+            btnCapturarFoto.classList.remove("hidden");
+            textoControlCamara.textContent = "Tocá para sacar otra foto";
+            setTimeout(function() {
+                if (modalCamara && !modalCamara.classList.contains("hidden")) {
+                    estadoCamara.textContent = "";
+                }
+            }, 1200);
+        } catch (error) {
+            console.error("Error al subir foto:", error);
+            estadoCamara.textContent = "No se pudo subir la foto. Intentá nuevamente.";
+            btnCapturarFoto.disabled = false;
+        }
+    }
+
+    function iniciarGrabacionCamara() {
+        if (!streamCamara) {
+            estadoCamara.textContent = "La cámara todavía no está lista.";
+            return;
+        }
+
+        if (!window.MediaRecorder) {
+            estadoCamara.textContent = "Este navegador no permite grabar video desde la página.";
+            return;
+        }
+
+        const pistasVideo = streamCamara.getVideoTracks();
+        if (!pistasVideo.length || pistasVideo[0].readyState !== "live") {
+            estadoCamara.textContent = "La cámara se desconectó. Cerrá y volvé a abrirla.";
+            return;
+        }
+
+        const mimeType = obtenerFormatoGrabacionCamara();
+
+        try {
+            const opcionesGrabacion = mimeType ? { mimeType: mimeType } : {};
+
+            // Una tasa moderada es más estable en celulares y mantiene
+            // archivos razonables para subir por datos móviles.
+            opcionesGrabacion.videoBitsPerSecond = esCelular ? 1400000 : 2000000;
+    // Un timeslice más largo reduce trabajo de codificación y cortes perceptibles durante la captura.
+    const intervaloChunks = esCelular ? 2000 : 1500;
+
+            mediaRecorderCamara = new MediaRecorder(streamCamara, opcionesGrabacion);
+
+            partesVideoCamara = [];
+            videoListoParaSubir = null;
+
+            mediaRecorderCamara.onstart = function() {
+                grabacionInicio = Date.now();
+                temporizadorCamara.classList.remove("hidden");
+                actualizarTemporizador();
+
+                if (temporizadorIntervalo) clearInterval(temporizadorIntervalo);
+                temporizadorIntervalo = setInterval(actualizarTemporizador, 250);
+
+                btnIniciarGrabacionCamara.classList.add("hidden");
+                btnDetenerGrabacionCamara.classList.remove("hidden");
+                btnSubirVideo.classList.add("hidden");
+                textoControlCamara.textContent = "Tocá el cuadrado para terminar";
+                estadoCamara.textContent = "";
+            };
+
+            mediaRecorderCamara.ondataavailable = function(event) {
+                if (event.data && event.data.size > 0) {
+                    partesVideoCamara.push(event.data);
+                }
+            };
+
+            mediaRecorderCamara.onerror = function(event) {
+                console.error("Error de MediaRecorder:", event.error || event);
+                detenerTemporizador();
+                btnDetenerGrabacionCamara.classList.add("hidden");
+                btnSubirVideo.classList.add("hidden");
+                btnIniciarGrabacionCamara.classList.remove("hidden");
+                estadoCamara.textContent = "El celular tuvo un problema con la grabación. Volvé a intentarlo.";
+            };
+
+            mediaRecorderCamara.onstop = function() {
+                // Detener SOLO prepara el video. Nunca inicia la subida.
+                const tipo = mediaRecorderCamara.mimeType || mimeType || "video/webm";
+                videoListoParaSubir = partesVideoCamara.length
+                    ? new Blob(partesVideoCamara, { type: tipo })
+                    : null;
+
+                detenerTemporizador();
+                temporizadorCamara.classList.add("hidden");
+                btnDetenerGrabacionCamara.classList.add("hidden");
+
+                if (videoListoParaSubir && videoListoParaSubir.size > 0) {
+                    btnSubirVideo.disabled = false;
+                    btnSubirVideo.classList.remove("hidden");
+                    textoControlCamara.textContent = "Tocá la flecha azul para subir";
+                    estadoCamara.textContent = "Video listo";
+                } else {
+                    btnIniciarGrabacionCamara.classList.remove("hidden");
+                    estadoCamara.textContent = "No se pudo preparar el video. Intentá nuevamente.";
+                }
+            };
+
+            // Los fragmentos cada segundo son SOLO datos parciales.
+            // La grabación continúa hasta que el usuario toca el cuadrado.
+            mediaRecorderCamara.start(intervaloChunks);
+
+        } catch (error) {
+            console.error("Error al iniciar grabación:", error);
+            estadoCamara.textContent = "No se pudo iniciar la grabación en este celular.";
+        }
+    }
+
+    function detenerGrabacionCamara() {
+        if (mediaRecorderCamara && mediaRecorderCamara.state !== "inactive") {
+            mediaRecorderCamara.stop();
+        }
+    }
+
+    async function subirVideoPreparado() {
+        if (!videoListoParaSubir || btnSubirVideo.disabled) return;
+
+        btnSubirVideo.disabled = true;
+        estadoCamara.textContent = "☁️ Subiendo video…";
+        textoControlCamara.textContent = "Subiendo…";
+
+        try {
+            const tipo = videoListoParaSubir.type || "video/webm";
+            const extension = tipo.includes("mp4") ? "mp4" : "webm";
+
+            await subirArchivoDirecto(
+                videoListoParaSubir,
+                "video-boda-" + Date.now() + "." + extension,
+                "❤️ ¡Video subido!"
+            );
+
+            // IMPORTANTE: después de subir el video NO se cierra la cámara.
+            // El stream queda activo y el botón rojo vuelve a estar disponible.
+            estadoCamara.textContent = "❤️ ¡Video subido! Podés grabar otro.";
+            videoListoParaSubir = null;
+            partesVideoCamara = [];
+            mediaRecorderCamara = null;
+            btnSubirVideo.classList.add("hidden");
+            btnSubirVideo.disabled = false;
+            btnDetenerGrabacionCamara.classList.add("hidden");
+            btnIniciarGrabacionCamara.classList.remove("hidden");
+            textoControlCamara.textContent = "Tocá para grabar otro video";
+        } catch (error) {
+            console.error("Error al subir video:", error);
+            estadoCamara.textContent = "No se pudo subir el video. Intentá nuevamente.";
+            textoControlCamara.textContent = "Tocá la flecha azul para reintentar";
+            btnSubirVideo.disabled = false;
+        }
+    }
+
+    btnFotos.addEventListener("click", function() {
+        if (esCelular) {
+            abrirCamara("foto");
+        } else {
+            widgetCloudinary.open();
+        }
+    });
+
+    btnGrabarVideo.addEventListener("click", function() {
+        abrirCamara("video");
+    });
+
+    // La botonera superior reutiliza exactamente las funciones de cámara existentes.
+    const btnBarraFoto = document.getElementById("btnBarraFoto");
+    const btnBarraVideo = document.getElementById("btnBarraVideo");
+
+    if (btnBarraFoto) {
+        btnBarraFoto.addEventListener("click", function() {
+            if (btnFotos) btnFotos.click();
+        });
+    }
+
+    if (btnBarraVideo) {
+        btnBarraVideo.addEventListener("click", function() {
+            if (btnGrabarVideo) btnGrabarVideo.click();
+        });
+    }
+
+    btnCapturarFoto.addEventListener("click", capturarFotoDirecta);
+    btnIniciarGrabacionCamara.addEventListener("click", iniciarGrabacionCamara);
+    btnDetenerGrabacionCamara.addEventListener("click", detenerGrabacionCamara);
+    btnSubirVideo.addEventListener("click", subirVideoPreparado);
+    cerrarModalCamara.addEventListener("click", cerrarCamara);
+
+
+
+    // Subir fotos y videos existentes desde la galería del celular
+    const btnSubirGaleriaCelular = document.getElementById("btnSubirGaleriaCelular");
+    const inputGaleriaCelular = document.getElementById("inputGaleriaCelular");
+
+    btnSubirGaleriaCelular.addEventListener("click", function() {
+        inputGaleriaCelular.value = "";
+        inputGaleriaCelular.click();
+    });
+
+    // La botonera lateral reutiliza exactamente la misma función de subida.
+    const btnBarraSubir = document.getElementById("btnBarraSubir");
+    if (btnBarraSubir) {
+        btnBarraSubir.addEventListener("click", function() {
+            if (btnSubirGaleriaCelular) btnSubirGaleriaCelular.click();
+        });
+    }
+
+    inputGaleriaCelular.addEventListener("change", async function() {
+        const archivos = Array.from(inputGaleriaCelular.files || []);
+        if (!archivos.length) return;
+
+        btnSubirGaleriaCelular.disabled = true;
+        btnSubirGaleriaCelular.textContent = "☁️ Subiendo…";
+
+        let subidos = 0;
+        let errores = 0;
+
+        for (const archivo of archivos) {
+            try {
+                await subirArchivoDirecto(
+                    archivo,
+                    archivo.name,
+                    "❤️ ¡Archivo subido!"
+                );
+                subidos++;
+            } catch (error) {
+                console.error("Error al subir archivo de galería:", error);
+                errores++;
+            }
+        }
+
+        btnSubirGaleriaCelular.disabled = false;
+        btnSubirGaleriaCelular.textContent = "🖼️ Subir fotos y videos del celular";
+
+        if (errores) {
+            alert("Se subieron " + subidos + " archivo(s). " + errores + " no pudieron subirse.");
+        } else {
+            alert("❤️ ¡Se subieron " + subidos + " archivo(s) correctamente!");
+        }
+
+        cargarGaleria();
+    });
+</script>
+</html>
