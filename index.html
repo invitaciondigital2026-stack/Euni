@@ -156,9 +156,83 @@
         }
 
         /* =====================================================
+           BOTONERA SUPERIOR FLOTANTE
+        ====================================================== */
+        .floating-toolbar {
+            position: fixed;
+            top: max(14px, env(safe-area-inset-top));
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9500;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px;
+            border: 1px solid rgba(255,255,255,.22);
+            border-radius: 999px;
+            background: rgba(30, 27, 24, .20);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 5px 20px rgba(0,0,0,.10);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .floating-toolbar button {
+            position: relative;
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,.10);
+            color: rgba(255,255,255,.82);
+            cursor: pointer;
+            transition: background .15s ease, transform .15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .floating-toolbar button:hover {
+            background: rgba(255,255,255,.18);
+            transform: scale(1.05);
+        }
+
+        .floating-toolbar button:active {
+            transform: scale(.94);
+        }
+
+        .floating-toolbar svg {
+            width: 21px;
+            height: 21px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: .78;
+        }
+
+        .floating-toolbar .toolbar-music.is-muted::after {
+            content: "";
+            position: absolute;
+            width: 26px;
+            height: 1.8px;
+            border-radius: 2px;
+            background: currentColor;
+            transform: rotate(-45deg);
+            opacity: .88;
+        }
+
+        .floating-toolbar .toolbar-music.is-muted {
+            color: rgba(255,255,255,.58);
+        }
+
+        /* =====================================================
            MÚSICA: control flotante + fallback para autoplay
         ====================================================== */
         .music-toggle {
+            display: none;
             position: fixed;
             right: 18px;
             bottom: 18px;
@@ -190,88 +264,17 @@
             50% { box-shadow: 0 5px 24px rgba(183,162,122,.55); }
         }
 
-        /* =====================================================
-           GALERÍA: aparición tipo pincelada / arena
-        ====================================================== */
-        .gallery-item {
-            opacity: 0;
-            transform: translateY(18px) scale(.97);
-            will-change: transform, opacity, clip-path;
-            animation: galleryBrushReveal .95s cubic-bezier(.22,.61,.36,1) forwards;
-        }
-
-        .gallery-item::after {
-            content: "";
-            position: absolute;
-            inset: -12%;
-            pointer-events: none;
-            z-index: 2;
-            opacity: .9;
-            background:
-                radial-gradient(circle at 15% 30%, rgba(255,255,255,.28) 0 1px, transparent 1.8px),
-                radial-gradient(circle at 75% 65%, rgba(255,255,255,.20) 0 1px, transparent 1.7px),
-                radial-gradient(circle at 40% 80%, rgba(120,100,80,.18) 0 1px, transparent 1.8px);
-            background-size: 9px 11px, 13px 9px, 11px 13px;
-            mix-blend-mode: screen;
-            transform: translateX(-105%);
-            animation: brushDust .95s cubic-bezier(.22,.61,.36,1) forwards;
-            animation-delay: inherit;
-        }
-
+        /* GALERÍA: imágenes sin animaciones para carga y scroll inmediatos */
+        .gallery-item,
         .gallery-item img,
         .gallery-item video {
-            transform: scale(1.08);
-            filter: saturate(.94) contrast(.98);
-            animation: galleryImageSettle 1.15s cubic-bezier(.22,.61,.36,1) forwards;
-            animation-delay: inherit;
-        }
-
-        @keyframes galleryBrushReveal {
-            0% {
-                opacity: 0;
-                transform: translateY(18px) scale(.97);
-                clip-path: polygon(
-                    0 0, 7% 3%, 16% 0, 25% 5%, 34% 1%, 44% 6%,
-                    54% 0, 64% 4%, 74% 1%, 84% 5%, 94% 0, 100% 4%,
-                    97% 18%, 100% 31%, 96% 44%, 100% 57%, 95% 70%,
-                    100% 84%, 94% 100%, 82% 96%, 70% 100%, 58% 95%,
-                    45% 100%, 32% 96%, 20% 100%, 8% 95%, 0 100%,
-                    4% 84%, 0 70%, 4% 56%, 0 42%, 4% 28%, 0 14%
-                );
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-                clip-path: polygon(0 0,100% 0,100% 100%,0 100%);
-            }
-        }
-
-        @keyframes brushDust {
-            0% { transform: translateX(-105%) rotate(-2deg); opacity: .9; }
-            65% { transform: translateX(15%) rotate(1deg); opacity: .45; }
-            100% { transform: translateX(115%) rotate(0); opacity: 0; }
-        }
-
-        @keyframes galleryImageSettle {
-            0% { transform: scale(1.08); }
-            100% { transform: scale(1); }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .gallery-item,
-            .gallery-item::after,
-            .gallery-item img,
-            .gallery-item video,
-            .music-toggle {
-                animation: none !important;
-                transition: none !important;
-            }
-
-            .gallery-item {
-                opacity: 1;
-                transform: none;
-                clip-path: none;
-            }
+            opacity: 1;
+            transform: none;
+            filter: none;
+            clip-path: none;
+            animation: none !important;
+            transition: none !important;
+            will-change: auto;
         }
 
         /* GALERÍA EN VIVO */
@@ -621,103 +624,20 @@
         }
 
 
-/* ===== GALERÍA: REVELADO ORGÁNICO AL ENTRAR EN PANTALLA ===== */
-.gallery-item {
-    position: relative;
-    overflow: hidden;
-    opacity: 0;
-    transform: translateY(28px) scale(.97);
-    filter: saturate(.65) contrast(.92) blur(2px);
-
-    /* Estado inicial: como una imagen cubierta por pincel/arena */
-    clip-path: polygon(
-        0% 8%, 14% 4%, 28% 9%, 43% 3%, 57% 8%, 72% 2%, 87% 7%, 100% 3%,
-        97% 22%, 100% 39%, 96% 55%, 100% 73%, 95% 91%, 82% 96%,
-        67% 92%, 51% 98%, 35% 93%, 19% 97%, 4% 92%, 7% 76%,
-        2% 59%, 6% 42%, 1% 25%
-    );
-
-    transition:
-        opacity .75s cubic-bezier(.22,.61,.36,1),
-        transform .9s cubic-bezier(.22,.61,.36,1),
-        filter .9s ease,
-        clip-path 1.05s cubic-bezier(.22,.61,.36,1);
-    will-change: opacity, transform, filter, clip-path;
-}
-
-/* La imagen también comienza ligeramente "lavada" y acercada */
+/* ===== GALERÍA: sin revelado al hacer scroll ===== */
+.gallery-item,
 .gallery-item img,
-.gallery-item video {
-    transform: scale(1.10);
-    filter: saturate(.72) contrast(.9);
-    transition:
-        transform 1.15s cubic-bezier(.22,.61,.36,1),
-        filter 1s ease;
-    will-change: transform, filter;
-}
-
-/* Pincel/arena que atraviesa la fotografía */
+.gallery-item video,
 .gallery-item::after {
-    content: "";
-    position: absolute;
-    inset: -20%;
-    pointer-events: none;
-    opacity: .95;
-    transform: translateX(-115%) rotate(-2deg);
-    background:
-        radial-gradient(circle at 8% 18%, rgba(255,255,255,.42) 0 2px, transparent 3px),
-        radial-gradient(circle at 24% 66%, rgba(255,255,255,.30) 0 3px, transparent 4px),
-        radial-gradient(circle at 42% 28%, rgba(255,255,255,.34) 0 2px, transparent 4px),
-        radial-gradient(circle at 61% 78%, rgba(255,255,255,.28) 0 3px, transparent 5px),
-        radial-gradient(circle at 79% 37%, rgba(255,255,255,.34) 0 2px, transparent 4px),
-        linear-gradient(100deg,
-            transparent 0%,
-            rgba(255,255,255,.08) 18%,
-            rgba(255,255,255,.34) 42%,
-            rgba(255,255,255,.12) 55%,
-            transparent 78%);
-    mix-blend-mode: screen;
-    transition:
-        opacity .45s ease,
-        transform 1.1s cubic-bezier(.22,.61,.36,1);
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    clip-path: none !important;
+    animation: none !important;
+    transition: none !important;
 }
-
-/* Al entrar al viewport: se revela */
-.gallery-item.is-visible {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: saturate(1) contrast(1) blur(0);
-    clip-path: inset(0 0 0 0 round 0);
-}
-
-.gallery-item.is-visible img,
-.gallery-item.is-visible video {
-    transform: scale(1);
-    filter: saturate(1) contrast(1);
-}
-
-.gallery-item.is-visible::after {
-    opacity: 0;
-    transform: translateX(115%) rotate(-2deg);
-}
-
-/* Al salir del viewport, vuelve a ocultarse y podrá revelarse otra vez */
-@media (prefers-reduced-motion: reduce) {
-    .gallery-item,
-    .gallery-item img,
-    .gallery-item video,
-    .gallery-item::after {
-        transition: none !important;
-    }
-    .gallery-item {
-        opacity: 1;
-        transform: none;
-        filter: none;
-        clip-path: none;
-    }
-    .gallery-item::after {
-        display: none;
-    }
+.gallery-item::after {
+    display: none !important;
 }
 
 </style>
@@ -732,6 +652,36 @@
 
 
 <body>
+
+    <!-- =====================================================
+         BOTONERA SUPERIOR FLOTANTE
+    ====================================================== -->
+    <nav class="floating-toolbar" aria-label="Controles rápidos">
+        <button id="btnBarraFoto" type="button" aria-label="Abrir cámara de fotos" title="Foto">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7.5h3l1.5-2h7L17 7.5h3v11H4z"></path>
+                <circle cx="12" cy="13" r="3.5"></circle>
+            </svg>
+        </button>
+
+        <button id="btnBarraVideo" type="button" aria-label="Abrir cámara de video" title="Video">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7.5h10.5A1.5 1.5 0 0 1 16 9v6a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 15V9A1.5 1.5 0 0 1 4 7.5z"></path>
+                <path d="m16 10 5-2.5v9L16 14z"></path>
+            </svg>
+        </button>
+
+        <button id="btnBarraMusica" class="toolbar-music" type="button" aria-label="Pausar música" aria-pressed="true" title="Pausar música">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 9v6"></path>
+                <path d="M8 7v10"></path>
+                <path d="M12 9v6"></path>
+                <path d="M16 6v12"></path>
+                <path d="M19 9v6"></path>
+            </svg>
+        </button>
+    </nav>
+
 
 <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <!-- =====================================================
@@ -1367,19 +1317,27 @@
     // =====================================================
     const musicaBoda = document.getElementById("musicaBoda");
     const btnMusica = document.getElementById("btnMusica");
+    const btnBarraMusica = document.getElementById("btnBarraMusica");
 
     function actualizarBotonMusica() {
-        if (!musicaBoda || !btnMusica) return;
+        if (!musicaBoda) return;
 
         const reproduciendo = !musicaBoda.paused;
-        btnMusica.classList.toggle("is-playing", reproduciendo);
-        btnMusica.textContent = reproduciendo ? "♫" : "♪";
-        btnMusica.setAttribute("aria-pressed", reproduciendo ? "true" : "false");
-        btnMusica.setAttribute(
-            "aria-label",
-            reproduciendo ? "Pausar música" : "Activar música"
-        );
-        btnMusica.title = reproduciendo ? "Pausar música" : "Activar música";
+
+        if (btnMusica) {
+            btnMusica.classList.toggle("is-playing", reproduciendo);
+            btnMusica.textContent = reproduciendo ? "♫" : "♪";
+            btnMusica.setAttribute("aria-pressed", reproduciendo ? "true" : "false");
+            btnMusica.setAttribute("aria-label", reproduciendo ? "Pausar música" : "Activar música");
+            btnMusica.title = reproduciendo ? "Pausar música" : "Activar música";
+        }
+
+        if (btnBarraMusica) {
+            btnBarraMusica.classList.toggle("is-muted", !reproduciendo);
+            btnBarraMusica.setAttribute("aria-pressed", reproduciendo ? "true" : "false");
+            btnBarraMusica.setAttribute("aria-label", reproduciendo ? "Pausar música" : "Reanudar música");
+            btnBarraMusica.title = reproduciendo ? "Pausar música" : "Reanudar música";
+        }
     }
 
     async function intentarIniciarMusica() {
@@ -1434,20 +1392,24 @@
         });
     }
 
+    // Botón de música de la botonera superior: pausa/reanuda sin reiniciar la canción.
+    if (btnBarraMusica && musicaBoda) {
+        btnBarraMusica.addEventListener("click", async function() {
+            try {
+                if (musicaBoda.paused) {
+                    await musicaBoda.play();
+                } else {
+                    musicaBoda.pause();
+                }
+            } catch (error) {
+                console.warn("No se pudo reproducir la música:", error);
+            }
+            actualizarBotonMusica();
+        });
+    }
+
     
-/* ===== GALERÍA: ACTIVACIÓN SEGÚN SCROLL ===== */
-const observerGaleria = new IntersectionObserver((entradas) => {
-    entradas.forEach((entrada) => {
-        // Entra en pantalla -> revela.
-        // Sale de pantalla -> revierte el efecto, permitiendo que vuelva a revelarse
-        // cuando el usuario regrese.
-        entrada.target.classList.toggle("is-visible", entrada.isIntersecting);
-    });
-}, {
-    root: null,
-    threshold: 0.16,
-    rootMargin: "0px 0px -8% 0px"
-});
+/* ===== GALERÍA: sin activación por scroll ===== */
 
 const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
@@ -2395,6 +2357,22 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
     btnGrabarVideo.addEventListener("click", function() {
         abrirCamara("video");
     });
+
+    // La botonera superior reutiliza exactamente las funciones de cámara existentes.
+    const btnBarraFoto = document.getElementById("btnBarraFoto");
+    const btnBarraVideo = document.getElementById("btnBarraVideo");
+
+    if (btnBarraFoto) {
+        btnBarraFoto.addEventListener("click", function() {
+            if (btnFotos) btnFotos.click();
+        });
+    }
+
+    if (btnBarraVideo) {
+        btnBarraVideo.addEventListener("click", function() {
+            if (btnGrabarVideo) btnGrabarVideo.click();
+        });
+    }
 
     btnCapturarFoto.addEventListener("click", capturarFotoDirecta);
     btnIniciarGrabacionCamara.addEventListener("click", iniciarGrabacionCamara);
