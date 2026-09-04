@@ -1631,8 +1631,6 @@ audio {
                 class="text-sm text-gray-500 mt-1"
             ></div>
 
-            <div id="eventosInvitado" class="mt-4 text-sm"></div>
-
         </div>
 
 
@@ -1650,7 +1648,6 @@ audio {
 
 
             <div
-                id="rsvpChoiceGrid"
                 class="rsvp-choice-grid"
                 role="group"
                 aria-label="Confirmación de asistencia"
@@ -1684,32 +1681,6 @@ audio {
                 </button>
 
 
-                <!-- SOLO CONFERENCIA -->
-
-                <button
-                    id="btnSoloConferencia"
-                    type="button"
-                    class="rsvp-choice rsvp-conference"
-                    aria-pressed="false"
-                >
-                    <span class="rsvp-choice-icon" aria-hidden="true">🕊</span>
-                    <span class="rsvp-choice-title">Solo conferencia</span>
-                    <span class="rsvp-choice-subtitle">20:00 hs</span>
-                </button>
-
-                <!-- CONFERENCIA + FIESTA -->
-
-                <button
-                    id="btnAmbos"
-                    type="button"
-                    class="rsvp-choice rsvp-both hidden"
-                    aria-pressed="false"
-                >
-                    <span class="rsvp-choice-icon" aria-hidden="true">🥂</span>
-                    <span class="rsvp-choice-title">Conferencia + fiesta</span>
-                    <span class="rsvp-choice-subtitle">20:00 hs + celebración</span>
-                </button>
-
                 <!-- NO -->
 
                 <button
@@ -1739,7 +1710,11 @@ audio {
             </div>
 
 
-            <!-- Valor: conferencia, ambos o no -->
+            <!--
+                Campo oculto.
+                Se mantiene para que el backend
+                siga recibiendo "si" o "no".
+            -->
 
             <input
                 type="hidden"
@@ -2160,8 +2135,6 @@ audio {
     const btnNo =
         $('btnNoAsistire');
 
-    const btnSoloConferencia = $('btnSoloConferencia');
-    const btnAmbos = $('btnAmbos');
 
     let guest;
 
@@ -2190,28 +2163,85 @@ audio {
     ================================================= */
 
     function render(g){
-        guest=g;
+
+        guest = g;
+
+
         load.classList.add('hidden');
+
         form.classList.remove('hidden');
-        $('nombreInvitado').textContent=g.nombre;
-        $('lugaresInvitado').textContent=`${g.lugares} ${g.lugares===1?'lugar reservado':'lugares reservados'}`;
-        $('saludoInvitado').textContent=`¿Nos acompañás, ${g.nombre}?`;
-        $('eventosInvitado').innerHTML=g.invitado_fiesta
-            ? '<div class="rounded-xl bg-white border border-stone-200 p-4 text-left"><div class="font-medium">Tu invitación incluye:</div><div class="mt-2">🕊 <strong>Conferencia</strong> · 20:00 hs</div><div class="mt-1">🥂 <strong>Fiesta</strong> · celebración</div></div>'
-            : '<div class="rounded-xl bg-white border border-stone-200 p-4 text-left"><div class="font-medium">Tu invitación incluye:</div><div class="mt-2">🕊 <strong>Conferencia</strong> · 20:00 hs</div></div>';
-        btnAmbos.classList.toggle('hidden',!g.invitado_fiesta);
-        quantity.innerHTML='';
-        for(let n=1;n<=g.lugares;n++){const o=document.createElement('option');o.value=n;o.textContent=n===1?'1 persona':`${n} personas`;quantity.appendChild(o)}
-        const prev=g.asistencia_eventos||(g.estado==='confirmado'?'conferencia':g.estado==='no_asiste'?'no':'');
-        if(prev)elegirAsistencia(prev);
-        if(g.estado==='confirmado'||g.estado==='no_asiste'){
-            form.classList.add('hidden');thanks.classList.remove('hidden');
-            const conf=g.confirmados_conferencia||0,fiesta=g.confirmados_fiesta||0;
-            $('rsvpGraciasTexto').textContent=g.estado==='confirmado'
-                ? (g.asistencia_eventos==='ambos'?`Ya registramos ${conf} ${conf===1?'persona':'personas'} para la conferencia y ${fiesta} ${fiesta===1?'persona':'personas'} para la fiesta. ¡Nos vemos!`:`Ya registramos ${conf} ${conf===1?'persona':'personas'} para la conferencia. ¡Nos vemos a las 20:00 hs!`)
-                : 'Ya registramos que no podrán acompañarnos. Gracias por avisarnos.';
+
+
+        $('nombreInvitado').textContent =
+            g.nombre;
+
+
+        $('lugaresInvitado').textContent =
+            `${g.lugares} ${
+                g.lugares === 1
+                    ? 'lugar reservado'
+                    : 'lugares reservados'
+            }`;
+
+
+        $('saludoInvitado').textContent =
+            `¿Nos acompañás, ${g.nombre}?`;
+
+
+        /* Cantidad */
+
+        quantity.innerHTML = '';
+
+
+        for (
+            let n = 1;
+            n <= g.lugares;
+            n++
+        ){
+
+            const o =
+                document.createElement('option');
+
+
+            o.value = n;
+
+
+            o.textContent =
+                n === 1
+                    ? '1 persona'
+                    : `${n} personas`;
+
+
+            quantity.appendChild(o);
+
         }
+
+
+        /* Si ya respondió */
+
+        if (
+            g.estado === 'confirmado' ||
+            g.estado === 'no_asiste'
+        ){
+
+            form.classList.add('hidden');
+
+            thanks.classList.remove('hidden');
+
+
+            $('rsvpGraciasTexto').textContent =
+                g.estado === 'confirmado'
+                    ? `Ya registramos tu confirmación de ${g.confirmados} ${
+                        g.confirmados === 1
+                            ? 'persona'
+                            : 'personas'
+                    }. ¡Nos vemos en la fiesta!`
+                    : 'Ya registramos que no podrán acompañarnos. Gracias por avisarnos.';
+
+        }
+
     }
+
 
 
     /* =================================================
@@ -2219,22 +2249,78 @@ audio {
     ================================================= */
 
     function elegirAsistencia(valor){
-        attendance.value=valor;
-        const esConf=valor==='conferencia',esAmbos=valor==='ambos',esSi=esConf||esAmbos;
-        btnSoloConferencia.classList.toggle('selected',esConf);
-        btnAmbos.classList.toggle('selected',esAmbos);
-        btnNo.classList.toggle('selected',valor==='no');
-        btnSoloConferencia.setAttribute('aria-pressed',String(esConf));
-        btnAmbos.setAttribute('aria-pressed',String(esAmbos));
-        btnNo.setAttribute('aria-pressed',String(valor==='no'));
-        qw.classList.toggle('hidden',!esSi);cw.classList.toggle('hidden',!esSi);quantity.required=esSi;state.textContent='';
+
+        attendance.value =
+            valor;
+
+
+        const esSi =
+            valor === 'si';
+
+
+        /* Estado visual */
+
+        btnYes.classList.toggle(
+            'selected',
+            esSi
+        );
+
+
+        btnNo.classList.toggle(
+            'selected',
+            !esSi
+        );
+
+
+        /* Accesibilidad */
+
+        btnYes.setAttribute(
+            'aria-pressed',
+            String(esSi)
+        );
+
+
+        btnNo.setAttribute(
+            'aria-pressed',
+            String(!esSi)
+        );
+
+
+        /* Mostrar datos adicionales
+           solamente cuando confirma */
+
+        qw.classList.toggle(
+            'hidden',
+            !esSi
+        );
+
+
+        cw.classList.toggle(
+            'hidden',
+            !esSi
+        );
+
+
+        quantity.required =
+            esSi;
+
+
+        /* Limpiar mensaje */
+
+        state.textContent = '';
+
     }
 
 
-    /* Click solo conferencia */
-    btnSoloConferencia.addEventListener('click',()=>elegirAsistencia('conferencia'));
-    /* Click conferencia + fiesta */
-    btnAmbos.addEventListener('click',()=>elegirAsistencia('ambos'));
+
+    /* Click botón SÍ */
+
+    btnYes.addEventListener(
+        'click',
+        () => elegirAsistencia('si')
+    );
+
+
     /* Click botón NO */
 
     btnNo.addEventListener(
@@ -2296,12 +2382,14 @@ audio {
                                         attendance.value,
 
                                     cantidad:
-                                        attendance.value !== 'no'
-                                            ? Number(quantity.value)
+                                        attendance.value === 'si'
+                                            ? Number(
+                                                quantity.value
+                                            )
                                             : 0,
 
                                     acompanantes:
-                                        attendance.value !== 'no'
+                                        attendance.value === 'si'
                                             ? companions.value.trim()
                                             : ''
 
@@ -2336,11 +2424,13 @@ audio {
 
 
                 $('rsvpGraciasTexto').textContent =
-                    attendance.value === 'no'
-                        ? 'Registramos que no podrán acompañarnos. Gracias por avisarnos.'
-                        : attendance.value === 'ambos'
-                            ? `Registramos ${Number(quantity.value)} ${Number(quantity.value) === 1 ? 'persona' : 'personas'} para la conferencia y la fiesta. ¡Nos vemos!`
-                            : `Registramos ${Number(quantity.value)} ${Number(quantity.value) === 1 ? 'persona' : 'personas'} para la conferencia. ¡Nos vemos a las 20:00 hs!`;
+                    attendance.value === 'si'
+                        ? `Registramos ${Number(quantity.value)} ${
+                            Number(quantity.value) === 1
+                                ? 'persona'
+                                : 'personas'
+                        }. ¡Nos vemos en la fiesta!`
+                        : 'Registramos que no podrán acompañarnos. Gracias por avisarnos.';
 
 
             } catch (e) {
