@@ -81,7 +81,7 @@
 let invitados=[];
 
 /* SERVIDOR 2: dominio donde estará publicada la invitación */
-const PUBLIC_SERVER2_URL='https://TU-SERVIDOR-2.netlify.app';
+const PUBLIC_SERVER2_URL=location.origin;
 
 const $=id=>document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>\'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}

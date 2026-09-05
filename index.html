@@ -4029,7 +4029,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
                 const r =
                     await fetch(
-                        `${SERVER1_URL}/.netlify/functions/rsvp`,
+                        `/api/rsvp`,
                         {
                             method: 'POST',
                             headers: {
@@ -4398,7 +4398,6 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
        del servidor 1 para obtener nombre, lugares y estado.
     ================================================= */
 
-    const SERVER1_URL = 'https://TU-SERVIDOR-1.netlify.app';
 
     if (!/^[A-F0-9]{8}[01]$/.test(publicCode)) {
         fail(
@@ -4408,7 +4407,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
     }
 
     fetch(
-        `${SERVER1_URL}/.netlify/functions/guest?i=${encodeURIComponent(publicCode)}`
+        `/api/guest?i=${encodeURIComponent(publicCode)}`
     )
     .then(async r => {
         const d = await r.json();
