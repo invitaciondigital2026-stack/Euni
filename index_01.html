@@ -3737,116 +3737,67 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
 
     /* =================================================
-       RSVP
+       RSVP SIN LECTURA DE DB
+       La página se alimenta únicamente del código y su sufijo:
+       0 = conferencia | 1 = conferencia + fiesta.
+       La DB solo se consulta en el servidor al enviar el RSVP.
     ================================================= */
 
     const publicCode =
         (new URLSearchParams(location.search).get('i') || '').trim().toUpperCase();
 
-    // 0 = conferencia solamente | 1 = conferencia + fiesta.
     const partyFromCode = /^[A-F0-9]{8}1$/.test(publicCode);
     const code = publicCode;
 
-
-    const $ =
-        id => document.getElementById(id);
-
-
-    const form =
-        $('formRSVP');
-
-
-    const load =
-        $('rsvpCargando');
-
-
-    const err =
-        $('rsvpError');
-
-
-    const thanks =
-        $('rsvpGracias');
-
-
-    const attendance =
-        $('asistencia');
-
-
-    const quantity =
-        $('cantidad');
-
-
-    const qw =
-        $('cantidadWrap');
-
-
-    const cw =
-        $('acompanantesWrap');
-
-
-    const companions =
-        $('acompanantes');
-
-
-    const state =
-        $('rsvpEstado');
-
-
-    const send =
-        $('btnEnviarRSVP');
-
-
-    const section =
-        $('confirmacion');
-
-
-    const btnConference =
-        $('btnConferencia');
-
-
-    const btnParty =
-        $('btnFiesta');
-
-
-    const btnNo =
-        $('btnNoAsistire');
-
-
-    const rsvpHelp =
-        $('rsvpAyuda');
-
-
-    let guest;
-
+    const $ = id => document.getElementById(id);
+    const form = $('formRSVP');
+    const load = $('rsvpCargando');
+    const err = $('rsvpError');
+    const thanks = $('rsvpGracias');
+    const attendance = $('asistencia');
+    const quantity = $('cantidad');
+    const qw = $('cantidadWrap');
+    const cw = $('acompanantesWrap');
+    const companions = $('acompanantes');
+    const state = $('rsvpEstado');
+    const send = $('btnEnviarRSVP');
+    const section = $('confirmacion');
+    const btnConference = $('btnConferencia');
+    const btnParty = $('btnFiesta');
+    const btnNo = $('btnNoAsistire');
+    const rsvpHelp = $('rsvpAyuda');
 
     function fail(m){
-
         load.classList.add('hidden');
         form.classList.add('hidden');
         err.textContent = m;
         err.classList.remove('hidden');
-
     }
 
+    function updatePartyVisibility(){
+        document.querySelectorAll('.party-only').forEach(el => {
+            el.hidden = !partyFromCode;
+            el.classList.toggle('hidden', !partyFromCode);
+        });
+
+        btnParty.disabled = !partyFromCode;
+        btnParty.classList.toggle('disabled', !partyFromCode);
+
+        if ($('fiestaSubtitle')) {
+            $('fiestaSubtitle').textContent = partyFromCode
+                ? 'Domingo · 09:00 hs'
+                : 'No incluida en tu invitación';
+        }
+    }
 
     function selectedEvents(){
-
-        const conference =
-            btnConference.classList.contains('selected');
-
-        const party =
-            btnParty.classList.contains('selected');
-
         return {
-            conference,
-            party
+            conference: btnConference.classList.contains('selected'),
+            party: btnParty.classList.contains('selected')
         };
-
     }
 
-
     function updateAttendanceValue(){
-
         if (btnNo.classList.contains('selected')) {
             attendance.value = 'no';
             return;
@@ -3854,341 +3805,142 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
         const events = selectedEvents();
 
-        if (events.conference && events.party) {
-            attendance.value = 'ambos';
-        } else if (events.conference) {
-            attendance.value = 'conferencia';
-        } else if (events.party) {
-            attendance.value = 'fiesta';
-        } else {
-            attendance.value = '';
-        }
-
+        if (events.conference && events.party) attendance.value = 'ambos';
+        else if (events.conference) attendance.value = 'conferencia';
+        else if (events.party) attendance.value = 'fiesta';
+        else attendance.value = '';
     }
 
-
     function updateRsvpUI(){
-
-        const no =
-            btnNo.classList.contains('selected');
-
-        const events =
-            selectedEvents();
+        const no = btnNo.classList.contains('selected');
+        const events = selectedEvents();
 
         btnConference.disabled = no;
         btnParty.disabled = no || !partyFromCode;
 
-        btnConference.classList.toggle(
-            'disabled',
-            no
-        );
+        btnConference.classList.toggle('disabled', no);
+        btnParty.classList.toggle('disabled', no || !partyFromCode);
 
-        btnParty.classList.toggle(
-            'disabled',
-            no || !partyFromCode
-        );
+        btnConference.setAttribute('aria-pressed', String(events.conference));
+        btnParty.setAttribute('aria-pressed', String(events.party));
+        btnNo.setAttribute('aria-pressed', String(no));
 
-        btnConference.setAttribute(
-            'aria-pressed',
-            String(events.conference)
-        );
+        qw.classList.toggle('hidden', !events.conference && !events.party);
+        cw.classList.toggle('hidden', !events.conference && !events.party);
+        quantity.required = events.conference || events.party;
 
-        btnParty.setAttribute(
-            'aria-pressed',
-            String(events.party)
-        );
-
-        btnNo.setAttribute(
-            'aria-pressed',
-            String(no)
-        );
-
-        qw.classList.toggle(
-            'hidden',
-            !events.conference && !events.party
-        );
-
-        cw.classList.toggle(
-            'hidden',
-            !events.conference && !events.party
-        );
-
-        quantity.required =
-            events.conference || events.party;
-
-        if (no) {
-            rsvpHelp.textContent =
-                'Al confirmar que no podrás asistir, se desactivan los demás eventos.';
-        } else if (events.conference && events.party) {
-            rsvpHelp.textContent =
-                'Confirmaste conferencia y fiesta.';
-        } else if (events.conference) {
-            rsvpHelp.textContent =
-                'Confirmaste tu asistencia a la conferencia.';
-        } else if (events.party) {
-            rsvpHelp.textContent =
-                'Confirmaste tu asistencia a la fiesta.';
-        } else {
-            rsvpHelp.textContent =
-                'Podés confirmar uno o ambos eventos.';
-        }
+        if (no) rsvpHelp.textContent = 'Registraremos que no podrás asistir.';
+        else if (events.conference && events.party) rsvpHelp.textContent = 'Confirmaste conferencia y fiesta.';
+        else if (events.conference) rsvpHelp.textContent = 'Confirmaste tu asistencia a la conferencia.';
+        else if (events.party) rsvpHelp.textContent = 'Confirmaste tu asistencia a la fiesta.';
+        else rsvpHelp.textContent = 'Podés confirmar uno o ambos eventos.';
 
         updateAttendanceValue();
-
     }
-
 
     function elegirEvento(evento){
-
-        if (btnNo.classList.contains('selected')) {
-            btnNo.classList.remove('selected');
-        }
-
-        if (evento === 'conferencia') {
-            btnConference.classList.toggle('selected');
-        }
-
-        if (evento === 'fiesta' && partyFromCode) {
-            btnParty.classList.toggle('selected');
-        }
-
+        if (btnNo.classList.contains('selected')) btnNo.classList.remove('selected');
+        if (evento === 'conferencia') btnConference.classList.toggle('selected');
+        if (evento === 'fiesta' && partyFromCode) btnParty.classList.toggle('selected');
         updateRsvpUI();
         state.textContent = '';
-
     }
 
-
     function elegirNo(){
-
         btnNo.classList.toggle('selected');
-
         if (btnNo.classList.contains('selected')) {
             btnConference.classList.remove('selected');
             btnParty.classList.remove('selected');
         }
-
         updateRsvpUI();
         state.textContent = '';
-
     }
 
+    btnConference.addEventListener('click', () => elegirEvento('conferencia'));
+    btnParty.addEventListener('click', () => elegirEvento('fiesta'));
+    btnNo.addEventListener('click', elegirNo);
 
-    btnConference.addEventListener(
-        'click',
-        () => elegirEvento('conferencia')
-    );
+    // Sin DB: la cantidad no viene del invitado. Ofrecemos un rango y el backend valida el máximo real.
+    quantity.innerHTML = '';
+    for (let n = 1; n <= 10; n++) {
+        const o = document.createElement('option');
+        o.value = n;
+        o.textContent = n === 1 ? '1 persona' : `${n} personas`;
+        quantity.appendChild(o);
+    }
 
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        updateAttendanceValue();
 
-    btnParty.addEventListener(
-        'click',
-        () => elegirEvento('fiesta')
-    );
-
-
-    btnNo.addEventListener(
-        'click',
-        elegirNo
-    );
-
-
-    /* =================================================
-       ENVÍO RSVP
-    ================================================= */
-
-    form.addEventListener(
-        'submit',
-        async e => {
-
-            e.preventDefault();
-
-            updateAttendanceValue();
-
-            if (!guest || !attendance.value) {
-                state.textContent =
-                    'Seleccioná conferencia, fiesta o no podré asistir.';
-                return;
-            }
-
-            const cantidad =
-                Number(quantity.value || 0);
-
-            if (
-                attendance.value !== 'no' &&
-                (!Number.isInteger(cantidad) || cantidad < 1)
-            ) {
-                state.textContent =
-                    'Seleccioná la cantidad de personas.';
-                return;
-            }
-
-            send.disabled = true;
-            state.textContent =
-                'Guardando confirmación…';
-
-            try {
-
-                const r =
-                    await fetch(
-                        `/.netlify/functions/rsvp`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type':
-                                    'application/json'
-                            },
-                            body: JSON.stringify({
-                                codigo:
-                                    guest.codigo,
-                                asistencia:
-                                    attendance.value,
-                                cantidad:
-                                    attendance.value === 'no'
-                                        ? 0
-                                        : cantidad,
-                                acompanantes:
-                                    attendance.value === 'no'
-                                        ? ''
-                                        : companions.value.trim()
-                            })
-                        }
-                    );
-
-                const d =
-                    await r.json();
-
-                if (!r.ok) {
-                    throw Error(
-                        d.error ||
-                        'No pudimos guardar la confirmación.'
-                    );
-                }
-
-                form.classList.add('hidden');
-                thanks.classList.remove('hidden');
-
-                if (attendance.value === 'ambos') {
-                    $('rsvpGraciasTexto').textContent =
-                        `Registramos ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la conferencia y la fiesta. ¡Nos vemos!`;
-                } else if (attendance.value === 'conferencia') {
-                    $('rsvpGraciasTexto').textContent =
-                        `Registramos ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la conferencia. ¡Nos vemos!`;
-                } else if (attendance.value === 'fiesta') {
-                    $('rsvpGraciasTexto').textContent =
-                        `Registramos ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la fiesta. ¡Nos vemos!`;
-                } else {
-                    $('rsvpGraciasTexto').textContent =
-                        'Registramos que no podrás acompañarnos. Gracias por avisarnos.';
-                }
-
-            } catch (e) {
-
-                state.textContent =
-                    e.message;
-
-                send.disabled = false;
-
-            }
-
-        }
-    );
-
-
-    /* =================================================
-       RENDER INVITADO
-    ================================================= */
-
-    function render(g){
-
-        guest = g;
-
-        load.classList.add('hidden');
-        form.classList.remove('hidden');
-
-        $('nombreInvitado').textContent =
-            g.nombre;
-
-        $('lugaresInvitado').textContent =
-            `${g.lugares} ${
-                g.lugares === 1
-                    ? 'lugar reservado'
-                    : 'lugares reservados'
-            }`;
-
-        $('saludoInvitado').textContent =
-            `¿Nos acompañás, ${g.nombre}?`;
-
-        quantity.innerHTML = '';
-
-        for (
-            let n = 1;
-            n <= g.lugares;
-            n++
-        ){
-
-            const o =
-                document.createElement('option');
-
-            o.value = n;
-
-            o.textContent =
-                n === 1
-                    ? '1 persona'
-                    : `${n} personas`;
-
-            quantity.appendChild(o);
-
+        if (!attendance.value) {
+            state.textContent = 'Seleccioná conferencia, fiesta o no podré asistir.';
+            return;
         }
 
-        const partyAllowed = partyFromCode;
+        const cantidad = Number(quantity.value || 0);
 
-        /* El servidor determina si esta invitación incluye la fiesta.
-           Esto evita que alguien pueda modificar el código en el navegador
-           para obtener acceso a un evento que no le corresponde. */
-        document.querySelectorAll('.party-only').forEach(el => {
-            el.hidden = !partyAllowed;
-            el.classList.toggle('hidden', !partyAllowed);
-        });
-
-        btnParty.disabled = !partyAllowed;
-
-        if (!partyAllowed) {
-            btnParty.classList.remove('selected');
-            btnParty.classList.add('disabled');
-            $('fiestaSubtitle').textContent =
-                'No incluida en tu invitación';
-        } else {
-            btnParty.classList.remove('disabled');
-            $('fiestaSubtitle').textContent =
-                'Domingo · 09:00 hs';
+        if (attendance.value !== 'no' && (!Number.isInteger(cantidad) || cantidad < 1)) {
+            state.textContent = 'Seleccioná la cantidad de personas.';
+            return;
         }
 
-        updateRsvpUI();
+        send.disabled = true;
+        state.textContent = 'Guardando confirmación…';
 
-        if (
-            g.estado === 'confirmado' ||
-            g.estado === 'no_asiste'
-        ){
+        try {
+            const r = await fetch('/.netlify/functions/rsvp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    codigo: code,
+                    asistencia: attendance.value,
+                    cantidad: attendance.value === 'no' ? 0 : cantidad,
+                    acompanantes: attendance.value === 'no' ? '' : companions.value.trim()
+                })
+            });
+
+            const text = await r.text();
+            let d = {};
+            try { d = text ? JSON.parse(text) : {}; } catch {
+                throw Error('El servidor no devolvió una respuesta JSON válida.');
+            }
+
+            if (!r.ok) throw Error(d.error || 'No pudimos guardar la confirmación.');
 
             form.classList.add('hidden');
             thanks.classList.remove('hidden');
 
-            if (g.asistencia_eventos === 'ambos') {
-                $('rsvpGraciasTexto').textContent =
-                    `Ya registramos tu confirmación para la conferencia y la fiesta. ¡Nos vemos!`;
-            } else if (g.asistencia_eventos === 'conferencia') {
-                $('rsvpGraciasTexto').textContent =
-                    `Ya registramos tu confirmación para la conferencia. ¡Nos vemos!`;
-            } else if (g.asistencia_eventos === 'fiesta') {
-                $('rsvpGraciasTexto').textContent =
-                    `Ya registramos tu confirmación para la fiesta. ¡Nos vemos!`;
+            if (attendance.value === 'ambos') {
+                $('rsvpGraciasTexto').textContent = `Registramos ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la conferencia y la fiesta. ¡Nos vemos!`;
+            } else if (attendance.value === 'conferencia') {
+                $('rsvpGraciasTexto').textContent = `Registramos ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la conferencia. ¡Nos vemos!`;
+            } else if (attendance.value === 'fiesta') {
+                $('rsvpGraciasTexto').textContent = `Registramos ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la fiesta. ¡Nos vemos!`;
             } else {
-                $('rsvpGraciasTexto').textContent =
-                    'Ya registramos que no podrás acompañarnos. Gracias por avisarnos.';
+                $('rsvpGraciasTexto').textContent = 'Registramos que no podrás acompañarnos. Gracias por avisarnos.';
             }
-
+        } catch (e) {
+            state.textContent = e.message;
+            send.disabled = false;
         }
+    });
 
+    if (!/^[A-F0-9]{8}[01]$/.test(publicCode)) {
+        fail('Esta invitación necesita un código válido de 8 caracteres más 0 o 1.');
+        return;
     }
+
+    // Todo lo visual de la fiesta depende exclusivamente del 0/1.
+    updatePartyVisibility();
+    load.classList.add('hidden');
+    form.classList.remove('hidden');
+    $('nombreInvitado').textContent = partyFromCode
+        ? 'Invitación con fiesta'
+        : 'Invitación de conferencia';
+    $('lugaresInvitado').textContent = 'Confirmá la cantidad de personas que asistirán';
+    $('saludoInvitado').textContent = '¿Nos acompañás?';
+    updateRsvpUI();
 
 
     /* =================================================
@@ -4396,33 +4148,11 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
 
     /* =================================================
-       CARGAR INVITADO DESDE LA DB
-       Esta versión consulta la función guest del mismo servidor
-       para obtener nombre, lugares y estado de la invitación.
+       INICIALIZACIÓN SIN DB
+       No se consulta ningún dato del invitado al cargar la página.
+       Todo se decide con el código y su sufijo 0/1.
     ================================================= */
 
-
-    if (!/^[A-F0-9]{8}[01]$/.test(publicCode)) {
-        fail(
-            'Esta invitación necesita su enlace personalizado. Pedile a Eunice y David que te reenvíen la invitación.'
-        );
-        return;
-    }
-
-    fetch(
-        `/.netlify/functions/guest?i=${encodeURIComponent(publicCode)}`
-    )
-    .then(async r => {
-        const d = await r.json();
-        if (!r.ok) {
-            throw Error(d.error || 'No encontramos esta invitación.');
-        }
-
-        // La fiesta se decide por el sufijo del enlace en el servidor 2.
-        d.invitado_fiesta = partyFromCode;
-        render(d);
-    })
-    .catch(e => fail(e.message));
 
 })();
 
