@@ -3746,7 +3746,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
     const publicCode =
         (new URLSearchParams(location.search).get('i') || '').trim().toUpperCase();
 
-    const partyFromCode = /^[A-F0-9]{8}1$/.test(publicCode);
+    const partyFromCode = /^[A-F0-9]{7}1$/.test(publicCode);
     const code = publicCode;
 
     const $ = id => document.getElementById(id);
@@ -3926,8 +3926,8 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         }
     });
 
-    if (!/^[A-F0-9]{8}[01]$/.test(publicCode)) {
-        fail('Esta invitación necesita un código válido de 8 caracteres más 0 o 1.');
+    if (!/^[A-F0-9]{7}[01]$/.test(publicCode)) {
+        fail('Esta invitación necesita un código válido de 8 caracteres: 7 caracteres hexadecimales + 0 o 1.');
         return;
     }
 
@@ -4030,9 +4030,16 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
     /* =================================================
        CARRUSEL DE FOTOS
-       Solo JPG y una búsqueda secuencial, una sola vez.
-       Busca carrucel1.jpg, carrucel2.jpg, etc.
-       Al encontrar el primer archivo inexistente, termina.
+       Solo JPG.
+
+       NOMBRE EXACTO DE LOS ARCHIVOS:
+       assets/carrucel1.jpg
+       assets/carrucel2.jpg
+       assets/carrucel3.jpg
+       ...
+
+       Se prueba una vez, en orden, y se detiene al encontrar
+       el primer número que no existe.
     ================================================= */
     (function initCarousel(){
         const track = document.getElementById('carouselTrack');
@@ -4048,7 +4055,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
         function finish(){
             if(!valid.length){
-                empty.style.display='block';
+                if(empty) empty.style.display='block';
                 if(prev) prev.style.display='none';
                 if(next) next.style.display='none';
                 return;
@@ -4061,7 +4068,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
                 const img=document.createElement('img');
                 img.src=src;
                 img.alt=`Foto seleccionada ${i+1}`;
-                img.loading=i===0?'eager':'lazy';
+                img.loading='eager';
                 slide.appendChild(img);
                 track.appendChild(slide);
 
@@ -4104,14 +4111,19 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
         function update(){
             track.style.transform=`translateX(-${current*100}%)`;
-            [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===current));
+            [...dots.children].forEach((d,i)=>
+                d.classList.toggle('active',i===current)
+            );
         }
 
         prev?.addEventListener('click',()=>go(current-1));
         next?.addEventListener('click',()=>go(current+1));
 
         let startX=null;
-        track.addEventListener('touchstart',e=>{startX=e.touches[0].clientX},{passive:true});
+        track.addEventListener('touchstart',e=>{
+            startX=e.touches[0].clientX;
+        },{passive:true});
+
         track.addEventListener('touchend',e=>{
             if(startX===null) return;
             const dx=e.changedTouches[0].clientX-startX;
