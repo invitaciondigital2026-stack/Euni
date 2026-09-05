@@ -13,7 +13,7 @@
     <div class="text-xs uppercase tracking-widest text-stone-500">Eunice & David</div>
     <h1 class="text-3xl md:text-4xl mt-1">Gestión de invitados</h1>
   </div>
-  <button id="logout" class="hidden text-sm underline">Cerrar sesión</button>
+  <button id="refreshBtn" class="hidden text-sm underline">Actualizar</button>
 </header>
 
 <section id="login" class="max-w-sm mx-auto bg-white rounded-2xl shadow-sm p-6">
@@ -139,8 +139,8 @@ async function load(){
     invitados=d.invitados||[]; render();
   }catch(e){$('loginError').textContent=e.message}
 }
-function showLogin(){$('login').classList.remove('hidden');$('app').classList.add('hidden');$('logout').classList.add('hidden')}
-function showApp(){$('login').classList.add('hidden');$('app').classList.remove('hidden');$('logout').classList.remove('hidden');load()}
+function showLogin(){$('login').classList.remove('hidden');$('app').classList.add('hidden');$('refreshBtn').classList.add('hidden')}
+function showApp(){$('login').classList.add('hidden');$('app').classList.remove('hidden');$('refreshBtn').classList.remove('hidden');load()}
 $('loginBtn').onclick=async()=>{
   $('loginError').textContent='';
   try{
@@ -151,7 +151,10 @@ $('loginBtn').onclick=async()=>{
   }catch(e){$('loginError').textContent=e.message}
 };
 $('password').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn').click()});
-$('logout').onclick=async()=>{await fetch('/.netlify/functions/admin-logout',{method:'POST',credentials:'same-origin'});showLogin()};
+$('refreshBtn').onclick=async()=>{
+  const b=$('refreshBtn'); b.disabled=true; b.textContent='Actualizando…';
+  try{await load();}finally{b.disabled=false; b.textContent='Actualizar';}
+};
 $('addBtn').onclick=async()=>{
   $('addMsg').textContent='Generando invitación…';
   try{
