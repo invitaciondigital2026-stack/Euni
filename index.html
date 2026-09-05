@@ -61,20 +61,10 @@ body {
 }
 
 .hero-content {
-    position: absolute;
+    position: relative;
     z-index: 2;
-    top: 11%;
-    right: 6%;
-    width: min(48%, 620px);
-    text-align: right;
+    text-align: center;
     padding: 20px;
-}
-
-/* Ubicación del texto de portada: arriba y hacia la derecha,
-   para dejar libre la zona principal de la fotografía. */
-.hero-content .decorative-line {
-    margin-left: auto;
-    margin-right: 0;
 }
 
 /* Títulos */
@@ -138,20 +128,13 @@ audio {
         background-position: center;
     }
 
-    .hero-content {
-        top: 8%;
-        right: 4%;
-        width: 82%;
-        padding: 10px;
-    }
-
     .hero h1 {
-        font-size: 3.6rem;
-        line-height: 1.05;
+        font-size: 4rem;
+        line-height: 1.1;
     }
 
     .hero h2 {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
     }
 
     .countdown-number {
@@ -3743,13 +3726,31 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
     const publicCode =
         (new URLSearchParams(location.search).get('i') || '').trim().toUpperCase();
 
+    // El último carácter del código define los permisos:
     // 0 = conferencia solamente | 1 = conferencia + fiesta.
-    const partyFromCode = /^[A-F0-9]{8}1$/.test(publicCode);
+    const validPublicCode = /^[A-F0-9]{8}[01]$/.test(publicCode);
+    const codeSuffix = validPublicCode ? publicCode.slice(-1) : '';
+    const partyFromCode = codeSuffix === '1';
     const code = publicCode;
 
 
     const $ =
         id => document.getElementById(id);
+
+    // Lee respuestas JSON sin romper si Netlify devuelve una página HTML
+    // (por ejemplo, cuando falta el proxy /api en el servidor 2).
+    async function readJsonResponse(response) {
+        const text = await response.text();
+        let data;
+        try {
+            data = text ? JSON.parse(text) : {};
+        } catch {
+            throw new Error(
+                'El servidor no respondió en formato JSON. Revisá que el servidor 2 tenga configurado el proxy /api.'
+            );
+        }
+        return data;
+    }
 
 
     const form =
@@ -4029,7 +4030,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
                 const r =
                     await fetch(
-                        `/api/rsvp`,
+                        '/api/rsvp',
                         {
                             method: 'POST',
                             headers: {
@@ -4054,7 +4055,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
                     );
 
                 const d =
-                    await r.json();
+                    await readJsonResponse(r);
 
                 if (!r.ok) {
                     throw Error(
@@ -4278,10 +4279,10 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
     /* =================================================
        CARRUSEL DE FOTOS
-       Como un sitio estático no puede listar una carpeta del servidor,
-       probamos automáticamente nombres habituales: carrucel1, carrucel2,
-       etc. También acepta carrucel-1, carrucel_1 y números con dos dígitos.
-       Los archivos deben estar en assets/.
+       Solo JPG. Se revisa UNA SOLA VEZ, en orden:
+       carrucel1.jpg, carrucel2.jpg, carrucel3.jpg...
+       Cuando encuentra el primer archivo que no existe, se detiene.
+       No queda escaneando ni hace 50 consultas simultáneas.
     ================================================= */
     (function initCarousel(){
         const track = document.getElementById('carouselTrack');
@@ -4291,39 +4292,27 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         const empty = document.getElementById('carouselEmpty');
         if(!track || !dots) return;
 
-        const files=[];
-        const seen=new Set();
-        const exts=['jpg','jpeg','png','webp','JPG','JPEG','PNG','WEBP'];
-        const stems=[];
-        for(let i=1;i<=50;i++){
-            const n=String(i), p=String(i).padStart(2,'0');
-            stems.push(`carrucel${n}`,`carrucel-${n}`,`carrucel_${n}`,
-                       `carrucel${p}`,`carrucel-${p}`,`carrucel_${p}`);
-        }
-        stems.forEach(stem=>exts.forEach(ext=>{
-            const src=`assets/${stem}.${ext}`;
-            if(!seen.has(src)){seen.add(src);files.push(src)}
-        }));
+        const valid = [];
+        let current = 0;
+        const MAX_CAROUSEL = 50;
 
-        let valid=[];
-        let current=0;
-        let pending=files.length;
-
-        const finish=()=>{
-            if(--pending>0)return;
+        function render(){
             if(!valid.length){
                 empty.style.display='block';
                 prev.style.display='none';
                 next.style.display='none';
                 return;
             }
+
             valid.forEach((src,i)=>{
                 const slide=document.createElement('div');
                 slide.className='carousel-slide';
+
                 const img=document.createElement('img');
                 img.src=src;
                 img.alt=`Foto seleccionada ${i+1}`;
                 img.loading=i===0?'eager':'lazy';
+
                 slide.appendChild(img);
                 track.appendChild(slide);
 
@@ -4334,31 +4323,61 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
                 dot.addEventListener('click',()=>go(i));
                 dots.appendChild(dot);
             });
-            update();
-            if(valid.length<2){prev.style.display='none';next.style.display='none';dots.style.display='none'}
-        };
 
-        files.forEach(src=>{
-            const img=new Image();
-            img.onload=()=>{valid.push(src);finish()};
-            img.onerror=finish;
-            img.src=src;
-        });
+            update();
+
+            if(valid.length<2){
+                prev.style.display='none';
+                next.style.display='none';
+                dots.style.display='none';
+            }
+        }
+
+        // Busca de forma secuencial y termina en el primer JPG faltante.
+        function checkNext(number){
+            if(number > MAX_CAROUSEL){
+                render();
+                return;
+            }
+
+            const src = `assets/carrucel${number}.jpg`;
+            const img = new Image();
+
+            img.onload = () => {
+                valid.push(src);
+                checkNext(number + 1);
+            };
+
+            img.onerror = () => {
+                render();
+            };
+
+            img.src = src;
+        }
+
+        checkNext(1);
 
         function go(index){
             if(!valid.length)return;
             current=(index+valid.length)%valid.length;
             update();
         }
+
         function update(){
             track.style.transform=`translateX(-${current*100}%)`;
-            [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===current));
+            [...dots.children].forEach((d,i)=>
+                d.classList.toggle('active',i===current)
+            );
         }
+
         prev.addEventListener('click',()=>go(current-1));
         next.addEventListener('click',()=>go(current+1));
 
         let startX=null;
-        track.addEventListener('touchstart',e=>{startX=e.touches[0].clientX},{passive:true});
+        track.addEventListener('touchstart',e=>{
+            startX=e.touches[0].clientX;
+        },{passive:true});
+
         track.addEventListener('touchend',e=>{
             if(startX===null)return;
             const dx=e.changedTouches[0].clientX-startX;
@@ -4394,12 +4413,11 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
     /* =================================================
        CARGAR INVITADO DESDE EL SERVIDOR 1
-       El servidor 2 no tiene DB. Consulta únicamente esta función
-       del servidor 1 para obtener nombre, lugares y estado.
+       El servidor 2 usa /api/guest como proxy hacia el servidor 1.
+       El sufijo 0/1 ya fue leído del enlace arriba.
     ================================================= */
 
-
-    if (!/^[A-F0-9]{8}[01]$/.test(publicCode)) {
+    if (!validPublicCode) {
         fail(
             'Esta invitación necesita su enlace personalizado. Pedile a Eunice y David que te reenvíen la invitación.'
         );
@@ -4410,7 +4428,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         `/api/guest?i=${encodeURIComponent(publicCode)}`
     )
     .then(async r => {
-        const d = await r.json();
+        const d = await readJsonResponse(r);
         if (!r.ok) {
             throw Error(d.error || 'No encontramos esta invitación.');
         }
