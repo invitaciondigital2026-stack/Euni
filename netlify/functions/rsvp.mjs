@@ -1,3 +1,50 @@
-import { getDatabase } from '@netlify/database'; const db=getDatabase();
-export default async req=>{if(req.method!=='POST')return new Response('Method not allowed',{status:405});let b;try{b=await req.json()}catch{return Response.json({error:'Solicitud inválida.'},{status:400})}const codigo=String(b.codigo||'').trim().toUpperCase(),asistencia=String(b.asistencia||''),cantidad=Number(b.cantidad||0),acompanantes=String(b.acompanantes||'').trim().slice(0,1000);if(!codigo||!['conferencia','ambos','no'].includes(asistencia))return Response.json({error:'Completá la confirmación.'},{status:400});const rows=await db.sql`SELECT id,lugares,invitado_fiesta FROM invitados WHERE codigo=${codigo} LIMIT 1`;if(!rows.length)return Response.json({error:'No encontramos esta invitación.'},{status:404});const g=rows[0];if(asistencia==='ambos'&&!g.invitado_fiesta)return Response.json({error:'Esta invitación no incluye la fiesta.'},{status:400});if(asistencia!=='no'&&(!Number.isInteger(cantidad)||cantidad<1||cantidad>g.lugares))return Response.json({error:`La cantidad debe estar entre 1 y ${g.lugares}.`},{status:400});const confirmados_conferencia=asistencia==='no'?0:cantidad;const confirmados_fiesta=asistencia==='ambos'?cantidad:0;const estado=asistencia==='no'?'no_asiste':'confirmado';await db.sql`UPDATE invitados SET estado=${estado},confirmados=${confirmados_conferencia},asistencia_eventos=${asistencia},confirmados_conferencia=${confirmados_conferencia},confirmados_fiesta=${confirmados_fiesta},acompanantes=${acompanantes},fecha_confirmacion=NOW(),updated_at=NOW() WHERE id=${g.id}`;return Response.json({ok:true,asistencia_eventos:asistencia,confirmados_conferencia,confirmados_fiesta});};
-export const config={path:'/.netlify/functions/rsvp'};
+import { getDatabase } from '@netlify/database';
+const db = getDatabase();
+
+export default async req => {
+  if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  let b;
+  try { b = await req.json(); }
+  catch { return Response.json({ error: 'Solicitud inválida.' }, { status: 400 }); }
+
+  const codigo = String(b.codigo || '').trim().toUpperCase();
+  const asistencia = String(b.asistencia || '');
+  const cantidad = Number(b.cantidad || 0);
+  const acompanantes = String(b.acompanantes || '').trim().slice(0, 1000);
+
+  if (!/^[A-F0-9]{8}[01]$/.test(codigo) || !['conferencia','fiesta','ambos','no'].includes(asistencia))
+    return Response.json({ error: 'Completá la confirmación.' }, { status: 400 });
+
+  const rows = await db.sql`
+    SELECT id,lugares,invitado_fiesta,codigo
+    FROM invitados WHERE codigo=${codigo} LIMIT 1`;
+
+  if (!rows.length) return Response.json({ error: 'No encontramos esta invitación.' }, { status: 404 });
+
+  const g = rows[0];
+  const partyFromCode = codigo.endsWith('1');
+
+  if (Boolean(g.invitado_fiesta) !== partyFromCode)
+    return Response.json({ error: 'El código de invitación no coincide con los permisos de esta invitación.' }, { status: 403 });
+
+  if ((asistencia === 'fiesta' || asistencia === 'ambos') && !g.invitado_fiesta)
+    return Response.json({ error: 'Esta invitación no incluye la fiesta.' }, { status: 400 });
+
+  if (asistencia !== 'no' && (!Number.isInteger(cantidad) || cantidad < 1 || cantidad > g.lugares))
+    return Response.json({ error: `La cantidad debe estar entre 1 y ${g.lugares}.` }, { status: 400 });
+
+  const confirmados_conferencia = (asistencia === 'conferencia' || asistencia === 'ambos') ? cantidad : 0;
+  const confirmados_fiesta = (asistencia === 'fiesta' || asistencia === 'ambos') ? cantidad : 0;
+  const estado = asistencia === 'no' ? 'no_asiste' : 'confirmado';
+
+  await db.sql`
+    UPDATE invitados SET estado=${estado}, confirmados=${confirmados_conferencia},
+      asistencia_eventos=${asistencia}, confirmados_conferencia=${confirmados_conferencia},
+      confirmados_fiesta=${confirmados_fiesta}, acompanantes=${acompanantes},
+      fecha_confirmacion=NOW(), updated_at=NOW() WHERE id=${g.id}`;
+
+  return Response.json({ ok:true, asistencia_eventos:asistencia, confirmados_conferencia, confirmados_fiesta });
+};
+
+export const config = { path: '/.netlify/functions/rsvp' };
