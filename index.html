@@ -1483,52 +1483,6 @@ audio {
         </svg>
         <span>Ubicación</span>
     </button>
-    <button
-        id="btnBarraFoto"
-        class="toolbar-action party-only"
-        type="button"
-        aria-label="Abrir cámara de fotos"
-        title="Cámara"
-        hidden
-    >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 7.5h3l1.5-2h7L17 7.5h3v11H4z"></path>
-            <circle cx="12" cy="13" r="3.5"></circle>
-        </svg>
-        <span>Cámara</span>
-    </button>
-
-    <button
-        id="btnBarraVideo"
-        class="toolbar-action party-only"
-        type="button"
-        aria-label="Abrir cámara de video"
-        title="Filmadora"
-        hidden
-    >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 7.5h10.5A1.5 1.5 0 0 1 16 9v6a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 15V9A1.5 1.5 0 0 1 4 7.5z"></path>
-            <path d="m16 10 5-2.5v9L16 14z"></path>
-        </svg>
-        <span>Filmadora</span>
-    </button>
-
-    <button
-        id="btnBarraSubir"
-        class="toolbar-action party-only"
-        type="button"
-        aria-label="Subir fotos y videos"
-        title="Subir archivo"
-        hidden
-    >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 16V4"></path>
-            <path d="m7 9 5-5 5 5"></path>
-            <path d="M5 20h14"></path>
-        </svg>
-        <span>Subir archivo</span>
-    </button>
-
 
     <button
         id="btnBarraRegalo"
@@ -2283,63 +2237,6 @@ audio {
 
 
 
-<!-- =====================================================
-     COMPARTIR FOTOS Y VIDEOS
-====================================================== -->
-
-<section id="recuerdosCompartidos" class="party-only hidden py-16 bg-stone-100 text-center px-6" hidden>
-
-    <h2 class="section-title uppercase text-sm mb-3">
-        Compartí tus recuerdos
-    </h2>
-
-    <div class="decorative-line"></div>
-
-    <h3 class="title-font text-5xl mt-5">
-        📸 Fotos y videos
-    </h3>
-
-    <p class="text-gray-600 max-w-md mx-auto mt-5 mb-7">
-        ¿Sacaste una foto o un video durante nuestra boda?
-        ¡Compartilo con nosotros!
-    </p>
-
-<div class="flex flex-col items-center gap-3 w-full max-w-md mx-auto">
-
-    <button
-        id="btnFotos"
-        type="button"
-        class="btn bg-stone-700 text-white text-base shadow-lg w-full"
-    >
-        📷 Compartir fotos y videos
-    </button>
-
-    <button
-        id="btnGrabarVideo"
-        type="button"
-        class="btn bg-stone-700 text-white text-base shadow-lg w-full"
-    >
-        🎥 Grabar video
-    </button>
-
-    <button
-        id="btnSubirGaleriaCelular"
-        type="button"
-        class="btn bg-stone-700 text-white text-base shadow-lg w-full"
-        style="display:block !important; visibility:visible !important; opacity:1 !important;"
-    >
-        🖼️ Subir fotos y videos del celular
-    </button>
-
-    <input
-        id="inputGaleriaCelular"
-        type="file"
-        accept="image/*,video/*"
-        multiple
-        class="hidden"
-    >
-
-</div>
 
 <!-- =====================================================
      VISOR DE GALERÍA A PANTALLA COMPLETA
