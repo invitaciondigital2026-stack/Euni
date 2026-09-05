@@ -61,10 +61,20 @@ body {
 }
 
 .hero-content {
-    position: relative;
+    position: absolute;
     z-index: 2;
-    text-align: center;
+    top: 11%;
+    right: 6%;
+    width: min(48%, 620px);
+    text-align: right;
     padding: 20px;
+}
+
+/* Ubicación del texto de portada: arriba y hacia la derecha,
+   para dejar libre la zona principal de la fotografía. */
+.hero-content .decorative-line {
+    margin-left: auto;
+    margin-right: 0;
 }
 
 /* Títulos */
@@ -128,13 +138,20 @@ audio {
         background-position: center;
     }
 
+    .hero-content {
+        top: 8%;
+        right: 4%;
+        width: 82%;
+        padding: 10px;
+    }
+
     .hero h1 {
-        font-size: 4rem;
-        line-height: 1.1;
+        font-size: 3.6rem;
+        line-height: 1.05;
     }
 
     .hero h2 {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
 
     .countdown-number {
@@ -1410,6 +1427,24 @@ audio {
     }
 }
 
+
+/* =====================================================
+   CARRUSEL DE FOTOS SELECCIONADAS
+===================================================== */
+.carousel-section{padding:4.5rem 1.25rem;background:#fff;text-align:center;overflow:hidden}
+.carousel-wrap{position:relative;max-width:900px;margin:2rem auto 0}
+.carousel-viewport{overflow:hidden;border-radius:28px;background:#f5f5f4;box-shadow:0 12px 35px rgba(0,0,0,.08)}
+.carousel-track{display:flex;transition:transform .45s ease;will-change:transform}
+.carousel-slide{min-width:100%;aspect-ratio:16/10;position:relative;background:#f5f5f4}
+.carousel-slide img{width:100%;height:100%;display:block;object-fit:cover}
+.carousel-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:44px;height:44px;border:0;border-radius:50%;background:rgba(255,255,255,.9);color:#444;box-shadow:0 5px 18px rgba(0,0,0,.14);font-size:25px;line-height:44px;cursor:pointer}
+.carousel-arrow.prev{left:14px}.carousel-arrow.next{right:14px}
+.carousel-dots{display:flex;justify-content:center;gap:7px;margin-top:15px;min-height:10px}
+.carousel-dot{width:8px;height:8px;border:0;border-radius:50%;padding:0;background:#cfcfcf;cursor:pointer}
+.carousel-dot.active{background:#555;transform:scale(1.25)}
+.carousel-empty{display:none;color:#777;padding:1rem}
+@media(max-width:640px){.carousel-section{padding:3.5rem 1rem}.carousel-slide{aspect-ratio:4/3}.carousel-arrow{width:38px;height:38px;line-height:38px;font-size:21px}.carousel-arrow.prev{left:8px}.carousel-arrow.next{right:8px}}
+
 </style>
 </head>
 
@@ -1525,6 +1560,21 @@ audio {
             <path d="M12 17h.01"></path>
         </svg>
         <span>Preguntas</span>
+    </button>
+
+    <button
+        id="btnBarraGaleria"
+        class="toolbar-action"
+        type="button"
+        aria-label="Ver fotos y videos de los invitados"
+        title="Galería de invitados"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+            <circle cx="8.5" cy="9" r="1.5"></circle>
+            <path d="m4.5 17 4.5-4 3.2 2.7 2.4-2.2 4.9 4.5"></path>
+        </svg>
+        <span>Galería</span>
     </button>
 
     <button
@@ -1694,6 +1744,32 @@ audio {
 
 </section>
 
+<!-- =====================================================
+     CARRUSEL DE FOTOS SELECCIONADAS
+     Archivos esperados dentro de assets/ con nombres que
+     comiencen por "carrucel". Ej.: carrucel1.jpg, carrucel2.jpg.
+===================================================== -->
+
+<section id="carrucelFotos" class="carousel-section">
+    <h2 class="section-title uppercase text-sm mb-3">Nuestros recuerdos</h2>
+    <div class="decorative-line"></div>
+    <h3 class="title-font text-5xl mt-5">Momentos que queremos compartir</h3>
+    <p class="text-gray-600 max-w-xl mx-auto mt-5">
+        Algunas de nuestras fotos favoritas para compartir este momento con vos.
+    </p>
+
+    <div class="carousel-wrap" id="carouselWrap">
+        <div class="carousel-viewport">
+            <div id="carouselTrack" class="carousel-track"></div>
+        </div>
+        <button id="carouselPrev" class="carousel-arrow prev" type="button" aria-label="Foto anterior">‹</button>
+        <button id="carouselNext" class="carousel-arrow next" type="button" aria-label="Foto siguiente">›</button>
+        <div id="carouselDots" class="carousel-dots" aria-label="Seleccionar foto"></div>
+        <div id="carouselEmpty" class="carousel-empty">
+            Todavía no hay fotos seleccionadas para mostrar.
+        </div>
+    </div>
+</section>
 
 
 <!-- =====================================================
@@ -2375,7 +2451,7 @@ audio {
          GALERÍA EN VIVO
     ====================================================== -->
 
-    <section class="py-16 bg-white text-center px-6">
+    <section id="galeriaInvitados" class="py-16 bg-white text-center px-6">
 
         <h2 class="section-title uppercase text-sm mb-3">
             Recuerdos compartidos
@@ -3668,7 +3744,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         (new URLSearchParams(location.search).get('i') || '').trim().toUpperCase();
 
     // 0 = conferencia solamente | 1 = conferencia + fiesta.
-    const partyFromCode = /^[A-F0-9]{9}1$/.test(publicCode);
+    const partyFromCode = /^[A-F0-9]{8}1$/.test(publicCode);
     const code = publicCode;
 
 
@@ -4199,6 +4275,108 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
     );
 
 
+
+    /* =================================================
+       CARRUSEL DE FOTOS
+       Como un sitio estático no puede listar una carpeta del servidor,
+       probamos automáticamente nombres habituales: carrucel1, carrucel2,
+       etc. También acepta carrucel-1, carrucel_1 y números con dos dígitos.
+       Los archivos deben estar en assets/.
+    ================================================= */
+    (function initCarousel(){
+        const track = document.getElementById('carouselTrack');
+        const dots = document.getElementById('carouselDots');
+        const prev = document.getElementById('carouselPrev');
+        const next = document.getElementById('carouselNext');
+        const empty = document.getElementById('carouselEmpty');
+        if(!track || !dots) return;
+
+        const files=[];
+        const seen=new Set();
+        const exts=['jpg','jpeg','png','webp','JPG','JPEG','PNG','WEBP'];
+        const stems=[];
+        for(let i=1;i<=50;i++){
+            const n=String(i), p=String(i).padStart(2,'0');
+            stems.push(`carrucel${n}`,`carrucel-${n}`,`carrucel_${n}`,
+                       `carrucel${p}`,`carrucel-${p}`,`carrucel_${p}`);
+        }
+        stems.forEach(stem=>exts.forEach(ext=>{
+            const src=`assets/${stem}.${ext}`;
+            if(!seen.has(src)){seen.add(src);files.push(src)}
+        }));
+
+        let valid=[];
+        let current=0;
+        let pending=files.length;
+
+        const finish=()=>{
+            if(--pending>0)return;
+            if(!valid.length){
+                empty.style.display='block';
+                prev.style.display='none';
+                next.style.display='none';
+                return;
+            }
+            valid.forEach((src,i)=>{
+                const slide=document.createElement('div');
+                slide.className='carousel-slide';
+                const img=document.createElement('img');
+                img.src=src;
+                img.alt=`Foto seleccionada ${i+1}`;
+                img.loading=i===0?'eager':'lazy';
+                slide.appendChild(img);
+                track.appendChild(slide);
+
+                const dot=document.createElement('button');
+                dot.type='button';
+                dot.className='carousel-dot'+(i===0?' active':'');
+                dot.setAttribute('aria-label',`Ver foto ${i+1}`);
+                dot.addEventListener('click',()=>go(i));
+                dots.appendChild(dot);
+            });
+            update();
+            if(valid.length<2){prev.style.display='none';next.style.display='none';dots.style.display='none'}
+        };
+
+        files.forEach(src=>{
+            const img=new Image();
+            img.onload=()=>{valid.push(src);finish()};
+            img.onerror=finish;
+            img.src=src;
+        });
+
+        function go(index){
+            if(!valid.length)return;
+            current=(index+valid.length)%valid.length;
+            update();
+        }
+        function update(){
+            track.style.transform=`translateX(-${current*100}%)`;
+            [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===current));
+        }
+        prev.addEventListener('click',()=>go(current-1));
+        next.addEventListener('click',()=>go(current+1));
+
+        let startX=null;
+        track.addEventListener('touchstart',e=>{startX=e.touches[0].clientX},{passive:true});
+        track.addEventListener('touchend',e=>{
+            if(startX===null)return;
+            const dx=e.changedTouches[0].clientX-startX;
+            if(Math.abs(dx)>45)go(current+(dx<0?1:-1));
+            startX=null;
+        },{passive:true});
+    })();
+
+    /* =================================================
+       BOTONERA → GALERÍA / CARRUSEL
+    ================================================= */
+    const btnBarraGaleria=document.getElementById('btnBarraGaleria');
+    if(btnBarraGaleria){
+        btnBarraGaleria.addEventListener('click',()=>{
+            document.getElementById('galeriaInvitados')?.scrollIntoView({behavior:'smooth',block:'start'});
+        });
+    }
+
     /* =================================================
        BOTONERA → PREGUNTAS FRECUENTES
     ================================================= */
@@ -4222,7 +4400,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
     const SERVER1_URL = 'https://TU-SERVIDOR-1.netlify.app';
 
-    if (!/^[A-F0-9]{9}[01]$/.test(publicCode)) {
+    if (!/^[A-F0-9]{8}[01]$/.test(publicCode)) {
         fail(
             'Esta invitación necesita su enlace personalizado. Pedile a Eunice y David que te reenvíen la invitación.'
         );

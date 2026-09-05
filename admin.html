@@ -79,11 +79,28 @@
 
 <script>
 let invitados=[];
+
+/* SERVIDOR 2: dominio donde estará publicada la invitación */
+const PUBLIC_SERVER2_URL='https://TU-SERVIDOR-2.netlify.app';
+
 const $=id=>document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>\'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
 function st(s){return s==='confirmado'?'🟢 Confirmó':s==='no_asiste'?'🔴 No asiste':'🟡 Pendiente'}
+
+async function readResponse(r){
+  const text=await r.text();
+  const type=(r.headers.get('content-type')||'').toLowerCase();
+  if(!text)return {};
+  if(type.includes('application/json')){
+    try{return JSON.parse(text)}catch{}
+  }
+  // Netlify/hosting may return HTML/XML when the Function route is missing
+  const clean=text.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+  throw Error(`El servidor devolvió una respuesta que no es JSON (${r.status}). ${clean.slice(0,180) || 'Revisá que las Functions estén desplegadas en este mismo sitio.'}`);
+}
+
 function wa(g){
-  const u=location.origin+'/?i='+g.codigo;
+  const u=PUBLIC_SERVER2_URL+'/?i='+g.codigo;
   const m=`Hola ${g.nombre}, somos Eunice y David ❤️\nTe compartimos nuestra invitación: ${u}`;
   return 'https://wa.me/'+String(g.telefono||'').replace(/\D/g,'')+'?text='+encodeURIComponent(m);
 }
@@ -117,7 +134,7 @@ async function load(){
   try{
     const r=await fetch('/.netlify/functions/admin-guests');
     if(r.status===401){showLogin();return}
-    const d=await r.json();
+    const d=await readResponse(r);
     if(!r.ok) throw Error(d.error||'No se pudieron cargar los invitados.');
     invitados=d.invitados||[]; render();
   }catch(e){$('loginError').textContent=e.message}
@@ -128,7 +145,7 @@ $('loginBtn').onclick=async()=>{
   $('loginError').textContent='';
   try{
     const r=await fetch('/.netlify/functions/admin-login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({password:$('password').value})});
-    const d=await r.json().catch(()=>({}));
+    const d=await readResponse(r).catch(()=>({}));
     if(!r.ok) throw Error(d.error||`No se pudo ingresar (${r.status}).`);
     showApp();
   }catch(e){$('loginError').textContent=e.message}
@@ -139,7 +156,7 @@ $('addBtn').onclick=async()=>{
   $('addMsg').textContent='Generando invitación…';
   try{
     const r=await fetch('/.netlify/functions/admin-guests',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({nombre:$('newName').value,telefono:$('newPhone').value,lugares:Number($('newSeats').value),invitado_fiesta:$('newParty').checked})});
-    const d=await r.json();
+    const d=await readResponse(r);
     if(!r.ok) throw Error(d.error||'Error al agregar.');
     invitados.push(d); $('newName').value='';$('newPhone').value='';$('newSeats').value=1;$('newParty').checked=false;
     $('addMsg').textContent='Invitado agregado. Código: '+d.codigo;
@@ -147,19 +164,32 @@ $('addBtn').onclick=async()=>{
   }catch(e){$('addMsg').textContent=e.message}
 };
 $('search').oninput=render;$('filter').onchange=render;
-window.copyLink=async c=>{await navigator.clipboard.writeText(location.origin+'/?i='+c);alert('Enlace copiado.')};
+window.copyLink=async c=>{await navigator.clipboard.writeText(PUBLIC_SERVER2_URL+'/?i='+c);alert('Enlace copiado.')};
 window.toggleParty=async(id,value)=>{
   const g=invitados.find(x=>x.id===id); if(!g)return;
   if(!confirm(value?'¿Dar acceso a la fiesta?':'¿Quitar acceso a la fiesta?'))return;
   try{
     const r=await fetch('/.netlify/functions/admin-guests',{method:'PUT',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({id:g.id,nombre:g.nombre,telefono:g.telefono,lugares:g.lugares,invitado_fiesta:value})});
-    const d=await r.json(); if(!r.ok) throw Error(d.error||'No se pudo actualizar.');
+    const d=await readResponse(r); if(!r.ok) throw Error(d.error||'No se pudo actualizar.');
     const i=invitados.findIndex(x=>x.id===id); invitados[i]=d; render();
     alert('Actualizado. El nuevo código es '+d.codigo+' y por lo tanto cambia el enlace.');
   }catch(e){alert(e.message)}
 };
-window.delGuest=async id=>{if(!confirm('¿Eliminar este invitado?'))return;const r=await fetch('/.netlify/functions/admin-guests',{method:'DELETE',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({id})});if(r.ok){invitados=invitados.filter(g=>g.id!==id);render()}};
-load();
+window.delGuest=async id=>{
+  if(!confirm('¿Eliminar este invitado?'))return;
+  try{
+    const r=await fetch('/.netlify/functions/admin-guests',{method:'DELETE',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({id})});
+    const d=await readResponse(r);
+    if(!r.ok) throw Error(d.error||'No se pudo eliminar.');
+    invitados=invitados.filter(g=>g.id!==id);
+    render();
+  }catch(e){alert(e.message)}
+};
+
+// Importante: no consultamos la DB al abrir el HTML.
+// El panel comienza en la pantalla de login y recién después de autenticarse
+// llama a admin-guests. Esto evita errores de JSON/XML en la vista previa local.
+showLogin();
 </script>
 </body>
 </html>
