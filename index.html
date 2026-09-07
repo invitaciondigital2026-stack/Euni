@@ -2350,6 +2350,22 @@ audio {
 
 <script>
 /* =====================================================
+   CONFIGURACIÓN API
+   El frontend puede estar alojado directamente en GitHub Pages.
+   Cambiá SOLAMENTE esta URL si en el futuro movés el backend.
+====================================================== */
+
+window.API_BASE_URL = "https://TU-PROYECTO.netlify.app";
+
+// Normaliza la URL para evitar barras duplicadas.
+const API_BASE_URL = window.API_BASE_URL.replace(/\/$/, "");
+
+const API_ENDPOINTS = {
+    guest: `${API_BASE_URL}/.netlify/functions/guest`,
+    rsvp: `${API_BASE_URL}/.netlify/functions/rsvp`
+};
+
+/* =====================================================
    FOTOS / VIDEOS
    Funciones reutilizadas de la botonera original.
 ====================================================== */
@@ -3868,7 +3884,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
                 const r =
                     await fetch(
-                        `/.netlify/functions/rsvp`,
+                        API_ENDPOINTS.rsvp,
                         {
                             method: 'POST',
                             headers: {
@@ -4261,7 +4277,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
     }
 
     fetch(
-        `/.netlify/functions/guest?i=${encodeURIComponent(publicCode)}`
+        `${API_ENDPOINTS.guest}?i=${encodeURIComponent(publicCode)}`
     )
     .then(async r => {
         const d = await r.json();
