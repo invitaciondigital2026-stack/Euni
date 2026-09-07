@@ -6,6 +6,20 @@
 <meta name="theme-color" content="#fafaf9">
 <title>Eunice & David | Nos Casamos</title>
 
+<script>
+/* =====================================================
+   CONFIGURACIÓN DE LA API
+   GitHub Pages sirve este index; Netlify queda como API + DB.
+   Cambiá SOLAMENTE esta URL por la URL real de tu sitio Netlify.
+===================================================== */
+window.API_BASE_URL = "https://tu-proyecto.netlify.app";
+
+window.API = {
+    guest: `${window.API_BASE_URL}/.netlify/functions/guest`,
+    rsvp: `${window.API_BASE_URL}/.netlify/functions/rsvp`
+};
+</script>
+
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='%27http://www.w3.org/2000/svg%27' viewBox='%270 0 64 64%27'%3E%3Crect width='%2764%27 height='%2764%27 rx='%2714%27 fill='%23f5f2ed'/%3E%3Ccircle cx='%2725%27 cy='%2735%27 r='%2714%27 fill='%27none%27 stroke='%23443f3a%27 stroke-width='%276%27/%3E%3Ccircle cx='%2739%27 cy='%2735%27 r='%2714%27 fill='%27none%27 stroke='%237c7168%27 stroke-width='%276%27/%3E%3C/svg%3E">
 
 <script src="https://cdn.tailwindcss.com"></script>
@@ -2350,22 +2364,6 @@ audio {
 
 <script>
 /* =====================================================
-   CONFIGURACIÓN API
-   El frontend puede estar alojado directamente en GitHub Pages.
-   Cambiá SOLAMENTE esta URL si en el futuro movés el backend.
-====================================================== */
-
-window.API_BASE_URL = "https://ornate-kataifi-9b102e.netlify.app";
-
-// Normaliza la URL para evitar barras duplicadas.
-const API_BASE_URL = window.API_BASE_URL.replace(/\/$/, "");
-
-const API_ENDPOINTS = {
-    guest: `${API_BASE_URL}/.netlify/functions/guest`,
-    rsvp: `${API_BASE_URL}/.netlify/functions/rsvp`
-};
-
-/* =====================================================
    FOTOS / VIDEOS
    Funciones reutilizadas de la botonera original.
 ====================================================== */
@@ -3305,17 +3303,21 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         }
     }
 
-    btnFotos.addEventListener("click", function() {
-        if (esCelular) {
-            abrirCamara("foto");
-        } else {
-            widgetCloudinary.open();
-        }
-    });
+    if (btnFotos) {
+        btnFotos.addEventListener("click", function() {
+            if (esCelular) {
+                abrirCamara("foto");
+            } else if (widgetCloudinary && typeof widgetCloudinary.open === "function") {
+                widgetCloudinary.open();
+            }
+        });
+    }
 
-    btnGrabarVideo.addEventListener("click", function() {
-        abrirCamara("video");
-    });
+    if (btnGrabarVideo) {
+        btnGrabarVideo.addEventListener("click", function() {
+            abrirCamara("video");
+        });
+    }
 
     // La botonera superior reutiliza exactamente las funciones de cámara existentes.
     const btnBarraFoto = document.getElementById("btnBarraFoto");
@@ -3333,11 +3335,11 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         });
     }
 
-    btnCapturarFoto.addEventListener("click", capturarFotoDirecta);
-    btnIniciarGrabacionCamara.addEventListener("click", iniciarGrabacionCamara);
-    btnDetenerGrabacionCamara.addEventListener("click", detenerGrabacionCamara);
-    btnSubirVideo.addEventListener("click", subirVideoPreparado);
-    cerrarModalCamara.addEventListener("click", cerrarCamara);
+    btnCapturarFoto?.addEventListener("click", capturarFotoDirecta);
+    btnIniciarGrabacionCamara?.addEventListener("click", iniciarGrabacionCamara);
+    btnDetenerGrabacionCamara?.addEventListener("click", detenerGrabacionCamara);
+    btnSubirVideo?.addEventListener("click", subirVideoPreparado);
+    cerrarModalCamara?.addEventListener("click", cerrarCamara);
 
 
 
@@ -3345,7 +3347,8 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
     const btnSubirGaleriaCelular = document.getElementById("btnSubirGaleriaCelular");
     const inputGaleriaCelular = document.getElementById("inputGaleriaCelular");
 
-    btnSubirGaleriaCelular.addEventListener("click", function() {
+    btnSubirGaleriaCelular?.addEventListener("click", function() {
+        if (!inputGaleriaCelular) return;
         inputGaleriaCelular.value = "";
         inputGaleriaCelular.click();
     });
@@ -3358,7 +3361,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         });
     }
 
-    inputGaleriaCelular.addEventListener("change", async function() {
+    inputGaleriaCelular?.addEventListener("change", async function() {
         const archivos = Array.from(inputGaleriaCelular.files || []);
         if (!archivos.length) return;
 
@@ -3884,7 +3887,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
                 const r =
                     await fetch(
-                        API_ENDPOINTS.rsvp,
+                        window.API.rsvp,
                         {
                             method: 'POST',
                             headers: {
@@ -4154,7 +4157,12 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
         const valid = [];
         let current = 0;
-        let number = 1;
+        const carouselSources = [
+            "assets/carrucel1.jpg",
+            "assets/carrucel2.jpg",
+            "assets/carrucel3.jpg",
+            "assets/carrucel4.jpg"
+        ];
 
         function finish(){
             if(!valid.length){
@@ -4192,18 +4200,26 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
             }
         }
 
-        function probeNext(){
-            const src=`assets/carrucel${number}.jpg`;
-            const img=new Image();
+        function probeNext(index = 0){
+            if (index >= carouselSources.length) {
+                finish();
+                return;
+            }
 
-            img.onload=()=>{
+            const src = carouselSources[index];
+            const img = new Image();
+
+            img.onload = () => {
                 valid.push(src);
-                number++;
-                probeNext();
+                probeNext(index + 1);
             };
 
-            img.onerror=()=>finish();
-            img.src=src;
+            img.onerror = () => {
+                // Un archivo faltante no genera una segunda consulta 404.
+                probeNext(index + 1);
+            };
+
+            img.src = src;
         }
 
         function go(index){
@@ -4277,7 +4293,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
     }
 
     fetch(
-        `${API_ENDPOINTS.guest}?i=${encodeURIComponent(publicCode)}`
+        `${window.API.guest}?i=${encodeURIComponent(publicCode)}`
     )
     .then(async r => {
         const d = await r.json();

@@ -1,5 +1,4 @@
 import { getDatabase } from '@netlify/database';
-
 const db = getDatabase();
 
 const CORS_HEADERS = {
@@ -9,17 +8,16 @@ const CORS_HEADERS = {
   'Content-Type': 'application/json; charset=utf-8'
 };
 
-const json = (data, status = 200) =>
-  new Response(JSON.stringify(data), { status, headers: CORS_HEADERS });
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), { status, headers: CORS_HEADERS });
+}
 
 export default async req => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: CORS_HEADERS });
   }
 
-  if (req.method !== 'POST') {
-    return json({ error: 'Method not allowed' }, 405);
-  }
+  if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
 
   let b;
   try {
@@ -34,7 +32,7 @@ export default async req => {
     const cantidad = Number(b.cantidad || 0);
     const acompanantes = String(b.acompanantes || '').trim().slice(0, 1000);
 
-    if (!codigo || !['conferencia', 'fiesta', 'ambos', 'no'].includes(asistencia)) {
+    if (!codigo || !['conferencia', 'ambos', 'no'].includes(asistencia)) {
       return json({ error: 'Completá la confirmación.' }, 400);
     }
 
@@ -45,39 +43,32 @@ export default async req => {
       LIMIT 1
     `;
 
-    if (!rows.length) {
-      return json({ error: 'No encontramos esta invitación.' }, 404);
-    }
+    if (!rows.length) return json({ error: 'No encontramos esta invitación.' }, 404);
 
     const g = rows[0];
 
-    if ((asistencia === 'fiesta' || asistencia === 'ambos') && !g.invitado_fiesta) {
+    if (asistencia === 'ambos' && !g.invitado_fiesta) {
       return json({ error: 'Esta invitación no incluye la fiesta.' }, 400);
     }
 
-    if (
-      asistencia !== 'no' &&
-      (!Number.isInteger(cantidad) || cantidad < 1 || cantidad > g.lugares)
-    ) {
-      return json({
-        error: `La cantidad debe estar entre 1 y ${g.lugares}.`
-      }, 400);
+    if (asistencia !== 'no' && (!Number.isInteger(cantidad) || cantidad < 1 || cantidad > g.lugares)) {
+      return json({ error: `La cantidad debe estar entre 1 y ${g.lugares}.` }, 400);
     }
 
     const confirmados_conferencia = asistencia === 'no' ? 0 : cantidad;
-    const confirmados_fiesta = asistencia === 'ambos' || asistencia === 'fiesta' ? cantidad : 0;
+    const confirmados_fiesta = asistencia === 'ambos' ? cantidad : 0;
     const estado = asistencia === 'no' ? 'no_asiste' : 'confirmado';
 
     await db.sql`
-      UPDATE invitados SET
-        estado=${estado},
-        confirmados=${confirmados_conferencia},
-        asistencia_eventos=${asistencia},
-        confirmados_conferencia=${confirmados_conferencia},
-        confirmados_fiesta=${confirmados_fiesta},
-        acompanantes=${acompanantes},
-        fecha_confirmacion=NOW(),
-        updated_at=NOW()
+      UPDATE invitados
+      SET estado=${estado},
+          confirmados=${confirmados_conferencia},
+          asistencia_eventos=${asistencia},
+          confirmados_conferencia=${confirmados_conferencia},
+          confirmados_fiesta=${confirmados_fiesta},
+          acompanantes=${acompanantes},
+          fecha_confirmacion=NOW(),
+          updated_at=NOW()
       WHERE id=${g.id}
     `;
 
@@ -88,8 +79,8 @@ export default async req => {
       confirmados_fiesta
     });
   } catch (error) {
-    console.error('rsvp error:', error);
-    return json({ error: 'No pudimos guardar la confirmación.' }, 500);
+    console.error('rsvp:', error);
+    return json({ error: 'No se pudo guardar la confirmación.' }, 500);
   }
 };
 
