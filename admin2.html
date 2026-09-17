@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>
+Panel de Invitados | Eunice & David
+</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-stone-100">
+
+<div class="max-w-7xl mx-auto p-6">
+
+    <div class="mb-8">
+
+        <h1 class="text-4xl font-light">
+            Administración
+        </h1>
+
+        <p class="text-stone-500 mt-2">
+            Invitación Digital Eunice & David
+        </p>
+
+    </div>
+
+    <!-- DASHBOARD -->
+
+    <div class="grid md:grid-cols-6 gap-4 mb-8">
+
+        <div class="bg-white rounded-xl p-5 shadow-sm">
+            <div class="text-sm text-stone-500">
+                Invitados
+            </div>
+            <div id="sTotal"
+                 class="text-3xl mt-1">
+                0
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-5 shadow-sm">
+            <div class="text-sm text-stone-500">
+                Confirmados
+            </div>
+            <div id="sOk"
+                 class="text-3xl mt-1">
+                0
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-5 shadow-sm">
+            <div class="text-sm text-stone-500">
+                Pendientes
+            </div>
+            <div id="sPending"
+                 class="text-3xl mt-1">
+                0
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-5 shadow-sm">
+            <div class="text-sm text-stone-500">
+                Ceremonia
+            </div>
+            <div id="sConference"
+                 class="text-3xl mt-1">
+                0
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-5 shadow-sm">
+            <div class="text-sm text-stone-500">
+                Fiesta
+            </div>
+            <div id="sParty"
+                 class="text-3xl mt-1">
+                0
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-5 shadow-sm">
+            <div class="text-sm text-stone-500">
+                Lugares Confirmados
+            </div>
+            <div id="sSeats"
+                 class="text-3xl mt-1">
+                0
+            </div>
+        </div>
+
+    </div>
+
+    <!-- NUEVO INVITADO -->
+
+    <div class="bg-white rounded-xl p-6 shadow-sm mb-8">
+
+        <h2 class="text-2xl mb-4">
+            Nuevo Invitado
+        </h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+
+            <input
+                id="newName"
+                type="text"
+                placeholder="Nombre"
+                class="border rounded-lg p-3">
+
+            <input
+                id="newPhone"
+                type="text"
+                placeholder="WhatsApp"
+                class="border rounded-lg p-3">
+
+            <input
+                id="newSeats"
+                type="number"
+                value="1"
+                min="1"
+                class="border rounded-lg p-3">
+
+            <input
+                id="newObs"
+                type="text"
+                placeholder="Observaciones"
+                class="border rounded-lg p-3">
+
+            <label class="flex items-center gap-2">
+
+                <input
+                    id="newCeremony"
+                    type="checkbox"
+                    checked>
+
+                Invitado a ceremonia
+
+            </label>
+
+            <label class="flex items-center gap-2">
+
+                <input
+                    id="newParty"
+                    type="checkbox"
+                    checked>
+
+                Invitado a fiesta
+
+            </label>
+
+        </div>
+
+        <button
+            class="bg-stone-800 text-white px-5 py-3 rounded-lg mt-5"
+            onclick="crearInvitado()">
+
+            Crear Invitado
+
+        </button>
+
+    </div>
+
+
+    <!-- BUSQUEDA -->
+
+    <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+
+        <input
+            id="search"
+            placeholder="Buscar invitado..."
+            class="border rounded-lg p-3 w-full">
+
+    </div>
+
+    <!-- TABLA -->
+
+    <div class="bg-white rounded-xl shadow-sm overflow-auto">
+
+        <table class="min-w-full">
+
+            <thead>
+
+                <tr class="bg-stone-200">
+
+                    <th class="p-3 text-left">
+                        Nombre
+                    </th>
+
+                    <th class="p-3">
+                        Teléfono
+                    </th>
+
+                    <th class="p-3">
+                        Cupos
+                    </th>
+
+                    <th class="p-3">
+                        Confirmados
+                    </th>
+
+                    <th class="p-3">
+                        Acciones
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="rows">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycby80WR98QzVdQk9SrVOuZ_AiA42rKROIT-ZjkMXLfEt4usPjbZ585kD5DcS_Zns2M8Y/exec";
+
+const SITE_URL =
+"https://invitaciondigital2026-stack.github.io/Euni/";
+
+let invitados = [];
+
+
+/* ===========================
+   DASHBOARD
+=========================== */
+
+async function cargarResumen() {
+
+    const res =
+        await fetch(
+            `${API_URL}?action=summary`
+        );
+
+    const data =
+        await res.json();
+
+    document.getElementById("sTotal").textContent =
+        data.total || 0;
+
+    document.getElementById("sOk").textContent =
+        data.confirmados || 0;
+
+    document.getElementById("sPending").textContent =
+        data.pendientes || 0;
+
+    document.getElementById("sConference").textContent =
+        data.invitadosCeremonia || 0;
+
+    document.getElementById("sParty").textContent =
+        data.invitadosFiesta || 0;
+
+    document.getElementById("sSeats").textContent =
+        data.confirmadosCantidad || 0;
+
+}
+
+
+/* ===========================
+   LISTADO
+=========================== */
+
+async function cargarInvitados() {
+
+    const res =
+        await fetch(
+            `${API_URL}?action=list`
+        );
+
+    const data =
+        await res.json();
+
+    invitados =
+        data.invitados || [];
+
+    render();
+
+}
+
+
+/* ===========================
+   RENDER
+=========================== */
+
+function render() {
+
+    const texto =
+        document
+            .getElementById("search")
+            .value
+            .toLowerCase();
+
+    const rows =
+        document.getElementById("rows");
+
+    rows.innerHTML = invitados
+
+        .filter(i =>
+            (i.nombre || "")
+            .toLowerCase()
+            .includes(texto)
+        )
+
+        .map(i => `
+
+<tr class="border-t">
+
+<td class="p-3">
+${i.nombre || ""}
+</td>
+
+<td class="p-3 text-center">
+${i.telefono || ""}
+</td>
+
+<td class="p-3 text-center">
+${i.cantidadPermitida || 0}
+</td>
+
+<td class="p-3 text-center">
+${i.cantidadConfirmada || 0}
+</td>
+
+<td class="p-3">
+
+<div class="flex flex-wrap gap-2">
+
+<button
+class="bg-blue-600 text-white px-3 py-1 rounded"
+onclick="copiarLink('${i.token}')">
+
+Copiar Link
+
+</button>
+
+<button
+class="bg-green-600 text-white px-3 py-1 rounded"
+onclick="enviarWhatsapp(
+'${(i.nombre || "").replace(/'/g,"\\'")}',
+'${i.telefono || ""}',
+'${i.token}'
+)">
+
+WhatsApp
+
+</button>
+
+<button
+class="bg-red-600 text-white px-3 py-1 rounded"
+onclick="eliminarInvitado('${i.token}')">
+
+Eliminar
+
+</button>
+
+</div>
+
+</td>
+
+</tr>
+
+`)
+
+        .join("");
+
+}
+
+
+/* ===========================
+   CREAR
+=========================== */
+
+async function crearInvitado() {
+
+    const payload = {
+
+        action: "create",
+
+        nombre:
+            document.getElementById("newName").value,
+
+        telefono:
+            document.getElementById("newPhone").value,
+
+        invitadoCeremonia:
+            document.getElementById("newCeremony").checked,
+
+        invitadoFiesta:
+            document.getElementById("newParty").checked,
+
+        cantidadPermitida:
+            Number(
+                document.getElementById("newSeats").value
+            ),
+
+        observaciones:
+            document.getElementById("newObs").value
+
+    };
+
+    const res = await fetch(
+
+        API_URL,
+
+        {
+            method: "POST",
+            headers: {
+                "Content-Type":
+                "application/json"
+            },
+            body:
+            JSON.stringify(payload)
+        }
+
+    );
+
+    const data =
+        await res.json();
+
+    alert(
+        "Invitado creado\n\nToken: " +
+        data.token
+    );
+
+    cargarInvitados();
+    cargarResumen();
+
+}
+
+
+/* ===========================
+   LINK
+=========================== */
+
+function generarLink(token) {
+
+    return `${SITE_URL}?t=${token}`;
+
+}
+
+async function copiarLink(token) {
+
+    await navigator.clipboard.writeText(
+        generarLink(token)
+    );
+
+    alert("Enlace copiado");
+
+}
+
+
+/* ===========================
+   WHATSAPP
+=========================== */
+
+function enviarWhatsapp(
+    nombre,
+    telefono,
+    token
+) {
+
+    const mensaje =
+
+`Hola ${nombre} ❤️
+
+Queremos compartir con vos nuestra invitación.
+
+${generarLink(token)}`;
+
+    window.open(
+
+        `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`,
+
+        "_blank"
+
+    );
+
+}
+
+
+/* ===========================
+   ELIMINAR
+=========================== */
+
+async function eliminarInvitado(token) {
+
+    if(!confirm("Eliminar invitado?"))
+        return;
+
+    await fetch(
+        API_URL,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type":
+                "application/json"
+            },
+            body:
+            JSON.stringify({
+                action:"delete",
+                token
+            })
+        }
+    );
+
+    cargarInvitados();
+    cargarResumen();
+
+}
+
+
+/* ===========================
+   EVENTOS
+=========================== */
+
+document
+.getElementById("search")
+.addEventListener(
+    "input",
+    render
+);
+
+window.onload = () => {
+
+    cargarResumen();
+    cargarInvitados();
+
+};
+
+</script>
+
+</body>
+</html>
