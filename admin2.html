@@ -385,61 +385,76 @@ Eliminar
 
 async function crearInvitado() {
 
-    const payload = {
+    const nombre =
+        document.getElementById("newName").value;
 
-        action: "create",
+    const telefono =
+        document.getElementById("newPhone").value;
 
-        nombre:
-            document.getElementById("newName").value,
+    const cantidad =
+        document.getElementById("newSeats").value;
 
-        telefono:
-            document.getElementById("newPhone").value,
+    const observaciones =
+        document.getElementById("newObs").value;
 
-        invitadoCeremonia:
-            document.getElementById("newCeremony").checked,
+    const ceremonia =
+        document.getElementById("newCeremony").checked
+            ? "SI"
+            : "NO";
 
-        invitadoFiesta:
-            document.getElementById("newParty").checked,
+    const fiesta =
+        document.getElementById("newParty").checked
+            ? "SI"
+            : "NO";
 
-        cantidadPermitida:
-            Number(
-                document.getElementById("newSeats").value
-            ),
+    const url =
 
-        observaciones:
-            document.getElementById("newObs").value
+`${API_URL}?action=create
+&nombre=${encodeURIComponent(nombre)}
+&telefono=${encodeURIComponent(telefono)}
+&cantidadPermitida=${cantidad}
+&invitadoCeremonia=${ceremonia}
+&invitadoFiesta=${fiesta}
+&observaciones=${encodeURIComponent(observaciones)}`.replace(/\n/g,'');
 
-    };
-
-    const res = await fetch(
-
-        API_URL,
-
-        {
-            method: "POST",
-            headers: {
-                "Content-Type":
-                "application/json"
-            },
-            body:
-            JSON.stringify(payload)
-        }
-
-    );
+    const response =
+        await fetch(url);
 
     const data =
-        await res.json();
+        await response.json();
+
+    if (!data.success) {
+
+        alert(
+            data.error ||
+            "Error creando invitado"
+        );
+
+        return;
+    }
+
+    const link =
+        generarLink(data.token);
 
     alert(
-        "Invitado creado\n\nToken: " +
-        data.token
+`Invitado creado correctamente
+
+Token:
+${data.token}
+
+Link:
+${link}`
     );
+
+    document.getElementById("newName").value = "";
+    document.getElementById("newPhone").value = "";
+    document.getElementById("newObs").value = "";
+    document.getElementById("newSeats").value = 1;
 
     cargarInvitados();
     cargarResumen();
 
 }
-
 
 /* ===========================
    LINK
@@ -472,17 +487,24 @@ function enviarWhatsapp(
     token
 ) {
 
+    const enlace =
+        generarLink(token);
+
     const mensaje =
 
 `Hola ${nombre} ❤️
 
 Queremos compartir con vos nuestra invitación.
 
-${generarLink(token)}`;
+${enlace}`;
+
+    const numero =
+        (telefono || "")
+        .replace(/\D/g, "");
 
     window.open(
 
-        `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`,
+        `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`,
 
         "_blank"
 
@@ -490,31 +512,40 @@ ${generarLink(token)}`;
 
 }
 
-
 /* ===========================
    ELIMINAR
 =========================== */
 
 async function eliminarInvitado(token) {
 
-    if(!confirm("Eliminar invitado?"))
+    if (
+        !confirm(
+            "¿Eliminar invitado?"
+        )
+    ) {
+        return;
+    }
+
+    const response =
+        await fetch(
+
+            `${API_URL}?action=delete&token=${token}`
+
+        );
+
+    const data =
+        await response.json();
+
+    if (!data.success) {
+
+        alert(
+            data.error ||
+            "No se pudo eliminar"
+        );
+
         return;
 
-    await fetch(
-        API_URL,
-        {
-            method: "POST",
-            headers: {
-                "Content-Type":
-                "application/json"
-            },
-            body:
-            JSON.stringify({
-                action:"delete",
-                token
-            })
-        }
-    );
+    }
 
     cargarInvitados();
     cargarResumen();
