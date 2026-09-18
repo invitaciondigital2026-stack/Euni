@@ -3576,28 +3576,25 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
 
     /* =================================================
-       INVITACIÓN BASADA EN EL MODELO DEL ADMIN
-       La invitación NO usa Netlify DB.
-       Lee los datos desde la misma fuente Google Apps Script
-       utilizada por el panel de administración.
+       INVITACIÓN PERSONALIZADA DESDE GOOGLE APPS SCRIPT
+       URL: ?t=TOKEN
 
-       URL:
-       ?t=TOKEN
+       Sin token:
+         - se muestra solamente el Civil
+         - no se muestran Fiesta ni multimedia
 
-       Campos esperados del admin:
-       token
-       nombre
-       cantidadPermitida
-       invitadoCeremonia = "SI" / "NO"
-       invitadoFiesta    = "SI" / "NO"
-       ================================================= */
+       Con token:
+         - Google devuelve los datos del invitado
+         - invitadoCeremonia = SI -> Civil + Conferencia
+         - invitadoFiesta = SI -> Fiesta + multimedia
+         - ambos = se muestran todos los eventos correspondientes
+    ================================================= */
 
     const API_URL =
         "https://script.google.com/macros/s/AKfycby80WR98QzVdQk9SrVOuZ_AiA42rKROIT-ZjkMXLfEt4usPjbZ585kD5DcS_Zns2M8Y/exec";
 
-    const invitationToken =
-        (new URLSearchParams(location.search).get('t') || '')
-        .trim();
+    const SITE_TOKEN =
+        (new URLSearchParams(location.search).get('t') || '').trim();
 
     const $ = id => document.getElementById(id);
 
@@ -3618,45 +3615,45 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
     const btnNo = $('btnNoAsistire');
     const rsvpHelp = $('rsvpAyuda');
 
-    let invitado = null;
-    let partyFromInvitation = false;
-    let ceremonyFromInvitation = true;
-    let maxPlaces = 1;
+    const civilCards = document.querySelectorAll('#ubicacion .max-w-2xl > article');
+    const civilCard = civilCards[0];
+    const conferenceCard = civilCards[1];
+    const partyCard = $('eventoFiesta');
+    const locationButton = $('btnBarraUbicacion');
 
-    function fail(m){
-        if (load) load.classList.add('hidden');
-        if (form) form.classList.add('hidden');
-        if (err) {
-            err.textContent = m;
-            err.classList.remove('hidden');
-        }
+    let invitado = null;
+    let invitadoCeremonia = false;
+    let invitadoFiesta = false;
+    let cantidadPermitida = 1;
+
+    function ocultar(el, oculto) {
+        if (!el) return;
+        el.hidden = oculto;
+        el.classList.toggle('hidden', oculto);
+    }
+
+    function fail(m) {
+        load.classList.add('hidden');
+        form.classList.add('hidden');
+        err.textContent = m;
+        err.classList.remove('hidden');
     }
 
     function apiUrl(action, params = {}) {
         const url = new URL(API_URL);
-        url.searchParams.set("action", action);
-
+        url.searchParams.set('action', action);
         Object.entries(params).forEach(([key, value]) => {
             if (value !== undefined && value !== null) {
                 url.searchParams.set(key, String(value));
             }
         });
-
         return url.toString();
     }
 
-    async function cargarInvitado(token) {
-        if (!token) {
-            throw new Error('Falta el token de la invitación.');
-        }
-
-        /*
-         * El modelo actual del Admin expone "list".
-         * Buscamos el token recibido en esa lista.
-         */
-        const response = await fetch(apiUrl("list"), {
-            method: "GET",
-            cache: "no-store"
+    async function apiGet(action, params = {}) {
+        const response = await fetch(apiUrl(action, params), {
+            method: 'GET',
+            cache: 'no-store'
         });
 
         if (!response.ok) {
@@ -3664,33 +3661,65 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         }
 
         const data = await response.json();
-        const lista = Array.isArray(data.invitados)
-            ? data.invitados
-            : [];
 
-        const encontrado = lista.find(i =>
-            String(i.token || '').trim() === token
-        );
-
-        if (!encontrado) {
-            throw new Error('No encontramos esta invitación.');
+        if (data && data.success === false) {
+            throw new Error(data.error || 'La API no pudo completar la operación.');
         }
 
-        return encontrado;
+        return data;
     }
 
-    function valorSI(valor) {
-        return String(valor || '').trim().toUpperCase() === 'SI';
+    function normalizarSiNo(valor) {
+        return String(valor ?? '').trim().toUpperCase() === 'SI';
     }
 
-    function selectedEvents(){
+    function obtenerInvitado(data) {
+        if (!data) return null;
+        if (data.invitado && typeof data.invitado === 'object') return data.invitado;
+        if (data.guest && typeof data.guest === 'object') return data.guest;
+        if (Array.isArray(data.invitados)) return data.invitados[0] || null;
+        if (typeof data === 'object') return data;
+        return null;
+    }
+
+    function llenarCantidad() {
+        quantity.innerHTML = '';
+        for (let n = 1; n <= cantidadPermitida; n++) {
+            const o = document.createElement('option');
+            o.value = n;
+            o.textContent = n === 1 ? '1 persona' : `${n} personas`;
+            quantity.appendChild(o);
+        }
+    }
+
+    function aplicarPermisosVisuales() {
+        // Sin token: únicamente Civil.
+        // Con invitación de ceremonia: Civil + Conferencia.
+        // Con invitación de fiesta: Fiesta + multimedia.
+        ocultar(civilCard, !SITE_TOKEN ? false : !invitadoCeremonia);
+        ocultar(conferenceCard, !SITE_TOKEN ? true : !invitadoCeremonia);
+        ocultar(partyCard, !invitadoFiesta);
+
+        document.querySelectorAll('.party-only').forEach(el => {
+            ocultar(el, !invitadoFiesta);
+        });
+
+        // La botonera de ubicación solamente aparece cuando hay al menos
+        // un evento personalizado por el token. Sin token no hace falta ocultar
+        // el botón porque apunta a la agenda pública del Civil.
+        if (locationButton) {
+            locationButton.style.display = (!SITE_TOKEN || invitadoCeremonia || invitadoFiesta) ? '' : 'none';
+        }
+    }
+
+    function selectedEvents() {
         return {
             conference: btnConference.classList.contains('selected'),
             party: btnParty.classList.contains('selected')
         };
     }
 
-    function updateAttendanceValue(){
+    function updateAttendanceValue() {
         if (btnNo.classList.contains('selected')) {
             attendance.value = 'no';
             return;
@@ -3698,92 +3727,60 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
         const events = selectedEvents();
 
-        if (events.conference && events.party) {
-            attendance.value = 'ambos';
-        } else if (events.conference) {
-            attendance.value = 'conferencia';
-        } else if (events.party) {
-            attendance.value = 'fiesta';
-        } else {
-            attendance.value = '';
-        }
+        if (events.conference && events.party) attendance.value = 'ambos';
+        else if (events.conference) attendance.value = 'conferencia';
+        else if (events.party) attendance.value = 'fiesta';
+        else attendance.value = '';
     }
 
-    function updateRsvpUI(){
+    function updateRsvpUI() {
         const no = btnNo.classList.contains('selected');
         const events = selectedEvents();
 
-        btnConference.disabled = no || !ceremonyFromInvitation;
-        btnParty.disabled = no || !partyFromInvitation;
+        btnConference.disabled = no || !invitadoCeremonia;
+        btnParty.disabled = no || !invitadoFiesta;
 
-        btnConference.classList.toggle(
-            'disabled',
-            no || !ceremonyFromInvitation
-        );
+        btnConference.classList.toggle('disabled', no || !invitadoCeremonia);
+        btnParty.classList.toggle('disabled', no || !invitadoFiesta);
 
-        btnParty.classList.toggle(
-            'disabled',
-            no || !partyFromInvitation
-        );
+        btnConference.setAttribute('aria-pressed', String(events.conference));
+        btnParty.setAttribute('aria-pressed', String(events.party));
+        btnNo.setAttribute('aria-pressed', String(no));
 
-        btnConference.setAttribute(
-            'aria-pressed',
-            String(events.conference)
-        );
-
-        btnParty.setAttribute(
-            'aria-pressed',
-            String(events.party)
-        );
-
-        btnNo.setAttribute(
-            'aria-pressed',
-            String(no)
-        );
-
-        const tieneEvento =
-            events.conference || events.party;
-
-        qw.classList.toggle('hidden', !tieneEvento);
-        cw.classList.toggle('hidden', !tieneEvento);
-        quantity.required = tieneEvento;
+        const hasEvent = events.conference || events.party;
+        qw.classList.toggle('hidden', !hasEvent);
+        cw.classList.toggle('hidden', !hasEvent);
+        quantity.required = hasEvent;
 
         if (no) {
-            rsvpHelp.textContent =
-                'Al confirmar que no podrás asistir, se desactivan los demás eventos.';
+            rsvpHelp.textContent = 'Al confirmar que no podrás asistir, se desactivan los demás eventos.';
         } else if (events.conference && events.party) {
-            rsvpHelp.textContent =
-                'Confirmaste conferencia y fiesta.';
+            rsvpHelp.textContent = 'Confirmaste conferencia y fiesta.';
         } else if (events.conference) {
-            rsvpHelp.textContent =
-                'Confirmaste tu asistencia a la conferencia.';
+            rsvpHelp.textContent = 'Confirmaste tu asistencia a la conferencia.';
         } else if (events.party) {
-            rsvpHelp.textContent =
-                'Confirmaste tu asistencia a la fiesta.';
-        } else if (ceremonyFromInvitation && partyFromInvitation) {
-            rsvpHelp.textContent =
-                'Podés confirmar conferencia, fiesta o ambas.';
-        } else if (partyFromInvitation) {
-            rsvpHelp.textContent =
-                'Podés confirmar tu asistencia a la fiesta.';
+            rsvpHelp.textContent = 'Confirmaste tu asistencia a la fiesta.';
+        } else if (invitadoFiesta && invitadoCeremonia) {
+            rsvpHelp.textContent = 'Podés confirmar conferencia, fiesta o ambas.';
+        } else if (invitadoFiesta) {
+            rsvpHelp.textContent = 'Podés confirmar tu asistencia a la fiesta.';
+        } else if (invitadoCeremonia) {
+            rsvpHelp.textContent = 'Podés confirmar tu asistencia a la conferencia.';
         } else {
-            rsvpHelp.textContent =
-                'Podés confirmar tu asistencia a la conferencia.';
+            rsvpHelp.textContent = 'Podés avisarnos si vas a asistir.';
         }
 
         updateAttendanceValue();
     }
 
-    function elegirEvento(evento){
-        if (btnNo.classList.contains('selected')) {
-            btnNo.classList.remove('selected');
-        }
+    function elegirEvento(evento) {
+        if (btnNo.classList.contains('selected')) btnNo.classList.remove('selected');
 
-        if (evento === 'conferencia' && ceremonyFromInvitation) {
+        if (evento === 'conferencia' && invitadoCeremonia) {
             btnConference.classList.toggle('selected');
         }
 
-        if (evento === 'fiesta' && partyFromInvitation) {
+        if (evento === 'fiesta' && invitadoFiesta) {
             btnParty.classList.toggle('selected');
         }
 
@@ -3791,7 +3788,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         state.textContent = '';
     }
 
-    function elegirNo(){
+    function elegirNo() {
         btnNo.classList.toggle('selected');
 
         if (btnNo.classList.contains('selected')) {
@@ -3803,208 +3800,172 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         state.textContent = '';
     }
 
-    btnConference.addEventListener(
-        'click',
-        () => elegirEvento('conferencia')
-    );
+    btnConference.addEventListener('click', () => elegirEvento('conferencia'));
+    btnParty.addEventListener('click', () => elegirEvento('fiesta'));
+    btnNo.addEventListener('click', elegirNo);
 
-    btnParty.addEventListener(
-        'click',
-        () => elegirEvento('fiesta')
-    );
-
-    btnNo.addEventListener(
-        'click',
-        elegirNo
-    );
-
-    /* =================================================
-       CONFIRMACIÓN LOCAL
-
-       El modelo de Admin proporcionado tiene acciones
-       create / list / summary / delete, pero no expone
-       una acción de actualización de RSVP.
-       Por eso la confirmación se muestra localmente.
-       ================================================= */
-
-    form.addEventListener('submit', e => {
+    form.addEventListener('submit', async e => {
         e.preventDefault();
-
         updateAttendanceValue();
 
+        if (!SITE_TOKEN || !invitado) {
+            state.textContent = 'Para confirmar la asistencia necesitás abrir tu enlace personalizado.';
+            return;
+        }
+
         if (!attendance.value) {
-            state.textContent =
-                'Seleccioná conferencia, fiesta o no podré asistir.';
+            state.textContent = 'Seleccioná una opción de asistencia.';
             return;
         }
 
         const cantidad = Number(quantity.value || 0);
-
-        if (
-            attendance.value !== 'no' &&
-            (
-                !Number.isInteger(cantidad) ||
-                cantidad < 1 ||
-                cantidad > maxPlaces
-            )
-        ) {
-            state.textContent =
-                `La cantidad debe estar entre 1 y ${maxPlaces}.`;
+        if (attendance.value !== 'no' && (!Number.isInteger(cantidad) || cantidad < 1 || cantidad > cantidadPermitida)) {
+            state.textContent = `La cantidad debe estar entre 1 y ${cantidadPermitida}.`;
             return;
         }
 
-        form.classList.add('hidden');
-        thanks.classList.remove('hidden');
+        send.disabled = true;
+        send.textContent = 'Guardando…';
+        state.textContent = '';
 
-        if (attendance.value === 'ambos') {
-            $('rsvpGraciasTexto').textContent =
-                `Confirmaste ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la conferencia y la fiesta. ¡Nos vemos!`;
-        } else if (attendance.value === 'conferencia') {
-            $('rsvpGraciasTexto').textContent =
-                `Confirmaste ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la conferencia. ¡Nos vemos!`;
-        } else if (attendance.value === 'fiesta') {
-            $('rsvpGraciasTexto').textContent =
-                `Confirmaste ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la fiesta. ¡Nos vemos!`;
-        } else {
-            $('rsvpGraciasTexto').textContent =
-                'Registramos que no podrás acompañarnos. Gracias por avisarnos.';
+        try {
+            // La respuesta se registra mediante doGet/action=confirm del mismo
+            // Google Apps Script utilizado por el Admin.
+            await apiGet('confirm', {
+                token: SITE_TOKEN,
+                asistencia: attendance.value,
+                cantidadConfirmada: attendance.value === 'no' ? 0 : cantidad,
+                acompanantes: companions.value.trim()
+            });
+
+            form.classList.add('hidden');
+            thanks.classList.remove('hidden');
+
+            if (attendance.value === 'ambos') {
+                $('rsvpGraciasTexto').textContent =
+                    `Confirmaste ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la conferencia y la fiesta. ¡Nos vemos!`;
+            } else if (attendance.value === 'conferencia') {
+                $('rsvpGraciasTexto').textContent =
+                    `Confirmaste ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la conferencia. ¡Nos vemos!`;
+            } else if (attendance.value === 'fiesta') {
+                $('rsvpGraciasTexto').textContent =
+                    `Confirmaste ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la fiesta. ¡Nos vemos!`;
+            } else {
+                $('rsvpGraciasTexto').textContent =
+                    'Registramos que no podrás acompañarnos. Gracias por avisarnos.';
+            }
+        } catch (error) {
+            console.error(error);
+            state.textContent = error?.message || 'No se pudo guardar la confirmación.';
+        } finally {
+            send.disabled = false;
+            send.textContent = 'Confirmar asistencia';
         }
     });
 
-    /* =================================================
-       CARGAR DATOS PERSONALIZADOS
-       ================================================= */
+    async function cargarInvitacionPersonalizada() {
+        // Página pública sin código: mostrar únicamente Civil.
+        if (!SITE_TOKEN) {
+            invitadoCeremonia = true;
+            invitadoFiesta = false;
+            cantidadPermitida = 1;
 
-    async function iniciarInvitacion() {
+            $('nombreInvitado').textContent = 'Eunice & David';
+            $('lugaresInvitado').textContent = 'Invitación general · Ceremonia civil';
+            $('saludoInvitado').textContent = '¿Nos acompañás?';
+
+            llenarCantidad();
+            aplicarPermisosVisuales();
+
+            load.classList.add('hidden');
+            form.classList.remove('hidden');
+            btnParty.disabled = true;
+            btnParty.classList.add('disabled');
+            $('fiestaSubtitle').textContent = 'No incluida en esta invitación';
+            updateRsvpUI();
+            return;
+        }
+
         try {
-            invitado = await cargarInvitado(invitationToken);
+            // El Admin usa exactamente este patrón: action + parámetros por GET.
+            // Esperamos que el Apps Script devuelva el invitado identificado por token.
+            const data = await apiGet('get', { token: SITE_TOKEN });
+            invitado = obtenerInvitado(data);
 
-            ceremonyFromInvitation =
-                valorSI(invitado.invitadoCeremonia);
-
-            partyFromInvitation =
-                valorSI(invitado.invitadoFiesta);
-
-            maxPlaces = Math.max(
-                1,
-                Number(invitado.cantidadPermitida) || 1
-            );
-
-            $('nombreInvitado').textContent =
-                invitado.nombre || 'Eunice & David';
-
-            $('lugaresInvitado').textContent =
-                partyFromInvitation
-                    ? `Invitación para conferencia y fiesta · ${maxPlaces} ${maxPlaces === 1 ? 'lugar' : 'lugares'}`
-                    : `Invitación para conferencia · ${maxPlaces} ${maxPlaces === 1 ? 'lugar' : 'lugares'}`;
-
-            $('saludoInvitado').textContent =
-                '¿Nos acompañás?';
-
-            /* Cantidad máxima según el Admin */
-            quantity.innerHTML = '';
-
-            for (let n = 1; n <= maxPlaces; n++) {
-                const o = document.createElement('option');
-                o.value = n;
-                o.textContent =
-                    n === 1
-                        ? '1 persona'
-                        : `${n} personas`;
-                quantity.appendChild(o);
+            if (!invitado || !invitado.token) {
+                fail('No encontramos esta invitación. Verificá el enlace recibido.');
+                return;
             }
 
-            /* Mostrar u ocultar elementos exclusivos de la fiesta */
-            document.querySelectorAll('.party-only').forEach(el => {
-                el.hidden = !partyFromInvitation;
-                el.classList.toggle(
-                    'hidden',
-                    !partyFromInvitation
-                );
-            });
+            invitadoCeremonia = normalizarSiNo(invitado.invitadoCeremonia);
+            invitadoFiesta = normalizarSiNo(invitado.invitadoFiesta);
+            cantidadPermitida = Math.max(1, Number(invitado.cantidadPermitida) || 1);
 
-            /* Configurar conferencia */
-            if (!ceremonyFromInvitation) {
-                btnConference.classList.remove('selected');
-                btnConference.classList.add('disabled');
-                btnConference.disabled = true;
-                $('fiestaSubtitle').textContent =
-                    partyFromInvitation
-                        ? 'Fiesta incluida en tu invitación'
-                        : 'No incluida en tu invitación';
-            }
+            $('nombreInvitado').textContent = invitado.nombre || 'Invitado';
+            $('lugaresInvitado').textContent = invitadoFiesta && invitadoCeremonia
+                ? `Invitación para conferencia y fiesta · hasta ${cantidadPermitida} ${cantidadPermitida === 1 ? 'persona' : 'personas'}`
+                : invitadoFiesta
+                    ? `Invitación para fiesta · hasta ${cantidadPermitida} ${cantidadPermitida === 1 ? 'persona' : 'personas'}`
+                    : invitadoCeremonia
+                        ? `Invitación para ceremonia · hasta ${cantidadPermitida} ${cantidadPermitida === 1 ? 'persona' : 'personas'}`
+                        : 'Invitación personalizada';
 
-            /* Configurar fiesta */
-            btnParty.disabled = !partyFromInvitation;
+            $('saludoInvitado').textContent = `¿Nos acompañás, ${invitado.nombre || ''}?`;
 
-            if (!partyFromInvitation) {
-                btnParty.classList.remove('selected');
-                btnParty.classList.add('disabled');
-                $('fiestaSubtitle').textContent =
-                    'No incluida en tu invitación';
-            } else {
-                btnParty.classList.remove('disabled');
-                $('fiestaSubtitle').textContent =
-                    'Domingo · 09:00 hs';
+            llenarCantidad();
+            aplicarPermisosVisuales();
+
+            // Si ya existe una confirmación en Google, mostramos su cantidad
+            // como valor inicial sin asumir una estructura adicional.
+            const confirmada = Number(invitado.cantidadConfirmada);
+            if (Number.isInteger(confirmada) && confirmada >= 1 && confirmada <= cantidadPermitida) {
+                quantity.value = String(confirmada);
             }
 
             load.classList.add('hidden');
             form.classList.remove('hidden');
-
             updateRsvpUI();
 
+            if (!invitadoCeremonia) {
+                btnConference.disabled = true;
+                btnConference.classList.add('disabled');
+            }
+            if (!invitadoFiesta) {
+                btnParty.disabled = true;
+                btnParty.classList.add('disabled');
+                $('fiestaSubtitle').textContent = 'No incluida en tu invitación';
+            } else {
+                $('fiestaSubtitle').textContent = 'Domingo · 09:00 hs';
+            }
         } catch (error) {
             console.error(error);
-
-            fail(
-                error?.message === 'No encontramos esta invitación.'
-                    ? error.message
-                    : 'No se pudo cargar la invitación. Verificá el enlace e intentá nuevamente.'
-            );
+            fail('No pudimos cargar tu invitación personalizada. Verificá el enlace o intentá nuevamente.');
         }
     }
 
-    iniciarInvitacion();
+    cargarInvitacionPersonalizada();
 
     /* =================================================
        BOTÓN FLOTANTE → CONFIRMACIÓN
     ================================================= */
 
-    $('btnBarraConfirmar').addEventListener(
-        'click',
-        () => {
-
-            section.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-
-        }
-    );
-
-
+    $('btnBarraConfirmar').addEventListener('click', () => {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
 
     /* =================================================
        BOTONERA → UBICACIÓN
     ================================================= */
 
-    $('btnBarraUbicacion').addEventListener(
-        'click',
-        () => {
-            $('ubicacion').scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    );
-
+    $('btnBarraUbicacion').addEventListener('click', () => {
+        $('ubicacion').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
 
     /* =================================================
        BOTONERA → REGALO
     ================================================= */
 
-    const giftModal =
-        $('giftModal');
+    const giftModal = $('giftModal');
 
     const openGiftModal = () => {
         giftModal.classList.remove('hidden');
@@ -4016,10 +3977,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         document.body.style.overflow = '';
     };
 
-    $('btnBarraRegalo').addEventListener(
-        'click',
-        openGiftModal
-    );
+    $('btnBarraRegalo').addEventListener('click', openGiftModal);
 
     $('giftModalClose').addEventListener(
         'click',
@@ -4184,6 +4142,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
 
 })();
+
 
 </script>
 
