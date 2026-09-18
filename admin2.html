@@ -224,236 +224,205 @@ Panel de Invitados | Eunice & David
 </div>
 
 <script>
-
 const API_URL =
-"https://script.google.com/macros/s/AKfycby80WR98QzVdQk9SrVOuZ_AiA42rKROIT-ZjkMXLfEt4usPjbZ585kD5DcS_Zns2M8Y/exec";
+    "https://script.google.com/macros/s/AKfycby80WR98QzVdQk9SrVOuZ_AiA42rKROIT-ZjkMXLfEt4usPjbZ585kD5DcS_Zns2M8Y/exec";
 
 const SITE_URL =
-"https://invitaciondigital2026-stack.github.io/Euni/";
+    "https://invitaciondigital2026-stack.github.io/Euni/";
 
 let invitados = [];
 
+function apiUrl(action, params = {}) {
+    const url = new URL(API_URL);
+    url.searchParams.set("action", action);
+
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+            url.searchParams.set(key, String(value));
+        }
+    });
+
+    return url.toString();
+}
+
+async function apiGet(action, params = {}) {
+    const response = await fetch(apiUrl(action, params), {
+        method: "GET",
+        cache: "no-store"
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+    }
+
+    return await response.json();
+}
+
+function mostrarError(error, mensaje = "No se pudo completar la operación.") {
+    console.error(error);
+    alert(`${mensaje}\n\n${error?.message || error || ""}`);
+}
 
 /* ===========================
    DASHBOARD
 =========================== */
 
 async function cargarResumen() {
+    try {
+        const data = await apiGet("summary");
 
-    const res =
-        await fetch(
-            `${API_URL}?action=summary`
-        );
-
-    const data =
-        await res.json();
-
-    document.getElementById("sTotal").textContent =
-        data.total || 0;
-
-    document.getElementById("sOk").textContent =
-        data.confirmados || 0;
-
-    document.getElementById("sPending").textContent =
-        data.pendientes || 0;
-
-    document.getElementById("sConference").textContent =
-        data.invitadosCeremonia || 0;
-
-    document.getElementById("sParty").textContent =
-        data.invitadosFiesta || 0;
-
-    document.getElementById("sSeats").textContent =
-        data.confirmadosCantidad || 0;
-
+        document.getElementById("sTotal").textContent = data.total ?? 0;
+        document.getElementById("sOk").textContent = data.confirmados ?? 0;
+        document.getElementById("sPending").textContent = data.pendientes ?? 0;
+        document.getElementById("sConference").textContent = data.invitadosCeremonia ?? 0;
+        document.getElementById("sParty").textContent = data.invitadosFiesta ?? 0;
+        document.getElementById("sSeats").textContent = data.confirmadosCantidad ?? 0;
+    } catch (error) {
+        mostrarError(error, "No se pudo cargar el resumen.");
+    }
 }
-
 
 /* ===========================
    LISTADO
 =========================== */
 
 async function cargarInvitados() {
-
-    const res =
-        await fetch(
-            `${API_URL}?action=list`
-        );
-
-    const data =
-        await res.json();
-
-    invitados =
-        data.invitados || [];
-
-    render();
-
+    try {
+        const data = await apiGet("list");
+        invitados = Array.isArray(data.invitados) ? data.invitados : [];
+        render();
+    } catch (error) {
+        mostrarError(error, "No se pudo cargar la lista de invitados.");
+    }
 }
-
 
 /* ===========================
    RENDER
 =========================== */
 
-function render() {
-
-    const texto =
-        document
-            .getElementById("search")
-            .value
-            .toLowerCase();
-
-    const rows =
-        document.getElementById("rows");
-
-    rows.innerHTML = invitados
-
-        .filter(i =>
-            (i.nombre || "")
-            .toLowerCase()
-            .includes(texto)
-        )
-
-        .map(i => `
-
-<tr class="border-t">
-
-<td class="p-3">
-${i.nombre || ""}
-</td>
-
-<td class="p-3 text-center">
-${i.telefono || ""}
-</td>
-
-<td class="p-3 text-center">
-${i.cantidadPermitida || 0}
-</td>
-
-<td class="p-3 text-center">
-${i.cantidadConfirmada || 0}
-</td>
-
-<td class="p-3">
-
-<div class="flex flex-wrap gap-2">
-
-<button
-class="bg-blue-600 text-white px-3 py-1 rounded"
-onclick="copiarLink('${i.token}')">
-
-Copiar Link
-
-</button>
-
-<button
-class="bg-green-600 text-white px-3 py-1 rounded"
-onclick="enviarWhatsapp(
-'${(i.nombre || "").replace(/'/g,"\\'")}',
-'${i.telefono || ""}',
-'${i.token}'
-)">
-
-WhatsApp
-
-</button>
-
-<button
-class="bg-red-600 text-white px-3 py-1 rounded"
-onclick="eliminarInvitado('${i.token}')">
-
-Eliminar
-
-</button>
-
-</div>
-
-</td>
-
-</tr>
-
-`)
-
-        .join("");
-
+function crearCelda(texto, clases = "") {
+    const td = document.createElement("td");
+    td.className = `p-3 ${clases}`;
+    td.textContent = texto ?? "";
+    return td;
 }
 
+function crearBoton(texto, clases, accion) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `${clases} px-3 py-1 rounded`;
+    button.textContent = texto;
+    button.addEventListener("click", accion);
+    return button;
+}
+
+function render() {
+    const search = document.getElementById("search");
+    const rows = document.getElementById("rows");
+
+    if (!search || !rows) return;
+
+    const texto = search.value.trim().toLowerCase();
+    rows.replaceChildren();
+
+    invitados
+        .filter(i =>
+            String(i.nombre || "").toLowerCase().includes(texto)
+        )
+        .forEach(i => {
+            const tr = document.createElement("tr");
+            tr.className = "border-t";
+
+            tr.appendChild(crearCelda(i.nombre || ""));
+            tr.appendChild(crearCelda(i.telefono || "", "text-center"));
+            tr.appendChild(crearCelda(i.cantidadPermitida ?? 0, "text-center"));
+            tr.appendChild(crearCelda(i.cantidadConfirmada ?? 0, "text-center"));
+
+            const acciones = document.createElement("div");
+            acciones.className = "flex flex-wrap gap-2";
+
+            acciones.appendChild(
+                crearBoton("Copiar Link", "bg-blue-600 text-white",
+                    () => copiarLink(i.token))
+            );
+
+            acciones.appendChild(
+                crearBoton("WhatsApp", "bg-green-600 text-white",
+                    () => enviarWhatsapp(i.nombre || "", i.telefono || "", i.token))
+            );
+
+            acciones.appendChild(
+                crearBoton("Eliminar", "bg-red-600 text-white",
+                    () => eliminarInvitado(i.token))
+            );
+
+            const tdAcciones = document.createElement("td");
+            tdAcciones.className = "p-3";
+            tdAcciones.appendChild(acciones);
+            tr.appendChild(tdAcciones);
+
+            rows.appendChild(tr);
+        });
+}
 
 /* ===========================
    CREAR
 =========================== */
 
 async function crearInvitado() {
+    const nombre = document.getElementById("newName").value.trim();
+    const telefono = document.getElementById("newPhone").value.trim();
 
-    const nombre =
-        document.getElementById("newName").value;
+    const cantidad = Math.max(
+        1,
+        parseInt(document.getElementById("newSeats").value, 10) || 1
+    );
 
-    const telefono =
-        document.getElementById("newPhone").value;
-
-    const cantidad =
-        document.getElementById("newSeats").value;
-
-    const observaciones =
-        document.getElementById("newObs").value;
+    const observaciones = document.getElementById("newObs").value.trim();
 
     const ceremonia =
-        document.getElementById("newCeremony").checked
-            ? "SI"
-            : "NO";
+        document.getElementById("newCeremony").checked ? "SI" : "NO";
 
     const fiesta =
-        document.getElementById("newParty").checked
-            ? "SI"
-            : "NO";
+        document.getElementById("newParty").checked ? "SI" : "NO";
 
-    const url =
-
-`${API_URL}?action=create
-&nombre=${encodeURIComponent(nombre)}
-&telefono=${encodeURIComponent(telefono)}
-&cantidadPermitida=${cantidad}
-&invitadoCeremonia=${ceremonia}
-&invitadoFiesta=${fiesta}
-&observaciones=${encodeURIComponent(observaciones)}`.replace(/\n/g,'');
-
-    const response =
-        await fetch(url);
-
-    const data =
-        await response.json();
-
-    if (!data.success) {
-
-        alert(
-            data.error ||
-            "Error creando invitado"
-        );
-
+    if (!nombre) {
+        alert("Ingresá el nombre del invitado.");
+        document.getElementById("newName").focus();
         return;
     }
 
-    const link =
-        generarLink(data.token);
+    try {
+        const data = await apiGet("create", {
+            nombre,
+            telefono,
+            cantidadPermitida: cantidad,
+            invitadoCeremonia: ceremonia,
+            invitadoFiesta: fiesta,
+            observaciones
+        });
 
-    alert(
-`Invitado creado correctamente
+        if (!data.success) {
+            throw new Error(data.error || "Error creando invitado.");
+        }
 
-Token:
-${data.token}
+        const link = generarLink(data.token);
 
-Link:
-${link}`
-    );
+        alert(
+            `Invitado creado correctamente.\n\n` +
+            `Token:\n${data.token}\n\n` +
+            `Link:\n${link}`
+        );
 
-    document.getElementById("newName").value = "";
-    document.getElementById("newPhone").value = "";
-    document.getElementById("newObs").value = "";
-    document.getElementById("newSeats").value = 1;
+        document.getElementById("newName").value = "";
+        document.getElementById("newPhone").value = "";
+        document.getElementById("newObs").value = "";
+        document.getElementById("newSeats").value = 1;
 
-    cargarInvitados();
-    cargarResumen();
-
+        await Promise.all([cargarInvitados(), cargarResumen()]);
+    } catch (error) {
+        mostrarError(error, "No se pudo crear el invitado.");
+    }
 }
 
 /* ===========================
@@ -461,55 +430,56 @@ ${link}`
 =========================== */
 
 function generarLink(token) {
-
-    return `${SITE_URL}?t=${token}`;
-
+    const url = new URL(SITE_URL);
+    url.searchParams.set("t", token);
+    return url.toString();
 }
 
 async function copiarLink(token) {
+    const link = generarLink(token);
 
-    await navigator.clipboard.writeText(
-        generarLink(token)
-    );
-
-    alert("Enlace copiado");
-
+    try {
+        await navigator.clipboard.writeText(link);
+        alert("Enlace copiado.");
+    } catch (error) {
+        try {
+            const input = document.createElement("input");
+            input.value = link;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand("copy");
+            input.remove();
+            alert("Enlace copiado.");
+        } catch (fallbackError) {
+            console.error(fallbackError);
+            prompt("Copiá este enlace:", link);
+        }
+    }
 }
-
 
 /* ===========================
    WHATSAPP
 =========================== */
 
-function enviarWhatsapp(
-    nombre,
-    telefono,
-    token
-) {
-
-    const enlace =
-        generarLink(token);
+function enviarWhatsapp(nombre, telefono, token) {
+    const enlace = generarLink(token);
 
     const mensaje =
+        `Hola ${nombre} ❤️\n\n` +
+        `Queremos compartir con vos nuestra invitación.\n\n` +
+        `${enlace}`;
 
-`Hola ${nombre} ❤️
+    const numero = String(telefono || "").replace(/\D/g, "");
 
-Queremos compartir con vos nuestra invitación.
+    if (!numero) {
+        alert("Este invitado no tiene un número de WhatsApp válido.");
+        return;
+    }
 
-${enlace}`;
+    const url =
+        `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
 
-    const numero =
-        (telefono || "")
-        .replace(/\D/g, "");
-
-    window.open(
-
-        `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`,
-
-        "_blank"
-
-    );
-
+    window.open(url, "_blank", "noopener,noreferrer");
 }
 
 /* ===========================
@@ -517,60 +487,40 @@ ${enlace}`;
 =========================== */
 
 async function eliminarInvitado(token) {
-
-    if (
-        !confirm(
-            "¿Eliminar invitado?"
-        )
-    ) {
+    if (!token) {
+        alert("El invitado no tiene token.");
         return;
     }
 
-    const response =
-        await fetch(
+    if (!confirm("¿Eliminar invitado?")) return;
 
-            `${API_URL}?action=delete&token=${token}`
+    try {
+        const data = await apiGet("delete", { token });
 
-        );
+        if (!data.success) {
+            throw new Error(data.error || "No se pudo eliminar.");
+        }
 
-    const data =
-        await response.json();
-
-    if (!data.success) {
-
-        alert(
-            data.error ||
-            "No se pudo eliminar"
-        );
-
-        return;
-
+        await Promise.all([cargarInvitados(), cargarResumen()]);
+    } catch (error) {
+        mostrarError(error, "No se pudo eliminar el invitado.");
     }
-
-    cargarInvitados();
-    cargarResumen();
-
 }
-
 
 /* ===========================
    EVENTOS
 =========================== */
 
-document
-.getElementById("search")
-.addEventListener(
-    "input",
-    render
-);
+document.addEventListener("DOMContentLoaded", () => {
+    const search = document.getElementById("search");
 
-window.onload = () => {
+    if (search) {
+        search.addEventListener("input", render);
+    }
 
     cargarResumen();
     cargarInvitados();
-
-};
-
+});
 </script>
 
 </body>
