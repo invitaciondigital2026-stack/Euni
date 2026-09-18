@@ -408,12 +408,6 @@ async function crearInvitado() {
 
         const link = generarLink(data.token);
 
-        alert(
-            `Invitado creado correctamente.\n\n` +
-            `Token:\n${data.token}\n\n` +
-            `Link:\n${link}`
-        );
-
         document.getElementById("newName").value = "";
         document.getElementById("newPhone").value = "";
         document.getElementById("newObs").value = "";
