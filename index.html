@@ -3984,65 +3984,44 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
     /* =================================================
        ENVÍO RSVP -> GOOGLE APPS SCRIPT POR GET
     ================================================= */
-    form?.addEventListener('submit', async e => {
-        e.preventDefault();
-        updateAttendanceValue();
+form?.addEventListener('submit', async e => {
+    e.preventDefault();
 
-        if (!SITE_TOKEN || !guest) {
-            if (state) state.textContent = 'Para confirmar la asistencia necesitás abrir el enlace personalizado.';
-            return;
+    const token = SITE_TOKEN;
+    const evento = attendance.value; // conferencia / fiesta / ambos / no
+    const cantidad = Number(quantity.value || 1);
+
+    const confirmoCeremonia =
+        evento === 'conferencia' || evento === 'ambos' ? 'SI' : 'NO';
+
+    const confirmoFiesta =
+        evento === 'fiesta' || evento === 'ambos' ? 'SI' : 'NO';
+
+    try {
+        send.disabled = true;
+        send.textContent = 'Enviando...';
+
+        const data = await apiGet('confirm', {
+            token,
+            confirmoCeremonia,
+            confirmoFiesta,
+            cantidadConfirmada:
+                evento === 'no' ? 0 : cantidad
+        });
+
+        if (!data.success) {
+            throw new Error(data.error || 'No se pudo confirmar.');
         }
 
-        if (!attendance?.value) {
-            if (state) state.textContent = 'Seleccioná conferencia, fiesta o no podré asistir.';
-            return;
-        }
-
-        const cantidad = Number(quantity?.value || 0);
-        if (attendance.value !== 'no' && (!Number.isInteger(cantidad) || cantidad < 1 || cantidad > cantidadPermitida)) {
-            if (state) state.textContent = `La cantidad debe estar entre 1 y ${cantidadPermitida}.`;
-            return;
-        }
-
-        if (send) {
-            send.disabled = true;
-            send.textContent = 'Guardando…';
-        }
-        if (state) state.textContent = '';
-
-        try {
-            await apiGet('confirm', {
-                token: SITE_TOKEN,
-                asistencia: attendance.value,
-                cantidadConfirmada: attendance.value === 'no' ? 0 : cantidad,
-                acompanantes: attendance.value === 'no' ? '' : (companions?.value || '').trim()
-            });
-
-            form.classList.add('hidden');
-            thanks?.classList.remove('hidden');
-
-            const texto = $('rsvpGraciasTexto');
-            if (texto) {
-                if (attendance.value === 'ambos') {
-                    texto.textContent = `Registramos ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la conferencia y la fiesta. ¡Nos vemos!`;
-                } else if (attendance.value === 'conferencia') {
-                    texto.textContent = `Registramos ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la conferencia. ¡Nos vemos!`;
-                } else if (attendance.value === 'fiesta') {
-                    texto.textContent = `Registramos ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la fiesta. ¡Nos vemos!`;
-                } else {
-                    texto.textContent = 'Registramos que no podrás acompañarnos. Gracias por avisarnos.';
-                }
-            }
-        } catch (error) {
-            console.error('Error confirmando asistencia:', error);
-            if (state) state.textContent = error?.message || 'No se pudo guardar la confirmación.';
-        } finally {
-            if (send) {
-                send.disabled = false;
-                send.textContent = 'Confirmar asistencia';
-            }
-        }
-    });
+        // éxito...
+    } catch (error) {
+        console.error(error);
+        state.textContent = error.message || 'No se pudo guardar la confirmación.';
+    } finally {
+        send.disabled = false;
+        send.textContent = 'Confirmar asistencia';
+    }
+});
 
     /* =================================================
        MOSTRAR INVITADO DESDE GOOGLE APPS SCRIPT
@@ -4113,7 +4092,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
             err?.classList.add('hidden');
 
             // El Admin usa Google Apps Script con action + parámetros por GET.
-            const data = await apiGet('get', { token: SITE_TOKEN });
+            const data = await apiGet('guest', { token: SITE_TOKEN });
             const g = obtenerInvitado(data);
 
             if (!g || !g.token) {
