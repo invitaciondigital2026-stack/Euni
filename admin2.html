@@ -34,68 +34,34 @@ Panel de Invitados | Eunice & David
 
     <!-- DASHBOARD -->
 
-    <div class="grid md:grid-cols-6 gap-4 mb-8">
-
-        <div class="bg-white rounded-xl p-5 shadow-sm">
-            <div class="text-sm text-stone-500">
-                Invitados
-            </div>
-            <div id="sTotal"
-                 class="text-3xl mt-1">
-                0
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl p-5 shadow-sm">
-            <div class="text-sm text-stone-500">
-                Confirmados
-            </div>
-            <div id="sOk"
-                 class="text-3xl mt-1">
-                0
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl p-5 shadow-sm">
-            <div class="text-sm text-stone-500">
-                Pendientes
-            </div>
-            <div id="sPending"
-                 class="text-3xl mt-1">
-                0
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl p-5 shadow-sm">
-            <div class="text-sm text-stone-500">
-                Ceremonia
-            </div>
-            <div id="sConference"
-                 class="text-3xl mt-1">
-                0
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl p-5 shadow-sm">
-            <div class="text-sm text-stone-500">
-                Fiesta
-            </div>
-            <div id="sParty"
-                 class="text-3xl mt-1">
-                0
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl p-5 shadow-sm">
-            <div class="text-sm text-stone-500">
-                Lugares Confirmados
-            </div>
-            <div id="sSeats"
-                 class="text-3xl mt-1">
-                0
-            </div>
-        </div>
-
+    <div class="bg-white rounded-xl shadow-sm overflow-x-auto mb-8">
+        <table class="min-w-full text-center">
+            <thead class="bg-stone-200">
+                <tr>
+                    <th class="p-3 text-left">Resumen</th>
+                    <th class="p-3">Civil</th>
+                    <th class="p-3">Conferencia</th>
+                    <th class="p-3">Fiesta</th>
+                    <th class="p-3">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-t">
+                    <th class="p-3 text-left">Invitados</th>
+                    <td id="sInvitadosCivil" class="p-3">0</td>
+                    <td id="sInvitadosConferencia" class="p-3">0</td>
+                    <td id="sInvitadosFiesta" class="p-3">0</td>
+                    <td id="sInvitadosTotal" class="p-3 font-semibold">0</td>
+                </tr>
+                <tr class="border-t">
+                    <th class="p-3 text-left">Confirmados</th>
+                    <td id="sConfirmadosCivil" class="p-3">0</td>
+                    <td id="sConfirmadosConferencia" class="p-3">0</td>
+                    <td id="sConfirmadosFiesta" class="p-3">0</td>
+                    <td id="sConfirmadosTotal" class="p-3 font-semibold">0</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <!-- NUEVO INVITADO -->
@@ -290,18 +256,47 @@ function mostrarError(error, mensaje = "No se pudo completar la operación.") {
 =========================== */
 
 async function cargarResumen() {
-    try {
-        const data = await apiGet("summary");
+    const resumen = {
+        invitadosCivil: 0,
+        invitadosConferencia: 0,
+        invitadosFiesta: 0,
+        invitadosTotal: 0,
+        confirmadosCivil: 0,
+        confirmadosConferencia: 0,
+        confirmadosFiesta: 0,
+        confirmadosTotal: 0
+    };
 
-        document.getElementById("sTotal").textContent = data.total ?? 0;
-        document.getElementById("sOk").textContent = data.confirmados ?? 0;
-        document.getElementById("sPending").textContent = data.pendientes ?? 0;
-        document.getElementById("sConference").textContent = data.invitadosCeremonia ?? 0;
-        document.getElementById("sParty").textContent = data.invitadosFiesta ?? 0;
-        document.getElementById("sSeats").textContent = data.confirmadosCantidad ?? 0;
-    } catch (error) {
-        mostrarError(error, "No se pudo cargar el resumen.");
-    }
+    invitados.forEach(invitado => {
+        const permitidos = Number(invitado.cantidadPermitida) || 0;
+        const confirmados = Number(invitado.cantidadConfirmada) || 0;
+        const tieneCeremonia = estaHabilitado(invitado.invitadoCeremonia);
+
+        resumen.invitadosTotal += permitidos;
+        if (tieneCeremonia) {
+            resumen.invitadosCivil += permitidos;
+            resumen.invitadosConferencia += permitidos;
+        }
+        if (estaHabilitado(invitado.invitadoFiesta)) {
+            resumen.invitadosFiesta += permitidos;
+        }
+
+        resumen.confirmadosTotal += confirmados;
+        if (estaHabilitado(invitado.confirmoCivil)) {
+            resumen.confirmadosCivil += confirmados;
+        }
+        if (estaHabilitado(invitado.confirmoCeremonia)) {
+            resumen.confirmadosConferencia += confirmados;
+        }
+        if (estaHabilitado(invitado.confirmoFiesta)) {
+            resumen.confirmadosFiesta += confirmados;
+        }
+    });
+
+    Object.entries(resumen).forEach(([campo, valor]) => {
+        const elemento = document.getElementById(`s${campo.charAt(0).toUpperCase()}${campo.slice(1)}`);
+        if (elemento) elemento.textContent = valor;
+    });
 }
 
 /* ===========================
@@ -312,6 +307,7 @@ async function cargarInvitados() {
     try {
         const data = await apiGet("list");
         invitados = Array.isArray(data.invitados) ? data.invitados : [];
+        cargarResumen();
         render();
     } catch (error) {
         mostrarError(error, "No se pudo cargar la lista de invitados.");
@@ -445,7 +441,12 @@ async function guardarInvitado(token, boton) {
             observaciones: valor("observaciones").value.trim()
         });
 
-        if (!data.success) throw new Error(data.error || "No se pudo actualizar el invitado.");
+        if (!data.success) {
+            if (data.error === "Acción inválida") {
+                throw new Error("El backend de Google Apps Script todavía no tiene habilitada la acción de actualización. Hay que agregar action=update en el Apps Script.");
+            }
+            throw new Error(data.error || "No se pudo actualizar el invitado.");
+        }
         const indice = invitados.findIndex(i => i.token === token);
         invitados[indice] = data.invitado || data;
         render();
@@ -503,7 +504,7 @@ async function crearInvitado() {
         document.getElementById("newObs").value = "";
         document.getElementById("newSeats").value = 1;
 
-        await Promise.all([cargarInvitados(), cargarResumen()]);
+        await cargarInvitados();
     } catch (error) {
         mostrarError(error, "No se pudo crear el invitado.");
     }
@@ -585,7 +586,7 @@ async function eliminarInvitado(token) {
             throw new Error(data.error || "No se pudo eliminar.");
         }
 
-        await Promise.all([cargarInvitados(), cargarResumen()]);
+        await cargarInvitados();
     } catch (error) {
         mostrarError(error, "No se pudo eliminar el invitado.");
     }
@@ -602,7 +603,6 @@ document.addEventListener("DOMContentLoaded", () => {
         search.addEventListener("input", render);
     }
 
-    cargarResumen();
     cargarInvitados();
 });
 </script>

@@ -4004,6 +4004,8 @@ form?.addEventListener('submit', async e => {
 
         const data = await apiGet('confirm', {
             token,
+            confirmoCivil:
+                evento === 'conferencia' || evento === 'ambos' ? 'SI' : 'NO',
             confirmoCeremonia,
             confirmoFiesta,
             cantidadConfirmada:
