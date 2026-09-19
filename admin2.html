@@ -206,6 +206,18 @@ Panel de Invitados | Eunice & David
                     </th>
 
                     <th class="p-3">
+                        Ceremonia
+                    </th>
+
+                    <th class="p-3">
+                        Fiesta
+                    </th>
+
+                    <th class="p-3 text-left">
+                        Comentario
+                    </th>
+
+                    <th class="p-3">
                         Acciones
                     </th>
 
@@ -258,6 +270,16 @@ async function apiGet(action, params = {}) {
     return await response.json();
 }
 
+function esc(valor) {
+    return String(valor ?? "").replace(/[&<>\'"]/g, caracter => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "'": "&#39;",
+        '"': "&quot;"
+    }[caracter]));
+}
+
 function mostrarError(error, mensaje = "No se pudo completar la operación.") {
     console.error(error);
     alert(`${mensaje}\n\n${error?.message || error || ""}`);
@@ -307,6 +329,10 @@ function crearCelda(texto, clases = "") {
     return td;
 }
 
+function estaHabilitado(valor) {
+    return valor === true || String(valor).toUpperCase() === "SI" || String(valor).toLowerCase() === "true";
+}
+
 function crearBoton(texto, clases, accion) {
     const button = document.createElement("button");
     button.type = "button";
@@ -332,11 +358,15 @@ function render() {
         .forEach(i => {
             const tr = document.createElement("tr");
             tr.className = "border-t";
+            tr.dataset.token = i.token;
 
             tr.appendChild(crearCelda(i.nombre || ""));
             tr.appendChild(crearCelda(i.telefono || "", "text-center"));
             tr.appendChild(crearCelda(i.cantidadPermitida ?? 0, "text-center"));
             tr.appendChild(crearCelda(i.cantidadConfirmada ?? 0, "text-center"));
+            tr.appendChild(crearCelda(estaHabilitado(i.invitadoCeremonia) ? "✓ Sí" : "— No", "text-center"));
+            tr.appendChild(crearCelda(estaHabilitado(i.invitadoFiesta) ? "✓ Sí" : "— No", "text-center"));
+            tr.appendChild(crearCelda(i.observaciones || "", "max-w-xs text-left"));
 
             const acciones = document.createElement("div");
             acciones.className = "flex flex-wrap gap-2";
@@ -352,6 +382,11 @@ function render() {
             );
 
             acciones.appendChild(
+                crearBoton("Editar", "bg-stone-700 text-white",
+                    () => editarInvitado(i.token))
+            );
+
+            acciones.appendChild(
                 crearBoton("Eliminar", "bg-red-600 text-white",
                     () => eliminarInvitado(i.token))
             );
@@ -363,6 +398,61 @@ function render() {
 
             rows.appendChild(tr);
         });
+}
+
+function editarInvitado(token) {
+    const invitado = invitados.find(i => i.token === token);
+    if (!invitado) return;
+
+    const tr = [...document.getElementById("rows").children]
+        .find(fila => fila.dataset.token === token);
+    if (!tr) return;
+
+    tr.innerHTML = `
+        <td class="p-3"><input data-edit="nombre" value="${esc(invitado.nombre || "")}" class="border rounded p-2 w-full"></td>
+        <td class="p-3"><input data-edit="telefono" value="${esc(invitado.telefono || "")}" class="border rounded p-2 w-full"></td>
+        <td class="p-3"><input data-edit="cantidadPermitida" type="number" min="1" value="${Number(invitado.cantidadPermitida) || 1}" class="border rounded p-2 w-20"></td>
+        <td class="p-3 text-center">${invitado.cantidadConfirmada ?? 0}</td>
+        <td class="p-3 text-center"><input data-edit="invitadoCeremonia" type="checkbox" ${estaHabilitado(invitado.invitadoCeremonia) ? "checked" : ""} class="w-4 h-4"></td>
+        <td class="p-3 text-center"><input data-edit="invitadoFiesta" type="checkbox" ${estaHabilitado(invitado.invitadoFiesta) ? "checked" : ""} class="w-4 h-4"></td>
+        <td class="p-3"><input data-edit="observaciones" value="${esc(invitado.observaciones || "")}" class="border rounded p-2 w-full"></td>
+        <td class="p-3"><div class="flex flex-wrap gap-2">
+            <button class="bg-green-700 text-white px-3 py-1 rounded" onclick="guardarInvitado('${esc(token)}', this)">Guardar</button>
+            <button class="bg-stone-200 px-3 py-1 rounded" onclick="render()">Cancelar</button>
+        </div></td>`;
+}
+
+async function guardarInvitado(token, boton) {
+    const fila = boton.closest("tr");
+    const valor = nombre => fila.querySelector(`[data-edit="${nombre}"]`);
+    const nombre = valor("nombre").value.trim();
+    const cantidad = Math.max(1, parseInt(valor("cantidadPermitida").value, 10) || 1);
+
+    if (!nombre) {
+        alert("Ingresá el nombre del invitado.");
+        return;
+    }
+
+    boton.disabled = true;
+    try {
+        const data = await apiGet("update", {
+            token,
+            nombre,
+            telefono: valor("telefono").value.trim(),
+            cantidadPermitida: cantidad,
+            invitadoCeremonia: valor("invitadoCeremonia").checked ? "SI" : "NO",
+            invitadoFiesta: valor("invitadoFiesta").checked ? "SI" : "NO",
+            observaciones: valor("observaciones").value.trim()
+        });
+
+        if (!data.success) throw new Error(data.error || "No se pudo actualizar el invitado.");
+        const indice = invitados.findIndex(i => i.token === token);
+        invitados[indice] = data.invitado || data;
+        render();
+    } catch (error) {
+        boton.disabled = false;
+        mostrarError(error, "No se pudo actualizar el invitado.");
+    }
 }
 
 /* ===========================
