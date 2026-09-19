@@ -2103,29 +2103,24 @@ audio {
 
 
 
-        <!-- ACOMPAÑANTES -->
+<!-- INFORMACIÓN ADICIONAL -->
 
-        <div
-            id="acompanantesWrap"
-            class="mt-5 hidden"
-        >
+<div
+    id="acompanantesWrap"
+    class="mt-5 hidden"
+>
+    <label
+        class="block text-sm font-medium mb-2"
+        for="observacionesInvitado"
+    >
+        Información adicional
+    </label>
 
-            <label
-                class="block text-sm font-medium mb-2"
-                for="acompanantes"
-            >
-                Nombres de acompañantes (opcional)
-            </label>
-
-            <textarea
-                id="acompanantes"
-                rows="3"
-                class="w-full rounded-xl border border-stone-300 p-3 bg-white"
-                placeholder="Ej.: María, Pedro…"
-            ></textarea>
-
-        </div>
-
+    <p
+        id="observacionesInvitado"
+        class="w-full rounded-xl border border-stone-300 p-3 bg-stone-50 text-sm text-stone-600 whitespace-pre-line"
+    ></p>
+</div>
 
 
         <!-- ENVIAR -->
@@ -3771,7 +3766,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
     const quantity = $('cantidad');
     const qw = $('cantidadWrap');
     const cw = $('acompanantesWrap');
-    const companions = $('acompanantes');
+    const observations = $('observacionesInvitado');
     const state = $('rsvpEstado');
     const send = $('btnEnviarRSVP');
     const section = $('confirmacion');
@@ -3784,6 +3779,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
     let invitadoCeremonia = false;
     let invitadoFiesta = false;
     let cantidadPermitida = 1;
+    let observacionesInvitado = '';
 
     function fail(m) {
         if (load) load.classList.add('hidden');
@@ -3935,7 +3931,12 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
         const hayEvento = events.conference || events.party;
         if (qw) qw.classList.toggle('hidden', !hayEvento);
-        if (cw) cw.classList.toggle('hidden', !hayEvento);
+       if (cw) {
+                    cw.classList.toggle(
+                        'hidden',
+                        !hayEvento || !observacionesInvitado
+                    );
+                }
         if (quantity) quantity.required = hayEvento;
 
         if (rsvpHelp) {
@@ -4032,7 +4033,13 @@ form?.addEventListener('submit', async e => {
         invitadoCeremonia = normalizarSiNo(g.invitadoCeremonia);
         invitadoFiesta = normalizarSiNo(g.invitadoFiesta);
         cantidadPermitida = Math.max(1, Number(g.cantidadPermitida) || 1);
+        observacionesInvitado = String(
+            g.observaciones ?? ''
+        ).trim();
 
+        if (observations) {
+            observations.textContent = observacionesInvitado;
+        }
         $('nombreInvitado').textContent = g.nombre || 'Invitado';
         $('lugaresInvitado').textContent =
             `${cantidadPermitida} ${cantidadPermitida === 1 ? 'lugar reservado' : 'lugares reservados'}`;
