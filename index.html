@@ -3924,9 +3924,8 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         const conferenceCard = cards[1] || null;
         const partyCard = $('eventoFiesta');
 
-        // Sin token: solamente Civil.
-        // Con token: se muestran exclusivamente los eventos incluidos en la invitación.
-        ocultar(civilCard, SITE_TOKEN ? !invitadoCeremonia : false);
+        // El Civil y su ubicación están disponibles para todos los invitados.
+        ocultar(civilCard, false);
         ocultar(conferenceCard, SITE_TOKEN ? !invitadoCeremonia : true);
         ocultar(partyCard, !SITE_TOKEN || !invitadoFiesta);
 
@@ -3940,9 +3939,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         // La botonera de ubicación solamente se muestra si existe al menos un evento
         // con ubicación visible. Sin token queda disponible para llevar al Civil.
         const locationButton = $('btnBarraUbicacion');
-        if (locationButton) {
-            locationButton.style.display = (!SITE_TOKEN || invitadoCeremonia || invitadoFiesta) ? '' : 'none';
-        }
+        if (locationButton) locationButton.style.display = '';
 
         // Confirmación siempre visible; el formulario decide qué eventos puede seleccionar.
         const confirmButton = $('btnBarraConfirmar');
@@ -3981,7 +3978,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         if (!btnCivil || !btnConference || !btnParty) return;
 
         const events = selectedEvents();
-        const canCivil = invitadoCeremonia;
+        const canCivil = true;
         const canConference = invitadoCeremonia;
         const canParty = invitadoFiesta;
 
@@ -4025,7 +4022,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
     }
 
     function elegirEvento(evento) {
-        if (evento === 'civil' && invitadoCeremonia) {
+        if (evento === 'civil') {
             btnCivil.classList.toggle('selected');
         }
         if (evento === 'conferencia' && invitadoCeremonia) {
