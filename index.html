@@ -1551,15 +1551,15 @@ audio {
         id="btnBarraFAQ"
         class="toolbar-faq"
         type="button"
-        aria-label="Preguntas frecuentes"
-        title="Preguntas frecuentes"
+        aria-label="Información"
+        title="Información"
     >
         <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="9"></circle>
             <path d="M9.7 9a2.5 2.5 0 1 1 4.1 1.9c-1 .8-1.8 1.2-1.8 2.6"></path>
             <path d="M12 17h.01"></path>
         </svg>
-        <span>Preguntas</span>
+        <span>Información</span>
     </button>
 
     <button
@@ -4188,6 +4188,28 @@ form?.addEventListener('submit', async e => {
 
     $('btnBarraUbicacion')?.addEventListener('click', () => {
         $('ubicacion')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    $('btnBarraFAQ')?.addEventListener('click', () => {
+        $('preguntas-frecuentes')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    $('btnBarraGaleria')?.addEventListener('click', () => {
+        $('galeriaInvitados')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    const giftModal = $('giftModal');
+    const cerrarRegalo = () => giftModal?.classList.add('hidden');
+    $('btnBarraRegalo')?.addEventListener('click', () => {
+        giftModal?.classList.remove('hidden');
+    });
+    $('giftModalX')?.addEventListener('click', cerrarRegalo);
+    $('giftModalClose')?.addEventListener('click', cerrarRegalo);
+    giftModal?.addEventListener('click', event => {
+        if (event.target === giftModal) cerrarRegalo();
+    });
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') cerrarRegalo();
     });
 
     // La botonera de foto/video existe en la versión de fiesta.
