@@ -3539,6 +3539,72 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
 
 /* =====================================================
+   CARRUSEL DE FOTOS SELECCIONADAS
+====================================================== */
+
+(function() {
+    const track = document.getElementById('carouselTrack');
+    const dots = document.getElementById('carouselDots');
+    const previous = document.getElementById('carouselPrev');
+    const next = document.getElementById('carouselNext');
+    const empty = document.getElementById('carouselEmpty');
+
+    if (!track || !dots) return;
+
+    const fotos = [
+        'assets/carrucel1.jpg',
+        'assets/carrucel2.jpg',
+        'assets/carrucel3.jpg',
+        'assets/carrucel4.jpg'
+    ];
+    let indice = 0;
+
+    function mostrarFoto(nuevoIndice) {
+        indice = (nuevoIndice + fotos.length) % fotos.length;
+        track.style.transform = `translateX(-${indice * 100}%)`;
+        dots.querySelectorAll('.carousel-dot').forEach((dot, dotIndex) => {
+            dot.classList.toggle('active', dotIndex === indice);
+            dot.setAttribute('aria-current', dotIndex === indice ? 'true' : 'false');
+        });
+    }
+
+    fotos.forEach((src, fotoIndex) => {
+        const slide = document.createElement('div');
+        slide.className = 'carousel-slide';
+
+        const imagen = document.createElement('img');
+        imagen.src = src;
+        imagen.alt = `Foto de Eunice y David ${fotoIndex + 1}`;
+        imagen.loading = fotoIndex === 0 ? 'eager' : 'lazy';
+        imagen.addEventListener('error', () => {
+            slide.remove();
+            const dot = dots.querySelector(`[data-slide="${fotoIndex}"]`);
+            dot?.remove();
+            if (!track.children.length) {
+                empty.style.display = 'block';
+                previous.style.display = 'none';
+                next.style.display = 'none';
+            }
+        });
+        slide.appendChild(imagen);
+        track.appendChild(slide);
+
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'carousel-dot';
+        dot.dataset.slide = String(fotoIndex);
+        dot.setAttribute('aria-label', `Mostrar foto ${fotoIndex + 1}`);
+        dot.addEventListener('click', () => mostrarFoto(fotoIndex));
+        dots.appendChild(dot);
+    });
+
+    previous?.addEventListener('click', () => mostrarFoto(indice - 1));
+    next?.addEventListener('click', () => mostrarFoto(indice + 1));
+    mostrarFoto(0);
+})();
+
+
+/* =====================================================
    CUENTA REGRESIVA
 ====================================================== */
 
