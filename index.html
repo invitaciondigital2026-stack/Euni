@@ -2029,6 +2029,17 @@ audio {
             >
 
                 <button
+                    id="btnCivil"
+                    type="button"
+                    class="rsvp-choice rsvp-yes"
+                    aria-pressed="false"
+                >
+                    <span class="rsvp-choice-icon" aria-hidden="true">💍</span>
+                    <span class="rsvp-choice-title">Civil</span>
+                    <span class="rsvp-choice-subtitle">Ceremonia</span>
+                </button>
+
+                <button
                     id="btnConferencia"
                     type="button"
                     class="rsvp-choice rsvp-yes"
@@ -2050,24 +2061,13 @@ audio {
                     <span id="fiestaSubtitle" class="rsvp-choice-subtitle">Después de la conferencia</span>
                 </button>
 
-                <button
-                    id="btnNoAsistire"
-                    type="button"
-                    class="rsvp-choice rsvp-no"
-                    aria-pressed="false"
-                >
-                    <span class="rsvp-choice-icon" aria-hidden="true">×</span>
-                    <span class="rsvp-choice-title">No podré asistir</span>
-                    <span class="rsvp-choice-subtitle">Gracias por avisar</span>
-                </button>
-
             </div>
 
             <p
                 id="rsvpAyuda"
                 class="text-center text-xs text-gray-500 mt-4"
             >
-                Podés confirmar conferencia, fiesta o ambas.
+                Podés confirmar civil, conferencia, fiesta o varias opciones.
             </p>
 
             <input
@@ -3836,9 +3836,9 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
     const state = $('rsvpEstado');
     const send = $('btnEnviarRSVP');
     const section = $('confirmacion');
+    const btnCivil = $('btnCivil');
     const btnConference = $('btnConferencia');
     const btnParty = $('btnFiesta');
-    const btnNo = $('btnNoAsistire');
     const rsvpHelp = $('rsvpAyuda');
 
     let guest = null;
@@ -3957,6 +3957,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
 
     function selectedEvents() {
         return {
+            civil: btnCivil?.classList.contains('selected') || false,
             conference: btnConference?.classList.contains('selected') || false,
             party: btnParty?.classList.contains('selected') || false
         };
@@ -3965,37 +3966,38 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
     function updateAttendanceValue() {
         if (!attendance) return;
 
-        if (btnNo?.classList.contains('selected')) {
-            attendance.value = 'no';
-            return;
-        }
-
         const events = selectedEvents();
-        if (events.conference && events.party) attendance.value = 'ambos';
+        if (events.civil && events.conference && events.party) attendance.value = 'civil_conferencia_fiesta';
+        else if (events.civil && events.conference) attendance.value = 'civil_conferencia';
+        else if (events.civil && events.party) attendance.value = 'civil_fiesta';
+        else if (events.conference && events.party) attendance.value = 'ambos';
+        else if (events.civil) attendance.value = 'civil';
         else if (events.conference) attendance.value = 'conferencia';
         else if (events.party) attendance.value = 'fiesta';
         else attendance.value = '';
     }
 
     function updateRsvpUI() {
-        if (!btnConference || !btnParty || !btnNo) return;
+        if (!btnCivil || !btnConference || !btnParty) return;
 
-        const no = btnNo.classList.contains('selected');
         const events = selectedEvents();
+        const canCivil = invitadoCeremonia;
         const canConference = invitadoCeremonia;
         const canParty = invitadoFiesta;
 
-        btnConference.disabled = no || !canConference;
-        btnParty.disabled = no || !canParty;
+        btnCivil.disabled = !canCivil;
+        btnConference.disabled = !canConference;
+        btnParty.disabled = !canParty;
 
-        btnConference.classList.toggle('disabled', no || !canConference);
-        btnParty.classList.toggle('disabled', no || !canParty);
+        btnCivil.classList.toggle('disabled', !canCivil);
+        btnConference.classList.toggle('disabled', !canConference);
+        btnParty.classList.toggle('disabled', !canParty);
 
+        btnCivil.setAttribute('aria-pressed', String(events.civil));
         btnConference.setAttribute('aria-pressed', String(events.conference));
         btnParty.setAttribute('aria-pressed', String(events.party));
-        btnNo.setAttribute('aria-pressed', String(no));
 
-        const hayEvento = events.conference || events.party;
+        const hayEvento = events.civil || events.conference || events.party;
         if (qw) qw.classList.toggle('hidden', !hayEvento);
        if (cw) {
                     cw.classList.toggle(
@@ -4006,8 +4008,11 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         if (quantity) quantity.required = hayEvento;
 
         if (rsvpHelp) {
-            if (no) rsvpHelp.textContent = 'Al indicar que no podrás asistir, se desactivan los demás eventos.';
+            if (events.civil && events.conference && events.party) rsvpHelp.textContent = 'Confirmaste civil, conferencia y fiesta.';
+            else if (events.civil && events.conference) rsvpHelp.textContent = 'Confirmaste civil y conferencia.';
+            else if (events.civil && events.party) rsvpHelp.textContent = 'Confirmaste civil y fiesta.';
             else if (events.conference && events.party) rsvpHelp.textContent = 'Confirmaste conferencia y fiesta.';
+            else if (events.civil) rsvpHelp.textContent = 'Confirmaste tu asistencia al civil.';
             else if (events.conference) rsvpHelp.textContent = 'Confirmaste tu asistencia a la conferencia.';
             else if (events.party) rsvpHelp.textContent = 'Confirmaste tu asistencia a la fiesta.';
             else if (invitadoCeremonia && invitadoFiesta) rsvpHelp.textContent = 'Podés confirmar conferencia, fiesta o ambas.';
@@ -4020,8 +4025,9 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
     }
 
     function elegirEvento(evento) {
-        if (btnNo?.classList.contains('selected')) btnNo.classList.remove('selected');
-
+        if (evento === 'civil' && invitadoCeremonia) {
+            btnCivil.classList.toggle('selected');
+        }
         if (evento === 'conferencia' && invitadoCeremonia) {
             btnConference.classList.toggle('selected');
         }
@@ -4033,20 +4039,9 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         if (state) state.textContent = '';
     }
 
-    function elegirNo() {
-        if (!btnNo) return;
-        btnNo.classList.toggle('selected');
-        if (btnNo.classList.contains('selected')) {
-            btnConference?.classList.remove('selected');
-            btnParty?.classList.remove('selected');
-        }
-        updateRsvpUI();
-        if (state) state.textContent = '';
-    }
-
+    btnCivil?.addEventListener('click', () => elegirEvento('civil'));
     btnConference?.addEventListener('click', () => elegirEvento('conferencia'));
     btnParty?.addEventListener('click', () => elegirEvento('fiesta'));
-    btnNo?.addEventListener('click', elegirNo);
 
     /* =================================================
        ENVÍO RSVP -> GOOGLE APPS SCRIPT POR GET
@@ -4055,7 +4050,7 @@ form?.addEventListener('submit', async e => {
     e.preventDefault();
 
     const token = SITE_TOKEN;
-    const evento = attendance.value; // conferencia / fiesta / ambos / no
+    const evento = attendance.value;
     const cantidad = Number(quantity.value || 1);
 
     const confirmoCeremonia =
@@ -4071,11 +4066,11 @@ form?.addEventListener('submit', async e => {
         const data = await apiGet('confirm', {
             token,
             confirmoCivil:
-                evento === 'conferencia' || evento === 'ambos' ? 'SI' : 'NO',
+                evento === 'civil' || evento === 'civil_conferencia' || evento === 'civil_fiesta' || evento === 'civil_conferencia_fiesta' ? 'SI' : 'NO',
             confirmoCeremonia,
             confirmoFiesta,
             cantidadConfirmada:
-                evento === 'no' ? 0 : cantidad
+                cantidad
         });
 
         if (!data.success) {
