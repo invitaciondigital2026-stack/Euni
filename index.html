@@ -1532,10 +1532,11 @@ audio {
 
     <button
         id="btnBarraRegalo"
-        class="toolbar-regalo"
+        class="toolbar-regalo party-only"
         type="button"
         aria-label="Regalo"
         title="Regalo"
+        hidden
     >
         <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M20 12v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8"></path>
@@ -1564,10 +1565,11 @@ audio {
 
     <button
         id="btnBarraGaleria"
-        class="toolbar-action"
+        class="toolbar-action party-only"
         type="button"
         aria-label="Ver fotos y videos de los invitados"
         title="Galería de invitados"
+        hidden
     >
         <svg viewBox="0 0 24 24" aria-hidden="true">
             <rect x="3" y="4" width="18" height="16" rx="2"></rect>
@@ -2446,7 +2448,7 @@ audio {
          GALERÍA EN VIVO
     ====================================================== -->
 
-    <section id="galeriaInvitados" class="py-16 bg-white text-center px-6">
+    <section id="galeriaInvitados" class="party-only hidden py-16 bg-white text-center px-6" hidden>
 
         <h2 class="section-title uppercase text-sm mb-3">
             Recuerdos compartidos
