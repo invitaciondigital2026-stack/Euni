@@ -17,6 +17,14 @@ function json(data) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+function jsonp(data, callback) {
+  const nombre = String(callback || "").replace(/[^a-zA-Z0-9_.$]/g, "");
+  if (!nombre) return json(data);
+  return ContentService
+    .createTextOutput(nombre + "(" + JSON.stringify(data) + ");")
+    .setMimeType(ContentService.MimeType.JAVASCRIPT);
+}
+
 function generarToken(length = 8) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let token = "";
@@ -62,7 +70,10 @@ function doGet(e) {
       return actualizarInvitadoGet(e.parameter);
 
     case "media_list":
-      return listarMultimedia();
+      return listarMultimedia(e.parameter.callback);
+
+    case "media_delete":
+      return eliminarMultimedia(e.parameter.resources);
 
     default:
       return json({
@@ -78,7 +89,14 @@ function doGet(e) {
 
 function doPost(e) {
   try {
-    const body = JSON.parse(e.postData.contents || "{}");
+    const contenido = e.postData && e.postData.contents ? e.postData.contents : "";
+    const tipo = e.postData && e.postData.type ? e.postData.type : "";
+    const body = tipo.indexOf("application/json") >= 0
+      ? JSON.parse(contenido || "{}")
+      : {
+          action: e.parameter.action,
+          resources: e.parameter.resources
+        };
 
     switch (String(body.action || "").toLowerCase()) {
       case "confirm":
@@ -439,7 +457,7 @@ function cloudinaryRequest_(path, method, payload, contentType) {
    MULTIMEDIA: LISTAR
 ===================================== */
 
-function listarMultimedia() {
+function listarMultimedia(callback) {
   const config = getCloudinaryConfig_();
   const resources = [];
   let nextCursor = null;
@@ -479,10 +497,12 @@ function listarMultimedia() {
     nextCursor = data.next_cursor || null;
   } while (nextCursor);
 
-  return json({
+  const respuesta = {
     success: true,
     resources
-  });
+  };
+
+  return jsonp(respuesta, callback);
 }
 
 /* =====================================
