@@ -102,8 +102,8 @@ body {
 .hero-sparkle::after { width: 1px; height: var(--sparkle-cross, 22px); }
 
 @keyframes sparkle {
-    0%, 100% { opacity: 0; transform: scale(.4) rotate(45deg); }
-    45%, 65% { opacity: .9; transform: scale(1) rotate(45deg); }
+    0%, 100% { opacity: .08; transform: scale(.55) rotate(45deg); filter: brightness(.7); }
+    42%, 62% { opacity: 1; transform: scale(1.12) rotate(45deg); filter: brightness(1.8); }
 }
 
 .hero-content {
@@ -158,7 +158,7 @@ body {
 }
 
 .hero-fixed-phrase.is-shining {
-    animation: gold-shine 2.2s ease-in-out forwards;
+    animation: gold-shine 10s ease-in-out infinite;
 }
 
 @keyframes fixed-phrase-writing {
@@ -167,8 +167,9 @@ body {
 }
 
 @keyframes gold-shine {
-    from { opacity: 1; background-position: 0% 50%; }
-    to { opacity: 1; background-position: 100% 50%; }
+    0%, 72% { opacity: 1; background-position: 0% 50%; }
+    88% { opacity: 1; background-position: 100% 50%; }
+    100% { opacity: 1; background-position: 0% 50%; }
 }
 
 .hero-phrase {
@@ -4611,7 +4612,7 @@ form?.addEventListener('submit', async e => {
         while (true) {
             const frase = elegirFrase();
             const posicionX = (window.innerWidth < 640 ? 55 : 52) + Math.random() * 32;
-            const posicionY = (window.innerWidth < 640 ? 34 : 28) + Math.random() * 54;
+            const posicionY = (window.innerWidth < 640 ? 24 : 20) + Math.random() * (window.innerWidth < 640 ? 28 : 34);
             const rotacion = (Math.random() * 8 - 4).toFixed(2) + "deg";
             const color = coloresFrases[Math.floor(Math.random() * coloresFrases.length)];
             const tamano = tamanosFrases[Math.floor(Math.random() * tamanosFrases.length)];
