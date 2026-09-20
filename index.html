@@ -4175,12 +4175,16 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
         const codigo = normalizarCodigo(gateInput?.value || '');
 
         if (!codigo) {
+            localStorage.removeItem('invitacion_codigo');
+            bloquearAcceso();
             if (gateError) gateError.textContent = 'Ingresá un código de invitación.';
             gateInput?.focus();
             return;
         }
 
         if (!VALID_INVITE_CODES.includes(codigo)) {
+            localStorage.removeItem('invitacion_codigo');
+            bloquearAcceso();
             if (gateError) gateError.textContent = 'Código inválido. Revisá el código recibido.';
             if (gateInput) gateInput.value = '';
             gateInput?.focus();
