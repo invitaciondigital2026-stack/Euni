@@ -128,41 +128,47 @@ body {
     margin-right: 0;
 }
 
-.hero-content > * {
-    width: max-content;
-    max-width: 100%;
-    overflow: hidden;
-    white-space: nowrap;
-    clip-path: inset(0 100% 0 0);
-    animation: type-in 1.3s steps(32, end) forwards;
+.hero-content {
+    display: none;
 }
 
-.hero-content > p:first-child { animation-delay: .25s; }
-.hero-content h1 { animation-delay: 1.15s; }
-.hero-content h2 { animation-delay: 2.45s; }
-.hero-content .decorative-line {
-    clip-path: inset(0 100% 0 0);
-    animation: line-in .8s ease forwards;
-    animation-delay: 3.55s;
+.hero-phrase {
+    position: absolute;
+    z-index: 3;
+    width: min(72vw, 440px);
+    color: #fff;
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(2rem, 5vw, 3.8rem);
+    line-height: 1.05;
+    text-align: center;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, .6);
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--phrase-rotation));
 }
-.hero-content > p:last-child { animation-delay: 4.25s; }
 
-@keyframes type-in {
-    from { clip-path: inset(0 100% 0 0); }
-    to { clip-path: inset(0 0 0 0); }
+.hero-phrase.is-writing {
+    animation: phrase-appear .45s ease-out forwards;
 }
 
-@keyframes line-in {
-    from { clip-path: inset(0 100% 0 0); transform: scaleX(0); transform-origin: right; }
-    to { clip-path: inset(0 0 0 0); transform: scaleX(1); transform-origin: right; }
+.hero-phrase.is-erasing {
+    animation: phrase-disappear .65s ease-in forwards;
+}
+
+@keyframes phrase-appear {
+    from { opacity: 0; transform: translate(-50%, -50%) rotate(var(--phrase-rotation)) scale(.96); }
+    to { opacity: 1; transform: translate(-50%, -50%) rotate(var(--phrase-rotation)) scale(1); }
+}
+
+@keyframes phrase-disappear {
+    from { opacity: 1; transform: translate(-50%, -50%) rotate(var(--phrase-rotation)) scale(1); }
+    to { opacity: 0; transform: translate(-50%, -50%) rotate(var(--phrase-rotation)) scale(.98); }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .hero-sparkle,
-    .hero-content > *,
-    .hero-content .decorative-line {
+    .hero-phrase {
         animation: none;
-        clip-path: none;
         opacity: 1;
         transform: none;
     }
@@ -1752,6 +1758,8 @@ audio {
         <span class="hero-sparkle"></span>
         <span class="hero-sparkle"></span>
     </div>
+
+    <div id="heroPhrase" class="hero-phrase" aria-live="polite"></div>
 
     <div class="hero-content text-white">
 
@@ -4484,6 +4492,64 @@ form?.addEventListener('submit', async e => {
 
 })();
 
+</script>
+
+<script>
+    const frasesPortada = [
+        "Estamos felices de anunciar",
+        "Eunice & David",
+        "Nos casamos",
+        "Una historia, un gran amor",
+        "Te esperamos para celebrar",
+        "Nuestro gran día",
+        "Con mucho amor"
+    ];
+
+    const frasePortada = document.getElementById("heroPhrase");
+    let indiceFraseAnterior = -1;
+
+    function esperarFrase(tiempo) {
+        return new Promise(resolve => setTimeout(resolve, tiempo));
+    }
+
+    function elegirFrase() {
+        let indice;
+        do {
+            indice = Math.floor(Math.random() * frasesPortada.length);
+        } while (frasesPortada.length > 1 && indice === indiceFraseAnterior);
+        indiceFraseAnterior = indice;
+        return frasesPortada[indice];
+    }
+
+    async function escribirFrasePortada() {
+        if (!frasePortada) return;
+
+        while (true) {
+            const frase = elegirFrase();
+            const margenX = window.innerWidth < 640 ? 36 : 28;
+            const margenY = window.innerWidth < 640 ? 20 : 16;
+            const posicionX = margenX + Math.random() * (100 - margenX * 2);
+            const posicionY = margenY + Math.random() * (100 - margenY * 2);
+            const rotacion = (Math.random() * 8 - 4).toFixed(2) + "deg";
+
+            frasePortada.style.left = posicionX + "%";
+            frasePortada.style.top = posicionY + "%";
+            frasePortada.style.setProperty("--phrase-rotation", rotacion);
+            frasePortada.className = "hero-phrase is-writing";
+            frasePortada.textContent = "";
+
+            for (const caracter of frase) {
+                frasePortada.textContent += caracter;
+                await esperar(48 + Math.random() * 55);
+            }
+
+            await esperar(1300 + Math.random() * 1800);
+            frasePortada.className = "hero-phrase is-erasing";
+            await esperar(650);
+        }
+    }
+
+    escribirFrasePortada();
 </script>
 
 </body>
