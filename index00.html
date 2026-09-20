@@ -1164,6 +1164,27 @@ audio {
     cursor: pointer;
 }
 
+.camera-frame-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.camera-frame-option {
+    border: 1px solid rgba(255,255,255,.45);
+    border-radius: 10px;
+    padding: 8px 12px;
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    cursor: pointer;
+}
+
+.camera-frame-option.active {
+    background: #b4536b;
+    border-color: #fff;
+}
+
 
 }
 
@@ -2794,6 +2815,12 @@ audio {
                 <button id="btnCancelarEdicion" class="camera-editor-cancel" type="button">Cancelar</button>
             </div>
 
+            <div class="camera-frame-options" aria-label="Elegir marco de boda">
+                <button type="button" class="camera-frame-option active" data-frame="0">Rosas</button>
+                <button type="button" class="camera-frame-option" data-frame="1">Eucalipto</button>
+                <button type="button" class="camera-frame-option" data-frame="2">Jardin</button>
+            </div>
+
             <div id="dedicatoriaControls" class="camera-editor-settings hidden">
                 <label>
                     Texto
@@ -3483,6 +3510,30 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
     const stickerTray = document.getElementById("stickerTray");
     const btnGuardarEditada = document.getElementById("btnGuardarEditada");
     const btnCancelarEdicion = document.getElementById("btnCancelarEdicion");
+    const marcosBoda = [
+        "assets/marco-boda-rosas.svg",
+        "assets/marco-boda-eucalipto.svg",
+        "assets/marco-boda-jardin.svg"
+    ];
+    let marcoSeleccionado = 0;
+    const marcoImagen = new Image();
+    marcoImagen.onload = function() {
+        if (editorActiva) renderEditorCanvas();
+    };
+    marcoImagen.src = marcosBoda[marcoSeleccionado];
+
+    document.querySelectorAll(".camera-frame-option").forEach(function(option) {
+        option.addEventListener("click", function() {
+            marcoSeleccionado = Number(option.dataset.frame) || 0;
+            marcoImagen.src = marcosBoda[marcoSeleccionado];
+            document.querySelectorAll(".camera-frame-option").forEach(item => item.classList.remove("active"));
+            option.classList.add("active");
+            marcoPreparado = true;
+            editorMarco = true;
+            btnMarcoBoda.classList.add("active");
+            renderEditorCanvas();
+        });
+    });
 
     function renderEditorCanvas() {
         if (!editorCanvas || !fotoBaseParaEditar) return;
@@ -3503,29 +3554,8 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
 
         ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
 
-        const margen = 26;
-        const borde = 22;
-        const frameX = drawX + margen;
-        const frameY = drawY + margen;
-        const frameW = drawWidth - margen * 2;
-        const frameH = drawHeight - margen * 2;
-
-        if (editorMarco) {
-            ctx.strokeStyle = "#f3dfb5";
-            ctx.lineWidth = 8;
-            ctx.strokeRect(frameX, frameY, frameW, frameH);
-
-            ctx.strokeStyle = "rgba(255,255,255,0.9)";
-            ctx.lineWidth = 2;
-            ctx.strokeRect(frameX + borde, frameY + borde, frameW - borde * 2, frameH - borde * 2);
-
-            ctx.fillStyle = "rgba(245, 243, 238, 0.9)";
-            ctx.fillRect(frameX + 18, frameY + frameH - 70, frameW - 36, 46);
-
-            ctx.fillStyle = "#4f3d37";
-            ctx.font = "600 22px Poppins, sans-serif";
-            ctx.textAlign = "center";
-            ctx.fillText("27 de noviembre de 2026", drawX + drawWidth / 2, frameY + frameH - 40);
+        if (editorMarco && marcoImagen.complete && marcoImagen.naturalWidth) {
+            ctx.drawImage(marcoImagen, 0, 0, width, height);
         }
 
         if (editorDedicatoria) {

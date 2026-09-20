@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+<defs><linearGradient id="gold" x1="0" x2="1"><stop stop-color="#a97836"/><stop offset=".5" stop-color="#f7e5b8"/><stop offset="1" stop-color="#a97836"/></linearGradient></defs>
+<rect x="24" y="24" width="852" height="1152" rx="34" fill="none" stroke="#fff8e9" stroke-width="16"/>
+<rect x="47" y="47" width="806" height="1106" rx="25" fill="none" stroke="url(#gold)" stroke-width="5"/>
+<g fill="none" stroke="#789368" stroke-width="7" stroke-linecap="round"><path d="M53 205C100 115 163 78 280 48"/><path d="M847 205C800 115 737 78 620 48"/><path d="M53 995c47 90 110 127 227 157"/><path d="M847 995c-47 90-110 127-227 157"/></g>
+<g fill="#e6a08d" stroke="#fffaf0" stroke-width="6"><path d="M107 121c-35-40-93 5-55 44 38 39 55 48 55 48s17-9 55-48c38-39-20-84-55-44z"/><path d="M793 121c-35-40-93 5-55 44 38 39 55 48 55 48s17-9 55-48c38-39-20-84-55-44z"/><path d="M107 1079c-35-40-93 5-55 44 38 39 55 48 55 48s17-9 55-48c38-39-20-84-55-44z"/><path d="M793 1079c-35-40-93 5-55 44 38 39 55 48 55 48s17-9 55-48c38-39-20-84-55-44z"/></g>
+<g fill="#fffdf4" stroke="#d3ab5d" stroke-width="4"><circle cx="105" cy="146" r="26"/><circle cx="795" cy="146" r="26"/><circle cx="105" cy="1054" r="26"/><circle cx="795" cy="1054" r="26"/></g>
+<g fill="#719064"><ellipse cx="180" cy="83" rx="14" ry="38" transform="rotate(58 180 83)"/><ellipse cx="720" cy="83" rx="14" ry="38" transform="rotate(-58 720 83)"/><ellipse cx="180" cy="1117" rx="14" ry="38" transform="rotate(-58 180 1117)"/><ellipse cx="720" cy="1117" rx="14" ry="38" transform="rotate(58 720 1117)"/></g>
+<g text-anchor="middle" fill="#695247" font-family="Georgia,serif"><text x="450" y="1080" font-size="31" font-style="italic">Euni y David</text><text x="450" y="1122" font-size="22" letter-spacing="3">27/11/26  |  Nuestra Boda</text></g>
+</svg>
