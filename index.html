@@ -2791,6 +2791,41 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
         GALERIA_TAG +
         ".json";
 
+    const MEDIA_API_URL =
+        "https://script.google.com/macros/s/AKfycby80WR98QzVdQk9SrVOuZ_AiA42rKROIT-ZjkMXLfEt4usPjbZ585kD5DcS_Zns2M8Y/exec";
+
+    function obtenerMultimediaJsonp() {
+        return new Promise(function(resolve, reject) {
+            const callbackName = "galeriaMedia_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+            const script = document.createElement("script");
+            const timer = setTimeout(function() {
+                finalizar(new Error("No se pudo consultar la galería."));
+            }, 20000);
+
+            function finalizar(error, data) {
+                clearTimeout(timer);
+                delete window[callbackName];
+                script.remove();
+                if (error) reject(error);
+                else resolve(data);
+            }
+
+            window[callbackName] = function(data) {
+                if (!data || data.success === false) {
+                    finalizar(new Error(data && data.error || "No se pudo cargar la galería."));
+                    return;
+                }
+                finalizar(null, data);
+            };
+
+            script.onerror = function() {
+                finalizar(new Error("No se pudo conectar con el servicio de galería."));
+            };
+            script.src = MEDIA_API_URL + "?action=media_list&callback=" + encodeURIComponent(callbackName);
+            document.head.appendChild(script);
+        });
+    }
+
 
     function crearUrlCloudinary(recurso) {
 
@@ -3027,54 +3062,6 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
     }
 
 
-    async function obtenerLista(url, tipo) {
-
-        try {
-
-            const respuesta =
-                await fetch(
-                    url +
-                    "?v=" +
-                    Math.floor(
-                        Date.now() / 60000
-                    )
-                );
-
-
-            if (!respuesta.ok) {
-                return [];
-            }
-
-
-            const datos =
-                await respuesta.json();
-
-
-            return (datos.resources || []).map(
-                function(recurso) {
-
-                    return {
-                        ...recurso,
-                        resource_type: tipo
-                    };
-
-                }
-            );
-
-        } catch (error) {
-
-            console.error(
-                "No se pudo cargar la lista:",
-                error
-            );
-
-            return [];
-
-        }
-
-    }
-
-
     async function cargarGaleria() {
 
         const estado =
@@ -3086,21 +3073,13 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
         }
 
 
-        const resultados =
-            await Promise.all([
-                obtenerLista(
-                    URL_LISTA_IMAGENES,
-                    "image"
-                ),
-                obtenerLista(
-                    URL_LISTA_VIDEOS,
-                    "video"
-                )
-            ]);
-
-
-        const recursos =
-            resultados[0].concat(resultados[1]);
+        let recursos = [];
+        try {
+            const datos = await obtenerMultimediaJsonp();
+            recursos = datos.resources || [];
+        } catch (error) {
+            console.error("No se pudo cargar la lista:", error);
+        }
 
 
         // Más recientes primero
