@@ -4615,7 +4615,10 @@ form?.addEventListener('submit', async e => {
             }
         } catch (error) {
             console.error('Error al cargar invitación:', error);
-            fail(error?.message || 'No pudimos cargar tu invitación personalizada.');
+            localStorage.removeItem('invitacion_codigo');
+            bloquearAcceso();
+            if (gateError) gateError.textContent = 'Ingresá un código de invitación.';
+            if (gateInput) gateInput.value = '';
         }
     }
 
