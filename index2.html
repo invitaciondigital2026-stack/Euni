@@ -132,6 +132,34 @@ body {
     display: none;
 }
 
+.hero-fixed-phrase {
+    position: absolute;
+    top: 9%;
+    left: 8%;
+    z-index: 4;
+    width: min(42vw, 340px);
+    color: #2563eb;
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(2rem, 4vw, 3.6rem);
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: 0 2px 12px rgba(255, 255, 255, .7), 0 2px 8px rgba(0, 0, 0, .35);
+    pointer-events: none;
+    opacity: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    clip-path: inset(0 100% 0 0);
+}
+
+.hero-fixed-phrase.is-writing {
+    animation: fixed-phrase-writing 2.4s steps(20, end) forwards;
+}
+
+@keyframes fixed-phrase-writing {
+    from { opacity: 0; clip-path: inset(0 100% 0 0); }
+    to { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
 .hero-phrase {
     position: absolute;
     z-index: 3;
@@ -167,10 +195,12 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
     .hero-sparkle,
-    .hero-phrase {
+    .hero-phrase,
+    .hero-fixed-phrase {
         animation: none;
         opacity: 1;
         transform: none;
+        clip-path: none;
     }
 }
 
@@ -1758,6 +1788,8 @@ audio {
         <span class="hero-sparkle"></span>
         <span class="hero-sparkle"></span>
     </div>
+
+    <div id="heroFixedPhrase" class="hero-fixed-phrase" aria-label="Eunice y David"></div>
 
     <div id="heroPhrase" class="hero-phrase" aria-live="polite"></div>
 
@@ -4497,7 +4529,6 @@ form?.addEventListener('submit', async e => {
 <script>
     const frasesPortada = [
         "Estamos felices de anunciar",
-        "Eunice & David",
         "Nos casamos",
         "Una historia, un gran amor",
         "Te esperamos para celebrar",
@@ -4505,6 +4536,9 @@ form?.addEventListener('submit', async e => {
         "Con mucho amor"
     ];
 
+    const coloresFrases = ["#ffffff", "#dbeafe", "#fef3c7", "#fce7f3", "#dcfce7", "#f5f5f4"];
+    const tamanosFrases = ["2rem", "2.35rem", "2.8rem", "3.2rem", "3.7rem", "4.2rem"];
+    const fraseFijaPortada = document.getElementById("heroFixedPhrase");
     const frasePortada = document.getElementById("heroPhrase");
     let indiceFraseAnterior = -1;
 
@@ -4521,20 +4555,33 @@ form?.addEventListener('submit', async e => {
         return frasesPortada[indice];
     }
 
+    async function escribirFraseFija() {
+        if (!fraseFijaPortada) return;
+        const texto = "Eunice & David";
+        fraseFijaPortada.classList.add("is-writing");
+        fraseFijaPortada.textContent = "";
+        for (const caracter of texto) {
+            fraseFijaPortada.textContent += caracter;
+            await esperarFrase(90);
+        }
+    }
+
     async function escribirFrasePortada() {
         if (!frasePortada) return;
 
         while (true) {
             const frase = elegirFrase();
-            const margenX = window.innerWidth < 640 ? 36 : 28;
-            const margenY = window.innerWidth < 640 ? 20 : 16;
-            const posicionX = margenX + Math.random() * (100 - margenX * 2);
-            const posicionY = margenY + Math.random() * (100 - margenY * 2);
+            const posicionX = (window.innerWidth < 640 ? 55 : 52) + Math.random() * 32;
+            const posicionY = (window.innerWidth < 640 ? 34 : 28) + Math.random() * 54;
             const rotacion = (Math.random() * 8 - 4).toFixed(2) + "deg";
+            const color = coloresFrases[Math.floor(Math.random() * coloresFrases.length)];
+            const tamano = tamanosFrases[Math.floor(Math.random() * tamanosFrases.length)];
 
             frasePortada.style.left = posicionX + "%";
             frasePortada.style.top = posicionY + "%";
             frasePortada.style.setProperty("--phrase-rotation", rotacion);
+            frasePortada.style.color = color;
+            frasePortada.style.fontSize = tamano;
             frasePortada.className = "hero-phrase is-writing";
             frasePortada.textContent = "";
 
@@ -4549,6 +4596,7 @@ form?.addEventListener('submit', async e => {
         }
     }
 
+    escribirFraseFija();
     escribirFrasePortada();
 </script>
 
