@@ -42,6 +42,12 @@ body {
 
 body.gate-open {
     overflow: hidden;
+    pointer-events: none;
+}
+
+body.gate-open #inviteGate,
+body.gate-open #inviteGate * {
+    pointer-events: auto;
 }
 
 .title-font {
