@@ -43,11 +43,27 @@ body {
 body.gate-open {
     overflow: hidden;
     pointer-events: none;
+    position: relative;
 }
 
 body.gate-open #inviteGate,
 body.gate-open #inviteGate * {
     pointer-events: auto;
+}
+
+#inviteGate {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(17, 24, 39, 0.48);
+    backdrop-filter: blur(2px);
+}
+
+#inviteGate.hidden {
+    display: none;
 }
 
 .title-font {
@@ -4178,7 +4194,10 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
             localStorage.removeItem('invitacion_codigo');
             bloquearAcceso();
             if (gateError) gateError.textContent = 'Ingresá un código de invitación.';
-            gateInput?.focus();
+            if (gateInput) {
+                gateInput.value = '';
+                setTimeout(() => gateInput.focus({ preventScroll: true }), 10);
+            }
             return;
         }
 
@@ -4186,8 +4205,10 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
             localStorage.removeItem('invitacion_codigo');
             bloquearAcceso();
             if (gateError) gateError.textContent = 'Código inválido. Revisá el código recibido.';
-            if (gateInput) gateInput.value = '';
-            gateInput?.focus();
+            if (gateInput) {
+                gateInput.value = '';
+                setTimeout(() => gateInput.focus({ preventScroll: true }), 10);
+            }
             return;
         }
 
