@@ -85,7 +85,6 @@ body {
     background: #fff;
     box-shadow: 0 0 8px 3px rgba(255, 255, 255, .8);
     opacity: 0;
-    transition: top 2.8s ease-in-out, left 2.8s ease-in-out, width 1.4s ease, height 1.4s ease;
     animation: sparkle var(--sparkle-duration, 3.8s) ease-in-out infinite;
 }
 
@@ -4556,29 +4555,28 @@ form?.addEventListener('submit', async e => {
     const destellosPortada = [...document.querySelectorAll(".hero-sparkle")];
     let indiceFraseAnterior = -1;
 
-    function moverDestello(destello) {
-        const posicionX = 6 + Math.random() * 88;
-        const posicionY = 8 + Math.random() * 84;
-        const tamano = 3 + Math.random() * 5;
+    const posicionesDestellos = [
+        [9, 15],
+        [88, 18],
+        [8, 82],
+        [91, 78],
+        [18, 91]
+    ];
+
+    function configurarDestello(destello, indice) {
+        const [posicionX, posicionY] = posicionesDestellos[indice % posicionesDestellos.length];
         const duracion = 2.8 + Math.random() * 3.2;
         const retraso = -(Math.random() * duracion).toFixed(2) + "s";
 
         destello.style.left = posicionX + "%";
         destello.style.top = posicionY + "%";
-        destello.style.width = tamano + "px";
-        destello.style.height = tamano + "px";
         destello.style.setProperty("--sparkle-duration", duracion + "s");
-        destello.style.setProperty("--sparkle-cross", (18 + tamano * 2.5) + "px");
         destello.style.animationDelay = retraso;
     }
 
     function iniciarDestellosDinamicos() {
         destellosPortada.forEach((destello, indice) => {
-            moverDestello(destello);
-            setTimeout(() => {
-                moverDestello(destello);
-                setInterval(() => moverDestello(destello), 3600 + indice * 500 + Math.random() * 1800);
-            }, 2800 + indice * 520);
+            configurarDestello(destello, indice);
         });
     }
 
