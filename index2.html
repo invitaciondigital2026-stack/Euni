@@ -4751,7 +4751,10 @@ form?.addEventListener('submit', async e => {
             const g = obtenerInvitado(data);
 
             if (!g || !g.token) {
-                fail('No encontramos esta invitación. Verificá el enlace recibido.');
+                localStorage.removeItem('invitacion_codigo');
+                bloquearAcceso();
+                if (gateError) gateError.textContent = 'Ingresá un código de invitación.';
+                if (gateInput) gateInput.value = '';
                 return;
             }
 
