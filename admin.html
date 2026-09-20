@@ -111,7 +111,7 @@ async function readResponse(r){
 
 function wa(g){
   const u=PUBLIC_SERVER2_URL+'/?i='+g.codigo;
-  const m=`Hola ${g.nombre}, somos Eunice y David ❤️\nTe compartimos nuestra invitación: ${u}`;
+  const m=`Hola ${g.nombre} 💛\n\nTe invitamos a celebrar con nosotros este momento tan especial.\nNuestra invitación digital está lista y nos encantaría compartirla con vos.\n\n${u}\n\nCon mucho cariño,\nEunice & David`;
   return 'https://wa.me/'+String(g.telefono||'').replace(/\D/g,'')+'?text='+encodeURIComponent(m);
 }
 function render(){
