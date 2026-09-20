@@ -27,6 +27,7 @@
     <section class="mb-5 rounded-xl bg-white p-4 shadow-sm" aria-label="Acciones multimedia">
       <div class="flex flex-wrap items-center gap-2">
         <button id="selectAllButton" type="button" class="rounded-lg bg-stone-200 px-4 py-2.5 text-sm font-medium hover:bg-stone-300">Marcar todo</button>
+        <button data-action="delete" type="button" class="rounded-lg bg-red-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-800">Eliminar</button>
         <button data-action="download" type="button" class="rounded-lg bg-stone-800 px-4 py-2.5 text-sm font-medium text-white hover:bg-stone-700">Descargar</button>
         <button data-action="share" type="button" class="rounded-lg bg-stone-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-stone-600">Compartir</button>
         <span id="selectionStatus" class="ml-auto text-sm text-stone-500">0 seleccionados</span>
@@ -38,15 +39,27 @@
   </main>
 
   <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycby80WR98QzVdQk9SrVOuZ_AiA42rKROIT-ZjkMXLfEt4usPjbZ585kD5DcS_Zns2M8Y/exec";
     const CLOUDINARY_CLOUD_NAME = "entbx2xv";
-    const GALERIA_TAG = "boda-eunice-david";
-    const URL_LISTA_IMAGENES = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/list/${GALERIA_TAG}.json`;
-    const URL_LISTA_VIDEOS = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/video/list/${GALERIA_TAG}.json`;
     const grid = document.getElementById("mediaGrid");
     const status = document.getElementById("status");
     const selectionStatus = document.getElementById("selectionStatus");
     let resources = [];
     const selected = new Set();
+
+    function apiUrl(action, params = {}) {
+      const url = new URL(API_URL);
+      url.searchParams.set("action", action);
+      Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, String(value)));
+      return url.toString();
+    }
+
+    async function apiGet(action, params = {}) {
+      const response = await fetch(apiUrl(action, params), { method: "GET", cache: "no-store" });
+      const data = await response.json();
+      if (!response.ok || data.success === false) throw new Error(data.error || `HTTP ${response.status}`);
+      return data;
+    }
 
     function esc(value) {
       return String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character]));
@@ -80,19 +93,11 @@
     async function loadMedia() {
       status.textContent = "Cargando multimedia...";
       try {
-        const [imagesResponse, videosResponse] = await Promise.all([
-          fetch(`${URL_LISTA_IMAGENES}?v=${Date.now()}`),
-          fetch(`${URL_LISTA_VIDEOS}?v=${Date.now()}`)
-        ]);
-        if (!imagesResponse.ok || !videosResponse.ok) throw new Error("No se pudo cargar la galería de Cloudinary.");
-        const [images, videos] = await Promise.all([imagesResponse.json(), videosResponse.json()]);
-        resources = [
-          ...(images.resources || []).map(resource => ({ ...resource, resource_type: "image" })),
-          ...(videos.resources || []).map(resource => ({ ...resource, resource_type: "video" }))
-        ].map(resource => ({
+        const data = await apiGet("media_list");
+        resources = (data.resources || []).map(resource => ({
           ...resource,
-          url: `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/${resource.resource_type}/upload/${resource.public_id}.${resource.format}`
-        })).sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+          url: resource.url || `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/${resource.resource_type}/upload/${resource.public_id}.${resource.format}`
+        }));
         selected.clear();
         render();
         status.textContent = resources.length ? `${resources.length} archivos disponibles.` : "Todavía no hay fotos ni videos.";
@@ -120,10 +125,20 @@
       alert("Enlaces copiados al portapapeles.");
     }
 
+    async function deleteSelected(chosen) {
+      if (!confirm(`¿Eliminar ${chosen.length} archivo${chosen.length === 1 ? "" : "s"}? Esta acción no se puede deshacer.`)) return;
+      status.textContent = `Eliminando ${chosen.length} archivos...`;
+      await apiGet("media_delete", {
+        resources: JSON.stringify(chosen.map(({ public_id, resource_type }) => ({ public_id, resource_type })))
+      });
+      await loadMedia();
+    }
+
     async function runAction(action) {
       const chosen = requireSelection();
       if (!chosen) return;
       try {
+        if (action === "delete") await deleteSelected(chosen);
         if (action === "download") downloadSelected(chosen);
         if (action === "share") await shareSelected(chosen);
       } catch (error) { alert(error.message); }
