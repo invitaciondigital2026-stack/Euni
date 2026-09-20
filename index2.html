@@ -4540,12 +4540,12 @@ form?.addEventListener('submit', async e => {
 
             for (const caracter of frase) {
                 frasePortada.textContent += caracter;
-                await esperar(48 + Math.random() * 55);
+                await esperarFrase(48 + Math.random() * 55);
             }
 
-            await esperar(1300 + Math.random() * 1800);
+            await esperarFrase(1300 + Math.random() * 1800);
             frasePortada.className = "hero-phrase is-erasing";
-            await esperar(650);
+            await esperarFrase(650);
         }
     }
 
