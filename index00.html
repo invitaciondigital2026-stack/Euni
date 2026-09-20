@@ -3867,6 +3867,8 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
         }, 1800);
     }
 
+    let intervaloCorazones = null;
+
     function activarCelebracion() {
         if (countdownEl) countdownEl.style.display = 'none';
         if (celebrationEl) {
@@ -3876,10 +3878,12 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
 
         mostrarFrase();
 
-        if (heartsEl) {
-            for (let i = 0; i < 18; i++) {
-                setTimeout(lanzarCorazon, i * 90);
-            }
+        if (heartsEl && !intervaloCorazones) {
+            intervaloCorazones = setInterval(() => {
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(lanzarCorazon, i * 110);
+                }
+            }, 1400);
         }
     }
 
@@ -3900,6 +3904,10 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
             celebracionActiva = false;
             if (countdownEl) countdownEl.style.display = 'flex';
             if (celebrationEl) celebrationEl.classList.remove('visible');
+            if (intervaloCorazones) {
+                clearInterval(intervaloCorazones);
+                intervaloCorazones = null;
+            }
         }
 
         const totalSeg =

@@ -40,6 +40,10 @@ body {
     color: #44403c;
 }
 
+body.gate-open {
+    overflow: hidden;
+}
+
 .title-font {
     font-family: 'Great Vibes', cursive;
 }
@@ -1584,7 +1588,29 @@ audio {
 </style>
 </head>
 
-<body>
+<body class="gate-open">
+
+<div id="inviteGate" class="invite-gate" aria-live="polite">
+    <div class="invite-gate-card">
+        <p class="invite-gate-label">Invitación</p>
+        <h2>Acceso restringido</h2>
+        <p>Ingresá el código de invitación para acceder a la celebración.</p>
+        <form id="inviteGateForm" class="invite-gate-form" novalidate>
+            <input
+                id="inviteCodeInput"
+                class="invite-gate-input"
+                type="text"
+                inputmode="text"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="Código de invitación"
+                aria-label="Código de invitación"
+            >
+            <button class="invite-gate-button" type="submit">Ingresar</button>
+            <p id="inviteGateError" class="invite-gate-error" role="alert"></p>
+        </form>
+    </div>
+</div>
 
 
 <!-- =====================================================
@@ -3867,6 +3893,8 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
         }, 1800);
     }
 
+    let intervaloCorazones = null;
+
     function activarCelebracion() {
         if (countdownEl) countdownEl.style.display = 'none';
         if (celebrationEl) {
@@ -3876,10 +3904,12 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
 
         mostrarFrase();
 
-        if (heartsEl) {
-            for (let i = 0; i < 18; i++) {
-                setTimeout(lanzarCorazon, i * 90);
-            }
+        if (heartsEl && !intervaloCorazones) {
+            intervaloCorazones = setInterval(() => {
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(lanzarCorazon, i * 110);
+                }
+            }, 1400);
         }
     }
 
@@ -3900,6 +3930,10 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
             celebracionActiva = false;
             if (countdownEl) countdownEl.style.display = 'flex';
             if (celebrationEl) celebrationEl.classList.remove('visible');
+            if (intervaloCorazones) {
+                clearInterval(intervaloCorazones);
+                intervaloCorazones = null;
+            }
         }
 
         const totalSeg =
@@ -4097,6 +4131,59 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
 
     const SITE_TOKEN =
         (new URLSearchParams(window.location.search).get('t') || '').trim();
+
+    const VALID_INVITE_CODES = [
+        'EUNICE2026',
+        'EUNICEYDAVID',
+        'INVITACION2026'
+    ];
+
+    const gate = document.getElementById('inviteGate');
+    const gateForm = document.getElementById('inviteGateForm');
+    const gateInput = document.getElementById('inviteCodeInput');
+    const gateError = document.getElementById('inviteGateError');
+
+    function normalizarCodigo(valor) {
+        return String(valor ?? '').trim().toUpperCase();
+    }
+
+    function permitirAcceso() {
+        if (gate) gate.classList.add('hidden');
+        document.body.classList.remove('gate-open');
+    }
+
+    function bloquearAcceso() {
+        if (gate) gate.classList.remove('hidden');
+        document.body.classList.add('gate-open');
+    }
+
+    const codigoGuardado = normalizarCodigo(localStorage.getItem('invitacion_codigo'));
+    if (SITE_TOKEN || VALID_INVITE_CODES.includes(codigoGuardado)) {
+        permitirAcceso();
+    } else {
+        bloquearAcceso();
+    }
+
+    gateForm?.addEventListener('submit', event => {
+        event.preventDefault();
+        const codigo = normalizarCodigo(gateInput?.value || '');
+
+        if (!codigo) {
+            if (gateError) gateError.textContent = 'Ingresá un código de invitación.';
+            gateInput?.focus();
+            return;
+        }
+
+        if (!VALID_INVITE_CODES.includes(codigo)) {
+            if (gateError) gateError.textContent = 'Código inválido. Revisá el código recibido.';
+            if (gateInput) gateInput.value = '';
+            gateInput?.focus();
+            return;
+        }
+
+        localStorage.setItem('invitacion_codigo', codigo);
+        permitirAcceso();
+    });
 
     const $ = id => document.getElementById(id);
 
