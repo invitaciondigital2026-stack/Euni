@@ -85,7 +85,8 @@ body {
     background: #fff;
     box-shadow: 0 0 8px 3px rgba(255, 255, 255, .8);
     opacity: 0;
-    animation: sparkle 3.8s ease-in-out infinite;
+    transition: top 2.8s ease-in-out, left 2.8s ease-in-out, width 1.4s ease, height 1.4s ease;
+    animation: sparkle var(--sparkle-duration, 3.8s) ease-in-out infinite;
 }
 
 .hero-sparkle::before,
@@ -98,13 +99,8 @@ body {
     transform: translate(-50%, -50%);
 }
 
-.hero-sparkle::before { width: 22px; height: 1px; }
-.hero-sparkle::after { width: 1px; height: 22px; }
-.hero-sparkle:nth-child(1) { top: 18%; left: 14%; animation-delay: .2s; }
-.hero-sparkle:nth-child(2) { top: 31%; left: 78%; width: 4px; height: 4px; animation-delay: 1.3s; }
-.hero-sparkle:nth-child(3) { top: 64%; left: 17%; width: 4px; height: 4px; animation-delay: 2.1s; }
-.hero-sparkle:nth-child(4) { top: 76%; left: 84%; animation-delay: 2.8s; }
-.hero-sparkle:nth-child(5) { top: 13%; left: 57%; width: 3px; height: 3px; animation-delay: 3.4s; }
+.hero-sparkle::before { width: var(--sparkle-cross, 22px); height: 1px; }
+.hero-sparkle::after { width: 1px; height: var(--sparkle-cross, 22px); }
 
 @keyframes sparkle {
     0%, 100% { opacity: 0; transform: scale(.4) rotate(45deg); }
@@ -4557,7 +4553,34 @@ form?.addEventListener('submit', async e => {
     const tamanosFrases = ["2rem", "2.35rem", "2.8rem", "3.2rem", "3.7rem", "4.2rem"];
     const fraseFijaPortada = document.getElementById("heroFixedPhrase");
     const frasePortada = document.getElementById("heroPhrase");
+    const destellosPortada = [...document.querySelectorAll(".hero-sparkle")];
     let indiceFraseAnterior = -1;
+
+    function moverDestello(destello) {
+        const posicionX = 6 + Math.random() * 88;
+        const posicionY = 8 + Math.random() * 84;
+        const tamano = 3 + Math.random() * 5;
+        const duracion = 2.8 + Math.random() * 3.2;
+        const retraso = -(Math.random() * duracion).toFixed(2) + "s";
+
+        destello.style.left = posicionX + "%";
+        destello.style.top = posicionY + "%";
+        destello.style.width = tamano + "px";
+        destello.style.height = tamano + "px";
+        destello.style.setProperty("--sparkle-duration", duracion + "s");
+        destello.style.setProperty("--sparkle-cross", (18 + tamano * 2.5) + "px");
+        destello.style.animationDelay = retraso;
+    }
+
+    function iniciarDestellosDinamicos() {
+        destellosPortada.forEach((destello, indice) => {
+            moverDestello(destello);
+            setTimeout(() => {
+                moverDestello(destello);
+                setInterval(() => moverDestello(destello), 3600 + indice * 500 + Math.random() * 1800);
+            }, 2800 + indice * 520);
+        });
+    }
 
     function esperarFrase(tiempo) {
         return new Promise(resolve => setTimeout(resolve, tiempo));
@@ -4616,6 +4639,7 @@ form?.addEventListener('submit', async e => {
 
     escribirFraseFija();
     escribirFrasePortada();
+    iniciarDestellosDinamicos();
 </script>
 
 </body>
