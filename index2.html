@@ -4,21 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#fafaf9">
+<meta property="og:title" content="Eunice & David te invitan">
+<meta property="og:description" content="Confirmá tu asistencia a nuestra invitación digital.">
+<meta property="og:image" content="https://invitaciondigital2026-stack.github.io/Euni/assets/portada.png">
+<meta property="og:url" content="https://invitaciondigital2026-stack.github.io/Euni/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Eunice & David te invitan">
+<meta name="twitter:description" content="Confirmá tu asistencia a nuestra invitación digital.">
+<meta name="twitter:image" content="https://invitaciondigital2026-stack.github.io/Euni/assets/portada.png">
 <title>Eunice & David | Nos Casamos</title>
-
-<script>
-/* =====================================================
-   CONFIGURACIÓN DE LA API
-   GitHub Pages sirve este index; Netlify queda como API + DB.
-   Cambiá SOLAMENTE esta URL por la URL real de tu sitio Netlify.
-===================================================== */
-window.API_BASE_URL = "https://ornate-kataifi-9b102e.netlify.app";
-
-window.API = {
-    guest: `${window.API_BASE_URL}/.netlify/functions/guest`,
-    rsvp: `${window.API_BASE_URL}/.netlify/functions/rsvp`
-};
-</script>
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='%27http://www.w3.org/2000/svg%27' viewBox='%270 0 64 64%27'%3E%3Crect width='%2764%27 height='%2764%27 rx='%2714%27 fill='%23f5f2ed'/%3E%3Ccircle cx='%2725%27 cy='%2735%27 r='%2714%27 fill='%27none%27 stroke='%23443f3a%27 stroke-width='%276%27/%3E%3Ccircle cx='%2739%27 cy='%2735%27 r='%2714%27 fill='%27none%27 stroke='%237c7168%27 stroke-width='%276%27/%3E%3C/svg%3E">
 
@@ -74,6 +69,48 @@ body {
     background: rgba(0, 0, 0, 0.40);
 }
 
+.hero-sparkles {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.hero-sparkle {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 8px 3px rgba(255, 255, 255, .8);
+    opacity: 0;
+    animation: sparkle 3.8s ease-in-out infinite;
+}
+
+.hero-sparkle::before,
+.hero-sparkle::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background: rgba(255, 255, 255, .8);
+    transform: translate(-50%, -50%);
+}
+
+.hero-sparkle::before { width: 22px; height: 1px; }
+.hero-sparkle::after { width: 1px; height: 22px; }
+.hero-sparkle:nth-child(1) { top: 18%; left: 14%; animation-delay: .2s; }
+.hero-sparkle:nth-child(2) { top: 31%; left: 78%; width: 4px; height: 4px; animation-delay: 1.3s; }
+.hero-sparkle:nth-child(3) { top: 64%; left: 17%; width: 4px; height: 4px; animation-delay: 2.1s; }
+.hero-sparkle:nth-child(4) { top: 76%; left: 84%; animation-delay: 2.8s; }
+.hero-sparkle:nth-child(5) { top: 13%; left: 57%; width: 3px; height: 3px; animation-delay: 3.4s; }
+
+@keyframes sparkle {
+    0%, 100% { opacity: 0; transform: scale(.4) rotate(45deg); }
+    45%, 65% { opacity: .9; transform: scale(1) rotate(45deg); }
+}
+
 .hero-content {
     position: absolute;
     z-index: 2;
@@ -91,6 +128,46 @@ body {
     margin-right: 0;
 }
 
+.hero-content > * {
+    width: max-content;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    clip-path: inset(0 100% 0 0);
+    animation: type-in 1.3s steps(32, end) forwards;
+}
+
+.hero-content > p:first-child { animation-delay: .25s; }
+.hero-content h1 { animation-delay: 1.15s; }
+.hero-content h2 { animation-delay: 2.45s; }
+.hero-content .decorative-line {
+    clip-path: inset(0 100% 0 0);
+    animation: line-in .8s ease forwards;
+    animation-delay: 3.55s;
+}
+.hero-content > p:last-child { animation-delay: 4.25s; }
+
+@keyframes type-in {
+    from { clip-path: inset(0 100% 0 0); }
+    to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes line-in {
+    from { clip-path: inset(0 100% 0 0); transform: scaleX(0); transform-origin: right; }
+    to { clip-path: inset(0 0 0 0); transform: scaleX(1); transform-origin: right; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-sparkle,
+    .hero-content > *,
+    .hero-content .decorative-line {
+        animation: none;
+        clip-path: none;
+        opacity: 1;
+        transform: none;
+    }
+}
+
 /* Títulos */
 
 .section-title {
@@ -104,6 +181,50 @@ body {
     height: 1px;
     background: #a8a29e;
     margin: 15px auto;
+}
+
+/* FAQ */
+
+.faq-item {
+    border: 1px solid #e7e5e4;
+    border-radius: 1rem;
+    background: #f8f7f5;
+    overflow: hidden;
+}
+
+.faq-item summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 1.1rem 1.25rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #292524;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.faq-item summary::after {
+    content: "+";
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #57534e;
+    transition: transform 0.2s ease;
+}
+
+.faq-item[open] summary::after {
+    content: "−";
+}
+
+.faq-answer {
+    padding: 0 1.25rem 1.1rem;
+    color: #57534e;
+    line-height: 1.7;
 }
 
 /* Cuenta regresiva */
@@ -350,6 +471,9 @@ audio {
     will-change: auto;
 }
 
+.gallery-item {
+    position: relative;
+}
 
 /* VISOR DE FOTOS */
 
@@ -1497,13 +1621,60 @@ audio {
         </svg>
         <span>Ubicación</span>
     </button>
+    <button
+        id="btnBarraFoto"
+        class="toolbar-action party-only"
+        type="button"
+        aria-label="Abrir cámara de fotos"
+        title="Cámara"
+        hidden
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7.5h3l1.5-2h7L17 7.5h3v11H4z"></path>
+            <circle cx="12" cy="13" r="3.5"></circle>
+        </svg>
+        <span>Cámara</span>
+    </button>
+
+    <button
+        id="btnBarraVideo"
+        class="toolbar-action party-only"
+        type="button"
+        aria-label="Abrir cámara de video"
+        title="Filmadora"
+        hidden
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7.5h10.5A1.5 1.5 0 0 1 16 9v6a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 15V9A1.5 1.5 0 0 1 4 7.5z"></path>
+            <path d="m16 10 5-2.5v9L16 14z"></path>
+        </svg>
+        <span>Filmadora</span>
+    </button>
+
+    <button
+        id="btnBarraSubir"
+        class="toolbar-action party-only"
+        type="button"
+        aria-label="Subir fotos y videos"
+        title="Subir archivo"
+        hidden
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 16V4"></path>
+            <path d="m7 9 5-5 5 5"></path>
+            <path d="M5 20h14"></path>
+        </svg>
+        <span>Subir archivo</span>
+    </button>
+
 
     <button
         id="btnBarraRegalo"
-        class="toolbar-regalo"
+        class="toolbar-regalo party-only"
         type="button"
         aria-label="Regalo"
         title="Regalo"
+        hidden
     >
         <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M20 12v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8"></path>
@@ -1519,17 +1690,32 @@ audio {
         id="btnBarraFAQ"
         class="toolbar-faq"
         type="button"
-        aria-label="Preguntas frecuentes"
-        title="Preguntas frecuentes"
+        aria-label="Información"
+        title="Información"
     >
         <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="9"></circle>
             <path d="M9.7 9a2.5 2.5 0 1 1 4.1 1.9c-1 .8-1.8 1.2-1.8 2.6"></path>
             <path d="M12 17h.01"></path>
         </svg>
-        <span>Preguntas</span>
+        <span>Información</span>
     </button>
 
+    <button
+        id="btnBarraGaleria"
+        class="toolbar-action party-only"
+        type="button"
+        aria-label="Ver fotos y videos de los invitados"
+        title="Galería de invitados"
+        hidden
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+            <circle cx="8.5" cy="9" r="1.5"></circle>
+            <path d="m4.5 17 4.5-4 3.2 2.7 2.4-2.2 4.9 4.5"></path>
+        </svg>
+        <span>Galería</span>
+    </button>
 
     <button
         id="btnBarraMusica"
@@ -1558,6 +1744,14 @@ audio {
 <section class="hero">
 
     <div class="hero-overlay"></div>
+
+    <div class="hero-sparkles" aria-hidden="true">
+        <span class="hero-sparkle"></span>
+        <span class="hero-sparkle"></span>
+        <span class="hero-sparkle"></span>
+        <span class="hero-sparkle"></span>
+        <span class="hero-sparkle"></span>
+    </div>
 
     <div class="hero-content text-white">
 
@@ -1983,6 +2177,17 @@ audio {
             >
 
                 <button
+                    id="btnCivil"
+                    type="button"
+                    class="rsvp-choice rsvp-yes"
+                    aria-pressed="false"
+                >
+                    <span class="rsvp-choice-icon" aria-hidden="true">💍</span>
+                    <span class="rsvp-choice-title">Civil</span>
+                    <span class="rsvp-choice-subtitle">Ceremonia</span>
+                </button>
+
+                <button
                     id="btnConferencia"
                     type="button"
                     class="rsvp-choice rsvp-yes"
@@ -2004,24 +2209,13 @@ audio {
                     <span id="fiestaSubtitle" class="rsvp-choice-subtitle">Después de la conferencia</span>
                 </button>
 
-                <button
-                    id="btnNoAsistire"
-                    type="button"
-                    class="rsvp-choice rsvp-no"
-                    aria-pressed="false"
-                >
-                    <span class="rsvp-choice-icon" aria-hidden="true">×</span>
-                    <span class="rsvp-choice-title">No podré asistir</span>
-                    <span class="rsvp-choice-subtitle">Gracias por avisar</span>
-                </button>
-
             </div>
 
             <p
                 id="rsvpAyuda"
                 class="text-center text-xs text-gray-500 mt-4"
             >
-                Podés confirmar conferencia, fiesta o ambas.
+                Podés confirmar civil, conferencia, fiesta o varias opciones.
             </p>
 
             <input
@@ -2057,29 +2251,24 @@ audio {
 
 
 
-        <!-- ACOMPAÑANTES -->
+<!-- INFORMACIÓN ADICIONAL -->
 
-        <div
-            id="acompanantesWrap"
-            class="mt-5 hidden"
-        >
+<div
+    id="acompanantesWrap"
+    class="mt-5 hidden"
+>
+    <label
+        class="block text-sm font-medium mb-2"
+        for="observacionesInvitado"
+    >
+        Información adicional
+    </label>
 
-            <label
-                class="block text-sm font-medium mb-2"
-                for="acompanantes"
-            >
-                Nombres de acompañantes (opcional)
-            </label>
-
-            <textarea
-                id="acompanantes"
-                rows="3"
-                class="w-full rounded-xl border border-stone-300 p-3 bg-white"
-                placeholder="Ej.: María, Pedro…"
-            ></textarea>
-
-        </div>
-
+    <p
+        id="observacionesInvitado"
+        class="w-full rounded-xl border border-stone-300 p-3 bg-stone-50 text-sm text-stone-600 whitespace-pre-line"
+    ></p>
+</div>
 
 
         <!-- ENVIAR -->
@@ -2122,6 +2311,19 @@ audio {
             class="text-gray-600 mt-3"
         ></p>
 
+        <div
+            id="rsvpGraciasDatos"
+            class="text-sm text-gray-600 mt-4 whitespace-pre-line"
+        ></div>
+
+        <button
+            id="btnActualizarRSVP"
+            type="button"
+            class="btn bg-stone-700 text-white w-full mt-5"
+        >
+            Actualizar
+        </button>
+
     </div>
 
 
@@ -2152,19 +2354,77 @@ audio {
 
     <div class="decorative-line"></div>
 
-    <div class="max-w-xl mx-auto mt-8 text-left">
+    <div class="max-w-3xl mx-auto mt-8 text-left space-y-3">
 
-        <div class="rounded-2xl bg-stone-100 p-5">
+        <details class="faq-item" open>
+            <summary>¿Cuándo y dónde es la ceremonia?</summary>
+            <div class="faq-answer">
+                La ceremonia civil será el viernes 27 de noviembre a las 11:00 hs. Podés encontrar el punto GPS en la sección Agenda o desde el botón Ubicación.
+            </div>
+        </details>
 
-            <h3 class="text-lg font-medium">
-                ¿Cuál es la vestimenta?
-            </h3>
+        <details class="faq-item">
+            <summary>¿Cómo confirmo mi asistencia?</summary>
+            <div class="faq-answer">
+                Podés hacerlo desde esta misma invitación, en la sección Confirmación.
+            </div>
+        </details>
 
-            <p class="text-gray-600 mt-2 leading-relaxed">
-                Vestimenta formal.
-            </p>
+        <details class="faq-item">
+            <summary>¿Hasta cuándo puedo confirmar?</summary>
+            <div class="faq-answer">
+                Por favor, confirmá tu asistencia antes del sábado 7 de noviembre.
+            </div>
+        </details>
 
-        </div>
+        <details class="faq-item">
+            <summary>¿Qué debo vestir?</summary>
+            <div class="faq-answer">
+                Te pedimos que asistas con vestimenta formal para todos los eventos.
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿Cómo llego al lugar?</summary>
+            <div class="faq-answer">
+                Podés usar el punto GPS que aparece en cada evento desde la opción Ubicación.
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿Hay estacionamiento o traslado?</summary>
+            <div class="faq-answer">
+                No hay estacionamiento en el lugar ni arreglos de traslados.
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿Puedo traer acompañante?</summary>
+            <div class="faq-answer">
+                Por favor, solo deben asistir la cantidad de personas indicadas en la invitación, ya que la capacidad es reducida.
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿Hay comida especial o restricciones?</summary>
+            <div class="faq-answer">
+                Se servirá una comida sencilla, sin bebidas alcohólicas.
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿La fiesta es en el mismo lugar?</summary>
+            <div class="faq-answer">
+                Sí, la fiesta será en el mismo lugar, pero en diferentes días. Podés encontrar más información en la sección Agenda.
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿Hay lista de regalos o se puede contribuir de otra manera?</summary>
+            <div class="faq-answer">
+                No hay lista de regalos. Si deseas hacer un obsequio económico, podés hacerlo con la información suministrada en la opción Regalo de la barra de opciones.
+            </div>
+        </details>
 
     </div>
 
@@ -2251,6 +2511,63 @@ audio {
 
 
 
+<!-- =====================================================
+     COMPARTIR FOTOS Y VIDEOS
+====================================================== -->
+
+<section id="recuerdosCompartidos" class="party-only hidden py-16 bg-stone-100 text-center px-6" hidden>
+
+    <h2 class="section-title uppercase text-sm mb-3">
+        Compartí tus recuerdos
+    </h2>
+
+    <div class="decorative-line"></div>
+
+    <h3 class="title-font text-5xl mt-5">
+        📸 Fotos y videos
+    </h3>
+
+    <p class="text-gray-600 max-w-md mx-auto mt-5 mb-7">
+        ¿Sacaste una foto o un video durante nuestra boda?
+        ¡Compartilo con nosotros!
+    </p>
+
+<div class="flex flex-col items-center gap-3 w-full max-w-md mx-auto">
+
+    <button
+        id="btnFotos"
+        type="button"
+        class="btn bg-stone-700 text-white text-base shadow-lg w-full"
+    >
+        📷 Compartir fotos y videos
+    </button>
+
+    <button
+        id="btnGrabarVideo"
+        type="button"
+        class="btn bg-stone-700 text-white text-base shadow-lg w-full"
+    >
+        🎥 Grabar video
+    </button>
+
+    <button
+        id="btnSubirGaleriaCelular"
+        type="button"
+        class="btn bg-stone-700 text-white text-base shadow-lg w-full"
+        style="display:block !important; visibility:visible !important; opacity:1 !important;"
+    >
+        🖼️ Subir fotos y videos del celular
+    </button>
+
+    <input
+        id="inputGaleriaCelular"
+        type="file"
+        accept="image/*,video/*"
+        multiple
+        class="hidden"
+    >
+
+</div>
 
 <!-- =====================================================
      VISOR DE GALERÍA A PANTALLA COMPLETA
@@ -2343,6 +2660,50 @@ audio {
     </div>
 </div>
 </section>
+
+    <!-- =====================================================
+         GALERÍA EN VIVO
+    ====================================================== -->
+
+    <section id="galeriaInvitados" class="party-only hidden py-16 bg-white text-center px-6" hidden>
+
+        <h2 class="section-title uppercase text-sm mb-3">
+            Recuerdos compartidos
+        </h2>
+
+        <div class="decorative-line"></div>
+
+        <h3 class="title-font text-5xl mt-5">
+            📷 Nuestra galería
+        </h3>
+
+        <p class="text-gray-600 max-w-md mx-auto mt-5 mb-6">
+            Las fotos y videos que compartan nuestros invitados
+            aparecerán aquí automáticamente.
+        </p>
+
+        <div id="galleryStatus" class="gallery-status">
+            Cargando recuerdos...
+        </div>
+
+        <button
+            id="btnActualizarGaleria"
+            type="button"
+            class="gallery-refresh"
+        >
+            ↻ Actualizar galería
+        </button>
+
+        <div
+            id="galeria"
+            class="gallery-grid mt-6"
+        >
+            <div class="gallery-empty">
+                Cargando fotos y videos...
+            </div>
+        </div>
+
+    </section>
 
     
 
@@ -2519,6 +2880,41 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
         "/video/list/" +
         GALERIA_TAG +
         ".json";
+
+    const MEDIA_API_URL =
+        "https://script.google.com/macros/s/AKfycby80WR98QzVdQk9SrVOuZ_AiA42rKROIT-ZjkMXLfEt4usPjbZ585kD5DcS_Zns2M8Y/exec";
+
+    function obtenerMultimediaJsonp() {
+        return new Promise(function(resolve, reject) {
+            const callbackName = "galeriaMedia_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+            const script = document.createElement("script");
+            const timer = setTimeout(function() {
+                finalizar(new Error("No se pudo consultar la galería."));
+            }, 20000);
+
+            function finalizar(error, data) {
+                clearTimeout(timer);
+                delete window[callbackName];
+                script.remove();
+                if (error) reject(error);
+                else resolve(data);
+            }
+
+            window[callbackName] = function(data) {
+                if (!data || data.success === false) {
+                    finalizar(new Error(data && data.error || "No se pudo cargar la galería."));
+                    return;
+                }
+                finalizar(null, data);
+            };
+
+            script.onerror = function() {
+                finalizar(new Error("No se pudo conectar con el servicio de galería."));
+            };
+            script.src = MEDIA_API_URL + "?action=media_list&callback=" + encodeURIComponent(callbackName);
+            document.head.appendChild(script);
+        });
+    }
 
 
     function crearUrlCloudinary(recurso) {
@@ -2736,7 +3132,6 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
 
             }
 
-
             galeria.appendChild(item);
 
         });
@@ -2757,54 +3152,6 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
     }
 
 
-    async function obtenerLista(url, tipo) {
-
-        try {
-
-            const respuesta =
-                await fetch(
-                    url +
-                    "?v=" +
-                    Math.floor(
-                        Date.now() / 60000
-                    )
-                );
-
-
-            if (!respuesta.ok) {
-                return [];
-            }
-
-
-            const datos =
-                await respuesta.json();
-
-
-            return (datos.resources || []).map(
-                function(recurso) {
-
-                    return {
-                        ...recurso,
-                        resource_type: tipo
-                    };
-
-                }
-            );
-
-        } catch (error) {
-
-            console.error(
-                "No se pudo cargar la lista:",
-                error
-            );
-
-            return [];
-
-        }
-
-    }
-
-
     async function cargarGaleria() {
 
         const estado =
@@ -2816,21 +3163,13 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
         }
 
 
-        const resultados =
-            await Promise.all([
-                obtenerLista(
-                    URL_LISTA_IMAGENES,
-                    "image"
-                ),
-                obtenerLista(
-                    URL_LISTA_VIDEOS,
-                    "video"
-                )
-            ]);
-
-
-        const recursos =
-            resultados[0].concat(resultados[1]);
+        let recursos = [];
+        try {
+            const datos = await obtenerMultimediaJsonp();
+            recursos = datos.resources || [];
+        } catch (error) {
+            console.error("No se pudo cargar la lista:", error);
+        }
 
 
         // Más recientes primero
@@ -3303,21 +3642,17 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
         }
     }
 
-    if (btnFotos) {
-        btnFotos.addEventListener("click", function() {
-            if (esCelular) {
-                abrirCamara("foto");
-            } else if (widgetCloudinary && typeof widgetCloudinary.open === "function") {
-                widgetCloudinary.open();
-            }
-        });
-    }
+    btnFotos?.addEventListener("click", function() {
+        if (esCelular) {
+            abrirCamara("foto");
+        } else {
+            widgetCloudinary.open();
+        }
+    });
 
-    if (btnGrabarVideo) {
-        btnGrabarVideo.addEventListener("click", function() {
-            abrirCamara("video");
-        });
-    }
+    btnGrabarVideo?.addEventListener("click", function() {
+        abrirCamara("video");
+    });
 
     // La botonera superior reutiliza exactamente las funciones de cámara existentes.
     const btnBarraFoto = document.getElementById("btnBarraFoto");
@@ -3348,7 +3683,6 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
     const inputGaleriaCelular = document.getElementById("inputGaleriaCelular");
 
     btnSubirGaleriaCelular?.addEventListener("click", function() {
-        if (!inputGaleriaCelular) return;
         inputGaleriaCelular.value = "";
         inputGaleriaCelular.click();
     });
@@ -3361,7 +3695,7 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
         });
     }
 
-    inputGaleriaCelular?.addEventListener("change", async function() {
+    inputGaleriaCelular.addEventListener("change", async function() {
         const archivos = Array.from(inputGaleriaCelular.files || []);
         if (!archivos.length) return;
 
@@ -3399,6 +3733,72 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
 </script>
 
 <script>
+
+
+/* =====================================================
+   CARRUSEL DE FOTOS SELECCIONADAS
+====================================================== */
+
+(function() {
+    const track = document.getElementById('carouselTrack');
+    const dots = document.getElementById('carouselDots');
+    const previous = document.getElementById('carouselPrev');
+    const next = document.getElementById('carouselNext');
+    const empty = document.getElementById('carouselEmpty');
+
+    if (!track || !dots) return;
+
+    const fotos = [
+        'assets/carrucel1.jpg',
+        'assets/carrucel2.jpg',
+        'assets/carrucel3.jpg',
+        'assets/carrucel4.jpg'
+    ];
+    let indice = 0;
+
+    function mostrarFoto(nuevoIndice) {
+        indice = (nuevoIndice + fotos.length) % fotos.length;
+        track.style.transform = `translateX(-${indice * 100}%)`;
+        dots.querySelectorAll('.carousel-dot').forEach((dot, dotIndex) => {
+            dot.classList.toggle('active', dotIndex === indice);
+            dot.setAttribute('aria-current', dotIndex === indice ? 'true' : 'false');
+        });
+    }
+
+    fotos.forEach((src, fotoIndex) => {
+        const slide = document.createElement('div');
+        slide.className = 'carousel-slide';
+
+        const imagen = document.createElement('img');
+        imagen.src = src;
+        imagen.alt = `Foto de Eunice y David ${fotoIndex + 1}`;
+        imagen.loading = fotoIndex === 0 ? 'eager' : 'lazy';
+        imagen.addEventListener('error', () => {
+            slide.remove();
+            const dot = dots.querySelector(`[data-slide="${fotoIndex}"]`);
+            dot?.remove();
+            if (!track.children.length) {
+                empty.style.display = 'block';
+                previous.style.display = 'none';
+                next.style.display = 'none';
+            }
+        });
+        slide.appendChild(imagen);
+        track.appendChild(slide);
+
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'carousel-dot';
+        dot.dataset.slide = String(fotoIndex);
+        dot.setAttribute('aria-label', `Mostrar foto ${fotoIndex + 1}`);
+        dot.addEventListener('click', () => mostrarFoto(fotoIndex));
+        dots.appendChild(dot);
+    });
+
+    previous?.addEventListener('click', () => mostrarFoto(indice - 1));
+    next?.addEventListener('click', () => mostrarFoto(indice + 1));
+    mostrarFoto(0);
+})();
 
 
 /* =====================================================
@@ -3595,717 +3995,492 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
 
 
     /* =================================================
-       RSVP
+       INVITACIÓN PERSONALIZADA + RSVP GOOGLE APPS SCRIPT
+
+       Sin ?t=TOKEN:
+         - invitación pública
+         - solamente Civil
+         - sin Fiesta ni multimedia
+
+       Con ?t=TOKEN:
+         - consulta action=get en Google Apps Script
+         - personaliza nombre y cantidadPermitida
+         - invitadoCeremonia = SI -> Civil + Conferencia
+         - invitadoFiesta = SI -> Fiesta + multimedia
+         - ambas = todos los eventos correspondientes
+
+       El enlace se genera desde el Admin como:
+         https://.../Euni/?t=TOKEN
     ================================================= */
 
-    const publicCode =
-        (new URLSearchParams(location.search).get('i') || '').trim().toUpperCase();
+    const API_URL =
+        "https://script.google.com/macros/s/AKfycby80WR98QzVdQk9SrVOuZ_AiA42rKROIT-ZjkMXLfEt4usPjbZ585kD5DcS_Zns2M8Y/exec";
 
-    // 0 = conferencia solamente | 1 = conferencia + fiesta.
-    const partyFromCode = /^[A-F0-9]{7}1$/.test(publicCode);
-    const code = publicCode;
+    const SITE_TOKEN =
+        (new URLSearchParams(window.location.search).get('t') || '').trim();
 
+    const $ = id => document.getElementById(id);
 
-    const $ =
-        id => document.getElementById(id);
+    const form = $('formRSVP');
+    const load = $('rsvpCargando');
+    const err = $('rsvpError');
+    const thanks = $('rsvpGracias');
+    const attendance = $('asistencia');
+    const quantity = $('cantidad');
+    const qw = $('cantidadWrap');
+    const cw = $('acompanantesWrap');
+    const observations = $('observacionesInvitado');
+    const state = $('rsvpEstado');
+    const send = $('btnEnviarRSVP');
+    const updateRsvpButton = $('btnActualizarRSVP');
+    const section = $('confirmacion');
+    const btnCivil = $('btnCivil');
+    const btnConference = $('btnConferencia');
+    const btnParty = $('btnFiesta');
+    const rsvpHelp = $('rsvpAyuda');
 
+    let guest = null;
+    let invitadoCeremonia = false;
+    let invitadoFiesta = false;
+    let cantidadPermitida = 1;
+    let observacionesInvitado = '';
 
-    const form =
-        $('formRSVP');
-
-
-    const load =
-        $('rsvpCargando');
-
-
-    const err =
-        $('rsvpError');
-
-
-    const thanks =
-        $('rsvpGracias');
-
-
-    const attendance =
-        $('asistencia');
-
-
-    const quantity =
-        $('cantidad');
-
-
-    const qw =
-        $('cantidadWrap');
-
-
-    const cw =
-        $('acompanantesWrap');
-
-
-    const companions =
-        $('acompanantes');
-
-
-    const state =
-        $('rsvpEstado');
-
-
-    const send =
-        $('btnEnviarRSVP');
-
-
-    const section =
-        $('confirmacion');
-
-
-    const btnConference =
-        $('btnConferencia');
-
-
-    const btnParty =
-        $('btnFiesta');
-
-
-    const btnNo =
-        $('btnNoAsistire');
-
-
-    const rsvpHelp =
-        $('rsvpAyuda');
-
-
-    let guest;
-
-
-    function fail(m){
-
-        load.classList.add('hidden');
-        form.classList.add('hidden');
-        err.textContent = m;
-        err.classList.remove('hidden');
-
-    }
-
-
-    function selectedEvents(){
-
-        const conference =
-            btnConference.classList.contains('selected');
-
-        const party =
-            btnParty.classList.contains('selected');
-
-        return {
-            conference,
-            party
-        };
-
-    }
-
-
-    function updateAttendanceValue(){
-
-        if (btnNo.classList.contains('selected')) {
-            attendance.value = 'no';
-            return;
+    function fail(m) {
+        if (load) load.classList.add('hidden');
+        if (form) form.classList.add('hidden');
+        if (err) {
+            err.textContent = m;
+            err.classList.remove('hidden');
         }
+    }
+
+    function apiUrl(action, params = {}) {
+        const url = new URL(API_URL);
+        url.searchParams.set('action', action);
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                url.searchParams.set(key, String(value));
+            }
+        });
+        return url.toString();
+    }
+
+    async function apiGet(action, params = {}) {
+        const response = await fetch(apiUrl(action, params), {
+            method: 'GET',
+            cache: 'no-store'
+        });
+
+        let data = null;
+        try {
+            data = await response.json();
+        } catch {
+            throw new Error(`La respuesta de Google no es un JSON válido (HTTP ${response.status}).`);
+        }
+
+        if (!response.ok) {
+            throw new Error(data?.error || `HTTP ${response.status}`);
+        }
+
+        if (data && data.success === false) {
+            throw new Error(data.error || 'Google Apps Script informó un error.');
+        }
+
+        return data;
+    }
+
+    function normalizarSiNo(valor) {
+        if (typeof valor === 'boolean') return valor;
+        return String(valor ?? '').trim().toUpperCase() === 'SI';
+    }
+
+    function obtenerInvitado(data) {
+        if (!data) return null;
+        if (data.invitado && typeof data.invitado === 'object') return data.invitado;
+        if (data.guest && typeof data.guest === 'object') return data.guest;
+        if (Array.isArray(data.invitados)) return data.invitados[0] || null;
+        if (Array.isArray(data.data)) return data.data[0] || null;
+        if (typeof data === 'object' && (data.token || data.nombre || data.cantidadPermitida !== undefined)) return data;
+        return null;
+    }
+
+    function llenarCantidad() {
+        if (!quantity) return;
+        quantity.innerHTML = '';
+        for (let n = 1; n <= cantidadPermitida; n++) {
+            const option = document.createElement('option');
+            option.value = String(n);
+            option.textContent = n === 1 ? '1 persona' : `${n} personas`;
+            quantity.appendChild(option);
+        }
+    }
+
+    function aplicarPermisosVisuales() {
+        // Todas las tarjetas de agenda: Civil, Conferencia y Fiesta.
+        const cards = document.querySelectorAll('#ubicacion article');
+        const civilCard = cards[0] || null;
+        const conferenceCard = cards[1] || null;
+        const partyCard = $('eventoFiesta');
+
+        // El Civil y su ubicación están disponibles para todos los invitados.
+        ocultar(civilCard, false);
+        ocultar(conferenceCard, SITE_TOKEN ? !invitadoCeremonia : true);
+        ocultar(partyCard, !SITE_TOKEN || !invitadoFiesta);
+
+        // Todo lo marcado party-only incluye multimedia y controles de cámara.
+        document.querySelectorAll('.party-only').forEach(el => {
+            const visible = Boolean(SITE_TOKEN && invitadoFiesta);
+            el.hidden = !visible;
+            el.classList.toggle('hidden', !visible);
+        });
+
+        // La botonera de ubicación solamente se muestra si existe al menos un evento
+        // con ubicación visible. Sin token queda disponible para llevar al Civil.
+        const locationButton = $('btnBarraUbicacion');
+        if (locationButton) locationButton.style.display = '';
+
+        // Confirmación siempre visible; el formulario decide qué eventos puede seleccionar.
+        const confirmButton = $('btnBarraConfirmar');
+        if (confirmButton) confirmButton.style.display = '';
+    }
+
+    function ocultar(el, oculto) {
+        if (!el) return;
+        el.hidden = Boolean(oculto);
+        el.classList.toggle('hidden', Boolean(oculto));
+    }
+
+    function selectedEvents() {
+        return {
+            civil: btnCivil?.classList.contains('selected') || false,
+            conference: btnConference?.classList.contains('selected') || false,
+            party: btnParty?.classList.contains('selected') || false
+        };
+    }
+
+    function updateAttendanceValue() {
+        if (!attendance) return;
 
         const events = selectedEvents();
-
-        if (events.conference && events.party) {
-            attendance.value = 'ambos';
-        } else if (events.conference) {
-            attendance.value = 'conferencia';
-        } else if (events.party) {
-            attendance.value = 'fiesta';
-        } else {
-            attendance.value = '';
-        }
-
+        if (events.civil && events.conference && events.party) attendance.value = 'civil_conferencia_fiesta';
+        else if (events.civil && events.conference) attendance.value = 'civil_conferencia';
+        else if (events.civil && events.party) attendance.value = 'civil_fiesta';
+        else if (events.conference && events.party) attendance.value = 'ambos';
+        else if (events.civil) attendance.value = 'civil';
+        else if (events.conference) attendance.value = 'conferencia';
+        else if (events.party) attendance.value = 'fiesta';
+        else attendance.value = '';
     }
 
+    function updateRsvpUI() {
+        if (!btnCivil || !btnConference || !btnParty) return;
 
-    function updateRsvpUI(){
+        const events = selectedEvents();
+        const canCivil = true;
+        const canConference = invitadoCeremonia;
+        const canParty = invitadoFiesta;
 
-        const no =
-            btnNo.classList.contains('selected');
+        btnCivil.disabled = !canCivil;
+        btnConference.disabled = !canConference;
+        btnParty.disabled = !canParty;
 
-        const events =
-            selectedEvents();
+        btnCivil.classList.toggle('disabled', !canCivil);
+        btnConference.classList.toggle('disabled', !canConference);
+        btnParty.classList.toggle('disabled', !canParty);
 
-        btnConference.disabled = no;
-        btnParty.disabled = no || !partyFromCode;
+        btnCivil.setAttribute('aria-pressed', String(events.civil));
+        btnConference.setAttribute('aria-pressed', String(events.conference));
+        btnParty.setAttribute('aria-pressed', String(events.party));
 
-        btnConference.classList.toggle(
-            'disabled',
-            no
-        );
+        const hayEvento = events.civil || events.conference || events.party;
+        if (qw) qw.classList.toggle('hidden', !hayEvento);
+       if (cw) {
+                    cw.classList.toggle(
+                        'hidden',
+                        !hayEvento || !observacionesInvitado
+                    );
+                }
+        if (quantity) quantity.required = hayEvento;
 
-        btnParty.classList.toggle(
-            'disabled',
-            no || !partyFromCode
-        );
-
-        btnConference.setAttribute(
-            'aria-pressed',
-            String(events.conference)
-        );
-
-        btnParty.setAttribute(
-            'aria-pressed',
-            String(events.party)
-        );
-
-        btnNo.setAttribute(
-            'aria-pressed',
-            String(no)
-        );
-
-        qw.classList.toggle(
-            'hidden',
-            !events.conference && !events.party
-        );
-
-        cw.classList.toggle(
-            'hidden',
-            !events.conference && !events.party
-        );
-
-        quantity.required =
-            events.conference || events.party;
-
-        if (no) {
-            rsvpHelp.textContent =
-                'Al confirmar que no podrás asistir, se desactivan los demás eventos.';
-        } else if (events.conference && events.party) {
-            rsvpHelp.textContent =
-                'Confirmaste conferencia y fiesta.';
-        } else if (events.conference) {
-            rsvpHelp.textContent =
-                'Confirmaste tu asistencia a la conferencia.';
-        } else if (events.party) {
-            rsvpHelp.textContent =
-                'Confirmaste tu asistencia a la fiesta.';
-        } else {
-            rsvpHelp.textContent =
-                'Podés confirmar uno o ambos eventos.';
+        if (rsvpHelp) {
+            if (events.civil && events.conference && events.party) rsvpHelp.textContent = 'Confirmaste civil, conferencia y fiesta.';
+            else if (events.civil && events.conference) rsvpHelp.textContent = 'Confirmaste civil y conferencia.';
+            else if (events.civil && events.party) rsvpHelp.textContent = 'Confirmaste civil y fiesta.';
+            else if (events.conference && events.party) rsvpHelp.textContent = 'Confirmaste conferencia y fiesta.';
+            else if (events.civil) rsvpHelp.textContent = 'Confirmaste tu asistencia al civil.';
+            else if (events.conference) rsvpHelp.textContent = 'Confirmaste tu asistencia a la conferencia.';
+            else if (events.party) rsvpHelp.textContent = 'Confirmaste tu asistencia a la fiesta.';
+            else if (invitadoCeremonia && invitadoFiesta) rsvpHelp.textContent = 'Podés confirmar conferencia, fiesta o ambas.';
+            else if (invitadoCeremonia) rsvpHelp.textContent = 'Podés confirmar tu asistencia a la conferencia.';
+            else if (invitadoFiesta) rsvpHelp.textContent = 'Podés confirmar tu asistencia a la fiesta.';
+            else rsvpHelp.textContent = 'Esta invitación no tiene eventos personalizados cargados.';
         }
 
         updateAttendanceValue();
-
     }
 
+    function mostrarConfirmacion(g) {
+        form?.classList.add('hidden');
+        thanks?.classList.remove('hidden');
 
-    function elegirEvento(evento){
+        const texto = $('rsvpGraciasTexto');
+        if (texto) texto.textContent = 'Ya tenés tu confirmación guardada. Podés actualizarla si querés.';
 
-        if (btnNo.classList.contains('selected')) {
-            btnNo.classList.remove('selected');
+        const datos = $('rsvpGraciasDatos');
+        if (datos) {
+            const eventos = [];
+            if (normalizarSiNo(g.confirmoCivil)) eventos.push('Civil');
+            if (normalizarSiNo(g.confirmoCeremonia)) eventos.push('Conferencia');
+            if (normalizarSiNo(g.confirmoFiesta)) eventos.push('Fiesta');
+            datos.textContent = [
+                `Eventos: ${eventos.length ? eventos.join(', ') : 'Sin eventos seleccionados'}`,
+                `Personas: ${Number(g.cantidadConfirmada) || 0}`,
+                g.fechaConfirmacion ? `Fecha: ${new Date(g.fechaConfirmacion).toLocaleString('es-AR')}` : ''
+            ].filter(Boolean).join('\n');
         }
+    }
 
-        if (evento === 'conferencia') {
+    function activarEdicionRSVP() {
+        thanks?.classList.add('hidden');
+        form?.classList.remove('hidden');
+        send.textContent = 'Confirmar asistencia';
+        state.textContent = '';
+        updateRsvpUI();
+    }
+
+    updateRsvpButton?.addEventListener('click', activarEdicionRSVP);
+
+    function elegirEvento(evento) {
+        if (evento === 'civil') {
+            btnCivil.classList.toggle('selected');
+        }
+        if (evento === 'conferencia' && invitadoCeremonia) {
             btnConference.classList.toggle('selected');
         }
-
-        if (evento === 'fiesta' && partyFromCode) {
+        if (evento === 'fiesta' && invitadoFiesta) {
             btnParty.classList.toggle('selected');
         }
 
         updateRsvpUI();
-        state.textContent = '';
-
+        if (state) state.textContent = '';
     }
 
-
-    function elegirNo(){
-
-        btnNo.classList.toggle('selected');
-
-        if (btnNo.classList.contains('selected')) {
-            btnConference.classList.remove('selected');
-            btnParty.classList.remove('selected');
-        }
-
-        updateRsvpUI();
-        state.textContent = '';
-
-    }
-
-
-    btnConference.addEventListener(
-        'click',
-        () => elegirEvento('conferencia')
-    );
-
-
-    btnParty.addEventListener(
-        'click',
-        () => elegirEvento('fiesta')
-    );
-
-
-    btnNo.addEventListener(
-        'click',
-        elegirNo
-    );
-
+    btnCivil?.addEventListener('click', () => elegirEvento('civil'));
+    btnConference?.addEventListener('click', () => elegirEvento('conferencia'));
+    btnParty?.addEventListener('click', () => elegirEvento('fiesta'));
 
     /* =================================================
-       ENVÍO RSVP
+       ENVÍO RSVP -> GOOGLE APPS SCRIPT POR GET
     ================================================= */
-
-    form.addEventListener(
-        'submit',
-        async e => {
-
-            e.preventDefault();
-
-            updateAttendanceValue();
-
-            if (!guest || !attendance.value) {
-                state.textContent =
-                    'Seleccioná conferencia, fiesta o no podré asistir.';
-                return;
-            }
-
-            const cantidad =
-                Number(quantity.value || 0);
-
-            if (
-                attendance.value !== 'no' &&
-                (!Number.isInteger(cantidad) || cantidad < 1)
-            ) {
-                state.textContent =
-                    'Seleccioná la cantidad de personas.';
-                return;
-            }
-
-            send.disabled = true;
-            state.textContent =
-                'Guardando confirmación…';
-
-            try {
-
-                const r =
-                    await fetch(
-                        window.API.rsvp,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type':
-                                    'application/json'
-                            },
-                            body: JSON.stringify({
-                                codigo:
-                                    guest.codigo,
-                                asistencia:
-                                    attendance.value,
-                                cantidad:
-                                    attendance.value === 'no'
-                                        ? 0
-                                        : cantidad,
-                                acompanantes:
-                                    attendance.value === 'no'
-                                        ? ''
-                                        : companions.value.trim()
-                            })
-                        }
-                    );
-
-                const d =
-                    await r.json();
-
-                if (!r.ok) {
-                    throw Error(
-                        d.error ||
-                        'No pudimos guardar la confirmación.'
-                    );
-                }
-
-                form.classList.add('hidden');
-                thanks.classList.remove('hidden');
-
-                if (attendance.value === 'ambos') {
-                    $('rsvpGraciasTexto').textContent =
-                        `Registramos ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la conferencia y la fiesta. ¡Nos vemos!`;
-                } else if (attendance.value === 'conferencia') {
-                    $('rsvpGraciasTexto').textContent =
-                        `Registramos ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la conferencia. ¡Nos vemos!`;
-                } else if (attendance.value === 'fiesta') {
-                    $('rsvpGraciasTexto').textContent =
-                        `Registramos ${cantidad} ${cantidad === 1 ? 'persona' : 'personas'} para la fiesta. ¡Nos vemos!`;
-                } else {
-                    $('rsvpGraciasTexto').textContent =
-                        'Registramos que no podrás acompañarnos. Gracias por avisarnos.';
-                }
-
-            } catch (e) {
-
-                state.textContent =
-                    e.message;
-
-                send.disabled = false;
-
-            }
-
-        }
-    );
-
-
-    /* =================================================
-       RENDER INVITADO
-    ================================================= */
-
-    function render(g){
-
-        guest = g;
-
-        load.classList.add('hidden');
-        form.classList.remove('hidden');
-
-        $('nombreInvitado').textContent =
-            g.nombre;
-
-        $('lugaresInvitado').textContent =
-            `${g.lugares} ${
-                g.lugares === 1
-                    ? 'lugar reservado'
-                    : 'lugares reservados'
-            }`;
-
-        $('saludoInvitado').textContent =
-            `¿Nos acompañás, ${g.nombre}?`;
-
-        quantity.innerHTML = '';
-
-        for (
-            let n = 1;
-            n <= g.lugares;
-            n++
-        ){
-
-            const o =
-                document.createElement('option');
-
-            o.value = n;
-
-            o.textContent =
-                n === 1
-                    ? '1 persona'
-                    : `${n} personas`;
-
-            quantity.appendChild(o);
-
-        }
-
-        const partyAllowed = partyFromCode;
-
-        /* El servidor determina si esta invitación incluye la fiesta.
-           Esto evita que alguien pueda modificar el código en el navegador
-           para obtener acceso a un evento que no le corresponde. */
-        document.querySelectorAll('.party-only').forEach(el => {
-            el.hidden = !partyAllowed;
-            el.classList.toggle('hidden', !partyAllowed);
-        });
-
-        btnParty.disabled = !partyAllowed;
-
-        if (!partyAllowed) {
-            btnParty.classList.remove('selected');
-            btnParty.classList.add('disabled');
-            $('fiestaSubtitle').textContent =
-                'No incluida en tu invitación';
-        } else {
-            btnParty.classList.remove('disabled');
-            $('fiestaSubtitle').textContent =
-                'Domingo · 09:00 hs';
-        }
-
-        updateRsvpUI();
-
-        if (
-            g.estado === 'confirmado' ||
-            g.estado === 'no_asiste'
-        ){
-
-            form.classList.add('hidden');
-            thanks.classList.remove('hidden');
-
-            if (g.asistencia_eventos === 'ambos') {
-                $('rsvpGraciasTexto').textContent =
-                    `Ya registramos tu confirmación para la conferencia y la fiesta. ¡Nos vemos!`;
-            } else if (g.asistencia_eventos === 'conferencia') {
-                $('rsvpGraciasTexto').textContent =
-                    `Ya registramos tu confirmación para la conferencia. ¡Nos vemos!`;
-            } else if (g.asistencia_eventos === 'fiesta') {
-                $('rsvpGraciasTexto').textContent =
-                    `Ya registramos tu confirmación para la fiesta. ¡Nos vemos!`;
-            } else {
-                $('rsvpGraciasTexto').textContent =
-                    'Ya registramos que no podrás acompañarnos. Gracias por avisarnos.';
-            }
-
-        }
-
-    }
-
-
-    /* =================================================
-       BOTÓN FLOTANTE → CONFIRMACIÓN
-    ================================================= */
-
-    $('btnBarraConfirmar').addEventListener(
-        'click',
-        () => {
-
-            section.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-
-        }
-    );
-
-
-
-    /* =================================================
-       BOTONERA → UBICACIÓN
-    ================================================= */
-
-    $('btnBarraUbicacion').addEventListener(
-        'click',
-        () => {
-            $('ubicacion').scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    );
-
-
-    /* =================================================
-       BOTONERA → REGALO
-    ================================================= */
-
-    const giftModal =
-        $('giftModal');
-
-    const openGiftModal = () => {
-        giftModal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    };
-
-    const closeGiftModal = () => {
-        giftModal.classList.add('hidden');
-        document.body.style.overflow = '';
-    };
-
-    $('btnBarraRegalo').addEventListener(
-        'click',
-        openGiftModal
-    );
-
-    $('giftModalClose').addEventListener(
-        'click',
-        closeGiftModal
-    );
-
-    $('giftModalX').addEventListener(
-        'click',
-        closeGiftModal
-    );
-
-    giftModal.addEventListener(
-        'click',
-        event => {
-            if (event.target === giftModal) {
-                closeGiftModal();
-            }
-        }
-    );
-
-    document.addEventListener(
-        'keydown',
-        event => {
-            if (event.key === 'Escape' && !giftModal.classList.contains('hidden')) {
-                closeGiftModal();
-            }
-        }
-    );
-
-
-
-    /* =================================================
-       CARRUSEL DE FOTOS
-       Solo JPG.
-
-       NOMBRE EXACTO DE LOS ARCHIVOS:
-       assets/carrucel1.jpg
-       assets/carrucel2.jpg
-       assets/carrucel3.jpg
-       ...
-
-       Se prueba una vez, en orden, y se detiene al encontrar
-       el primer número que no existe.
-    ================================================= */
-    (function initCarousel(){
-        const track = document.getElementById('carouselTrack');
-        const dots = document.getElementById('carouselDots');
-        const prev = document.getElementById('carouselPrev');
-        const next = document.getElementById('carouselNext');
-        const empty = document.getElementById('carouselEmpty');
-        if(!track || !dots) return;
-
-        const valid = [];
-        let current = 0;
-        const carouselSources = [
-            "assets/carrucel1.jpg",
-            "assets/carrucel2.jpg",
-            "assets/carrucel3.jpg",
-            "assets/carrucel4.jpg"
-        ];
-
-        function finish(){
-            if(!valid.length){
-                if(empty) empty.style.display='block';
-                if(prev) prev.style.display='none';
-                if(next) next.style.display='none';
-                return;
-            }
-
-            valid.forEach((src,i)=>{
-                const slide=document.createElement('div');
-                slide.className='carousel-slide';
-
-                const img=document.createElement('img');
-                img.src=src;
-                img.alt=`Foto seleccionada ${i+1}`;
-                img.loading='eager';
-                slide.appendChild(img);
-                track.appendChild(slide);
-
-                const dot=document.createElement('button');
-                dot.type='button';
-                dot.className='carousel-dot'+(i===0?' active':'');
-                dot.setAttribute('aria-label',`Ver foto ${i+1}`);
-                dot.addEventListener('click',()=>go(i));
-                dots.appendChild(dot);
-            });
-
-            update();
-
-            if(valid.length<2){
-                if(prev) prev.style.display='none';
-                if(next) next.style.display='none';
-                dots.style.display='none';
-            }
-        }
-
-        function probeNext(index = 0){
-            if (index >= carouselSources.length) {
-                finish();
-                return;
-            }
-
-            const src = carouselSources[index];
-            const img = new Image();
-
-            img.onload = () => {
-                valid.push(src);
-                probeNext(index + 1);
-            };
-
-            img.onerror = () => {
-                // Un archivo faltante no genera una segunda consulta 404.
-                probeNext(index + 1);
-            };
-
-            img.src = src;
-        }
-
-        function go(index){
-            if(!valid.length) return;
-            current=(index+valid.length)%valid.length;
-            update();
-        }
-
-        function update(){
-            track.style.transform=`translateX(-${current*100}%)`;
-            [...dots.children].forEach((d,i)=>
-                d.classList.toggle('active',i===current)
-            );
-        }
-
-        prev?.addEventListener('click',()=>go(current-1));
-        next?.addEventListener('click',()=>go(current+1));
-
-        let startX=null;
-        track.addEventListener('touchstart',e=>{
-            startX=e.touches[0].clientX;
-        },{passive:true});
-
-        track.addEventListener('touchend',e=>{
-            if(startX===null) return;
-            const dx=e.changedTouches[0].clientX-startX;
-            if(Math.abs(dx)>45) go(current+(dx<0?1:-1));
-            startX=null;
-        },{passive:true});
-
-        probeNext();
-    })();
-
-    /* =================================================
-       BOTONERA → GALERÍA / CARRUSEL
-    ================================================= */
-    const btnBarraGaleria=document.getElementById('btnBarraGaleria');
-    if(btnBarraGaleria){
-        btnBarraGaleria.addEventListener('click',()=>{
-            document.getElementById('galeriaInvitados')?.scrollIntoView({behavior:'smooth',block:'start'});
-        });
-    }
-
-    /* =================================================
-       BOTONERA → PREGUNTAS FRECUENTES
-    ================================================= */
-
-    $('btnBarraFAQ').addEventListener(
-        'click',
-        () => {
-            $('preguntas-frecuentes').scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    );
-
-
-    /* =================================================
-       CARGAR INVITADO DESDE LA DB
-       Esta versión consulta la función guest del mismo servidor
-       para obtener nombre, lugares y estado de la invitación.
-    ================================================= */
-
-
-    if (!/^[A-F0-9]{7}[01]$/.test(publicCode)) {
-        fail(
-            'Esta invitación necesita su enlace personalizado. Pedile a Eunice y David que te reenvíen la invitación.'
-        );
+form?.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const token = SITE_TOKEN;
+    const evento = attendance.value;
+    const cantidad = Number(quantity.value || 1);
+
+    if (!evento) {
+        state.textContent = 'Seleccioná al menos una opción de asistencia.';
         return;
     }
 
-    fetch(
-        `${window.API.guest}?i=${encodeURIComponent(publicCode)}`
-    )
-    .then(async r => {
-        const d = await r.json();
-        if (!r.ok) {
-            throw Error(d.error || 'No encontramos esta invitación.');
+    const confirmoCeremonia =
+        evento === 'ambos' || evento.includes('conferencia') ? 'SI' : 'NO';
+
+    const confirmoFiesta =
+        evento === 'ambos' || evento.includes('fiesta') ? 'SI' : 'NO';
+
+    try {
+        send.disabled = true;
+        send.textContent = 'Enviando...';
+
+        const data = await apiGet('confirm', {
+            token,
+            confirmoCivil:
+                evento.includes('civil') ? 'SI' : 'NO',
+            confirmoCeremonia,
+            confirmoFiesta,
+            cantidadConfirmada:
+                cantidad
+        });
+
+        if (!data.success) {
+            throw new Error(data.error || 'No se pudo confirmar.');
         }
 
-        // La fiesta se decide por el sufijo del enlace en el servidor 2.
-        d.invitado_fiesta = partyFromCode;
-        render(d);
-    })
-    .catch(e => fail(e.message));
+        guest = {
+            ...(guest || {}),
+            confirmoCivil: evento.includes('civil') ? 'SI' : 'NO',
+            confirmoCeremonia: evento.includes('conferencia') ? 'SI' : 'NO',
+            confirmoFiesta: evento.includes('fiesta') ? 'SI' : 'NO',
+            cantidadConfirmada: cantidad,
+            fechaConfirmacion: new Date().toISOString()
+        };
+        mostrarConfirmacion(guest);
+    } catch (error) {
+        console.error(error);
+        state.textContent = error.message || 'No se pudo guardar la confirmación.';
+    } finally {
+        send.disabled = false;
+        send.textContent = 'Confirmar asistencia';
+    }
+});
+
+    /* =================================================
+       MOSTRAR INVITADO DESDE GOOGLE APPS SCRIPT
+    ================================================= */
+    function render(g) {
+        guest = g;
+
+        invitadoCeremonia = normalizarSiNo(g.invitadoCeremonia);
+        invitadoFiesta = normalizarSiNo(g.invitadoFiesta);
+        cantidadPermitida = Math.max(1, Number(g.cantidadPermitida) || 1);
+        observacionesInvitado = String(
+            g.observaciones ?? ''
+        ).trim();
+
+        if (observations) {
+            observations.textContent = observacionesInvitado;
+        }
+        $('nombreInvitado').textContent = g.nombre || 'Invitado';
+        $('lugaresInvitado').textContent =
+            `${cantidadPermitida} ${cantidadPermitida === 1 ? 'lugar reservado' : 'lugares reservados'}`;
+        $('saludoInvitado').textContent =
+            `¿Nos acompañás, ${g.nombre || ''}?`;
+
+        llenarCantidad();
+        aplicarPermisosVisuales();
+
+        btnCivil.classList.toggle('selected', normalizarSiNo(g.confirmoCivil));
+        btnConference.classList.toggle('selected', normalizarSiNo(g.confirmoCeremonia));
+        btnParty.classList.toggle('selected', normalizarSiNo(g.confirmoFiesta));
+        if (g.cantidadConfirmada && quantity) {
+            quantity.value = String(Math.min(Number(g.cantidadConfirmada), cantidadPermitida));
+        }
+        updateRsvpUI();
+
+        const tieneFechaConfirmacion =
+            !!g.fechaConfirmacion &&
+            String(g.fechaConfirmacion).trim() !== '' &&
+            String(g.fechaConfirmacion).trim().toLowerCase() !== 'null';
+
+        // Si Google devuelve una confirmación previa, la mostramos.
+        const yaConfirmado =
+            tieneFechaConfirmacion ||
+            String(g.estado || '').trim().toLowerCase() === 'confirmado' ||
+            String(g.estado || '').trim().toLowerCase() === 'no_asiste' ||
+            normalizarSiNo(g.confirmoCivil) ||
+            normalizarSiNo(g.confirmoCeremonia) ||
+            normalizarSiNo(g.confirmoFiesta) ||
+            Number(g.cantidadConfirmada) > 0 ||
+            (String(g.asistencia || '').trim() !== '' &&
+             String(g.asistencia || '').trim().toLowerCase() !== 'pendiente');
+
+        if (yaConfirmado) {
+            mostrarConfirmacion(g);
+        }
+    }
+
+    async function iniciarInvitacion() {
+        // SIN TOKEN: invitación pública únicamente Civil.
+        if (!SITE_TOKEN) {
+            guest = null;
+            invitadoCeremonia = true;
+            invitadoFiesta = false;
+            cantidadPermitida = 1;
+
+            $('nombreInvitado').textContent = 'Eunice & David';
+            $('lugaresInvitado').textContent = 'Invitación general · Ceremonia civil';
+            $('saludoInvitado').textContent = '¿Nos acompañás?';
+
+            llenarCantidad();
+            aplicarPermisosVisuales();
+            updateRsvpUI();
+
+            load?.classList.add('hidden');
+            form?.classList.remove('hidden');
+            return;
+        }
+
+        try {
+            load?.classList.remove('hidden');
+            form?.classList.add('hidden');
+            err?.classList.add('hidden');
+
+            // El Admin usa Google Apps Script con action + parámetros por GET.
+            const data = await apiGet('guest', { token: SITE_TOKEN });
+            const g = obtenerInvitado(data);
+
+            if (!g || !g.token) {
+                fail('No encontramos esta invitación. Verificá el enlace recibido.');
+                return;
+            }
+
+            render(g);
+            load?.classList.add('hidden');
+            const tieneFechaConfirmacion =
+                !!g.fechaConfirmacion &&
+                String(g.fechaConfirmacion).trim() !== '' &&
+                String(g.fechaConfirmacion).trim().toLowerCase() !== 'null';
+            if (!tieneFechaConfirmacion && !(
+                String(g.estado || '').trim().toLowerCase() === 'confirmado' ||
+                String(g.estado || '').trim().toLowerCase() === 'no_asiste' ||
+                normalizarSiNo(g.confirmoCivil) ||
+                normalizarSiNo(g.confirmoCeremonia) ||
+                normalizarSiNo(g.confirmoFiesta) ||
+                Number(g.cantidadConfirmada) > 0 ||
+                (String(g.asistencia || '').trim() !== '' &&
+                 String(g.asistencia || '').trim().toLowerCase() !== 'pendiente')
+            )) {
+                form?.classList.remove('hidden');
+            }
+        } catch (error) {
+            console.error('Error al cargar invitación:', error);
+            fail(error?.message || 'No pudimos cargar tu invitación personalizada.');
+        }
+    }
+
+    /* =================================================
+       BOTONERA
+    ================================================= */
+    $('btnBarraConfirmar')?.addEventListener('click', () => {
+        section?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    $('btnBarraUbicacion')?.addEventListener('click', () => {
+        $('ubicacion')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    $('btnBarraFAQ')?.addEventListener('click', () => {
+        $('preguntas-frecuentes')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    $('btnBarraGaleria')?.addEventListener('click', () => {
+        $('galeriaInvitados')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    const giftModal = $('giftModal');
+    const cerrarRegalo = () => giftModal?.classList.add('hidden');
+    $('btnBarraRegalo')?.addEventListener('click', () => {
+        giftModal?.classList.remove('hidden');
+    });
+    $('giftModalX')?.addEventListener('click', cerrarRegalo);
+    $('giftModalClose')?.addEventListener('click', cerrarRegalo);
+    giftModal?.addEventListener('click', event => {
+        if (event.target === giftModal) cerrarRegalo();
+    });
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') cerrarRegalo();
+    });
+
+    // La botonera de foto/video existe en la versión de fiesta.
+    // Los controles internos también quedan protegidos contra null.
+    const btnBarraFoto = $('btnBarraFoto');
+    const btnBarraVideo = $('btnBarraVideo');
+    btnBarraFoto?.addEventListener('click', () => $('btnFotos')?.click());
+    btnBarraVideo?.addEventListener('click', () => $('btnGrabarVideo')?.click());
+
+    iniciarInvitacion();
 
 })();
 
