@@ -3717,6 +3717,8 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
     const btnIniciarGrabacionCamara = document.getElementById("btnIniciarGrabacionCamara");
     const btnDetenerGrabacionCamara = document.getElementById("btnDetenerGrabacionCamara");
     const btnSubirVideo = document.getElementById("btnSubirVideo");
+    const marcoCamara = new Image();
+    marcoCamara.src = "assets/marco.svg";
 
     let streamCamara = null;
     let mediaRecorderCamara = null;
@@ -4230,13 +4232,42 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
         estadoCamara.textContent = "☁️ Subiendo…";
 
         try {
-            const ancho = previewCamara.videoWidth || 1280;
-            const alto = previewCamara.videoHeight || 720;
+            const ancho = 407;
+            const alto = 533;
+            const marcoX = 17;
+            const marcoY = 174;
+            const marcoAncho = 371;
+            const marcoAlto = 240;
             canvasFoto.width = ancho;
             canvasFoto.height = alto;
 
             const contexto = canvasFoto.getContext("2d");
-            contexto.drawImage(previewCamara, 0, 0, ancho, alto);
+            contexto.clearRect(0, 0, ancho, alto);
+
+            const videoAncho = previewCamara.videoWidth || 1280;
+            const videoAlto = previewCamara.videoHeight || 720;
+            const escala = Math.max(marcoAncho / videoAncho, marcoAlto / videoAlto);
+            const fotoAncho = videoAncho * escala;
+            const fotoAlto = videoAlto * escala;
+            const fotoX = marcoX + (marcoAncho - fotoAncho) / 2;
+            const fotoY = marcoY + (marcoAlto - fotoAlto) / 2;
+
+            contexto.drawImage(previewCamara, fotoX, fotoY, fotoAncho, fotoAlto);
+
+            if (!marcoCamara.complete || !marcoCamara.naturalWidth) {
+                await new Promise(function(resolve, reject) {
+                    if (marcoCamara.complete && !marcoCamara.naturalWidth) {
+                        reject(new Error("No se pudo cargar el marco de la boda."));
+                        return;
+                    }
+                    marcoCamara.onload = resolve;
+                    marcoCamara.onerror = function() {
+                        reject(new Error("No se pudo cargar el marco de la boda."));
+                    };
+                });
+            }
+
+            contexto.drawImage(marcoCamara, 0, 0, ancho, alto);
 
             const blobFoto = await new Promise(function(resolve, reject) {
                 let terminado = false;

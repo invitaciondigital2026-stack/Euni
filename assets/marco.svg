@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="407" height="533" viewBox="0 0 407 533">
+  <defs>
+    <mask id="transparent-center" maskUnits="userSpaceOnUse" x="0" y="0" width="407" height="533">
+      <rect width="407" height="533" fill="white"/>
+      <rect x="17" y="174" width="371" height="240" fill="black"/>
+    </mask>
+  </defs>
+  <image
+    x="0"
+    y="0"
+    width="407"
+    height="533"
+    preserveAspectRatio="none"
+    href="marco.jpg"
+    xlink:href="marco.jpg"
+    mask="url(#transparent-center)"
+  />
+</svg>
