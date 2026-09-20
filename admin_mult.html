@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multimedia | Administración</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root { color-scheme: light; }
+    .media-card { aspect-ratio: 1; }
+    .media-card.is-selected { outline: 4px solid #292524; outline-offset: -4px; }
+    .media-card.is-selected::after { content: "✓"; position: absolute; inset: 10px auto auto 10px; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 999px; background: #292524; color: white; font-weight: 700; }
+    .media-card img, .media-card video { width: 100%; height: 100%; object-fit: cover; }
+  </style>
+</head>
+<body class="min-h-screen bg-stone-100 text-stone-900">
+  <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <header class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <a href="admin2.html" class="text-sm text-stone-500 hover:text-stone-900">← Volver a administración</a>
+        <h1 class="mt-2 text-3xl font-semibold tracking-tight">Contenido multimedia</h1>
+        <p class="mt-1 text-stone-500">Fotos y videos compartidos durante la fiesta.</p>
+      </div>
+      <button id="refreshButton" type="button" class="rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-medium shadow-sm hover:bg-stone-50">↻ Actualizar</button>
+    </header>
+
+    <section class="mb-5 rounded-xl bg-white p-4 shadow-sm" aria-label="Acciones multimedia">
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="selectAllButton" type="button" class="rounded-lg bg-stone-200 px-4 py-2.5 text-sm font-medium hover:bg-stone-300">Marcar todo</button>
+        <button data-action="download" type="button" class="rounded-lg bg-stone-800 px-4 py-2.5 text-sm font-medium text-white hover:bg-stone-700">Descargar</button>
+        <button data-action="share" type="button" class="rounded-lg bg-stone-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-stone-600">Compartir</button>
+        <span id="selectionStatus" class="ml-auto text-sm text-stone-500">0 seleccionados</span>
+      </div>
+      <p id="status" class="mt-3 text-sm text-stone-500" role="status">Cargando multimedia...</p>
+    </section>
+
+    <section id="mediaGrid" class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5" aria-live="polite"></section>
+  </main>
+
+  <script>
+    const CLOUDINARY_CLOUD_NAME = "entbx2xv";
+    const GALERIA_TAG = "boda-eunice-david";
+    const URL_LISTA_IMAGENES = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/list/${GALERIA_TAG}.json`;
+    const URL_LISTA_VIDEOS = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/video/list/${GALERIA_TAG}.json`;
+    const grid = document.getElementById("mediaGrid");
+    const status = document.getElementById("status");
+    const selectionStatus = document.getElementById("selectionStatus");
+    let resources = [];
+    const selected = new Set();
+
+    function esc(value) {
+      return String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character]));
+    }
+
+    function updateSelectionStatus() {
+      selectionStatus.textContent = `${selected.size} seleccionado${selected.size === 1 ? "" : "s"}`;
+      document.querySelectorAll(".media-card").forEach(card => card.classList.toggle("is-selected", selected.has(card.dataset.id)));
+    }
+
+    function render() {
+      grid.replaceChildren();
+      resources.forEach(resource => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "media-card relative overflow-hidden rounded-xl bg-stone-200 shadow-sm transition hover:shadow-md";
+        card.dataset.id = resource.public_id;
+        card.setAttribute("aria-label", `Seleccionar ${resource.resource_type === "video" ? "video" : "foto"}`);
+        card.innerHTML = resource.resource_type === "video"
+          ? `<video src="${esc(resource.url)}" muted playsinline preload="metadata"></video><span class="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-xs text-white">▶ Video</span>`
+          : `<img src="${esc(resource.url)}" alt="Foto compartida" loading="lazy"><span class="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-xs text-white">Foto</span>`;
+        card.addEventListener("click", () => {
+          selected.has(resource.public_id) ? selected.delete(resource.public_id) : selected.add(resource.public_id);
+          updateSelectionStatus();
+        });
+        grid.appendChild(card);
+      });
+      updateSelectionStatus();
+    }
+
+    async function loadMedia() {
+      status.textContent = "Cargando multimedia...";
+      try {
+        const [imagesResponse, videosResponse] = await Promise.all([
+          fetch(`${URL_LISTA_IMAGENES}?v=${Date.now()}`),
+          fetch(`${URL_LISTA_VIDEOS}?v=${Date.now()}`)
+        ]);
+        if (!imagesResponse.ok || !videosResponse.ok) throw new Error("No se pudo cargar la galería de Cloudinary.");
+        const [images, videos] = await Promise.all([imagesResponse.json(), videosResponse.json()]);
+        resources = [
+          ...(images.resources || []).map(resource => ({ ...resource, resource_type: "image" })),
+          ...(videos.resources || []).map(resource => ({ ...resource, resource_type: "video" }))
+        ].map(resource => ({
+          ...resource,
+          url: `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/${resource.resource_type}/upload/${resource.public_id}.${resource.format}`
+        })).sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+        selected.clear();
+        render();
+        status.textContent = resources.length ? `${resources.length} archivos disponibles.` : "Todavía no hay fotos ni videos.";
+      } catch (error) {
+        status.textContent = error.message;
+        grid.replaceChildren();
+      }
+    }
+
+    function chosenResources() { return resources.filter(resource => selected.has(resource.public_id)); }
+    function requireSelection() {
+      const chosen = chosenResources();
+      if (!chosen.length) { alert("Seleccioná al menos un archivo."); return null; }
+      return chosen;
+    }
+
+    function downloadSelected(chosen) {
+      chosen.forEach((resource, index) => setTimeout(() => { const link = document.createElement("a"); link.href = resource.url; link.download = resource.public_id.split("/").pop(); link.target = "_blank"; link.rel = "noopener"; document.body.appendChild(link); link.click(); link.remove(); }, index * 150));
+    }
+
+    async function shareSelected(chosen) {
+      const urls = chosen.map(resource => resource.url);
+      if (navigator.share) { await navigator.share({ title: "Recuerdos de la fiesta", text: "Mirá estos recuerdos de la fiesta", url: urls[0] }); return; }
+      await navigator.clipboard.writeText(urls.join("\n"));
+      alert("Enlaces copiados al portapapeles.");
+    }
+
+    async function runAction(action) {
+      const chosen = requireSelection();
+      if (!chosen) return;
+      try {
+        if (action === "download") downloadSelected(chosen);
+        if (action === "share") await shareSelected(chosen);
+      } catch (error) { alert(error.message); }
+    }
+
+    document.getElementById("selectAllButton").addEventListener("click", () => {
+      if (selected.size === resources.length) selected.clear(); else resources.forEach(resource => selected.add(resource.public_id));
+      updateSelectionStatus();
+    });
+    document.getElementById("refreshButton").addEventListener("click", loadMedia);
+    document.querySelectorAll("[data-action]").forEach(button => button.addEventListener("click", () => runAction(button.dataset.action)));
+    loadMedia();
+  </script>
+</body>
+</html>
