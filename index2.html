@@ -1233,6 +1233,38 @@ audio {
     color: #1f2937;
 }
 
+.camera-frame-toggle,
+.camera-switch {
+    position: absolute;
+    z-index: 5;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255,255,255,.65);
+    border-radius: 50%;
+    background: rgba(0,0,0,.48);
+    color: #fff;
+    font-size: 23px;
+    cursor: pointer;
+    box-shadow: 0 3px 14px rgba(0,0,0,.35);
+}
+
+.camera-frame-toggle {
+    top: max(18px, env(safe-area-inset-top));
+    right: 18px;
+}
+
+.camera-switch {
+    right: 18px;
+    bottom: max(24px, env(safe-area-inset-bottom));
+}
+
+.camera-frame-toggle.active {
+    background: #b4536b;
+    border-color: #fff;
+}
+
 .camera-editor-accept {
     background: #16a34a;
     color: #fff;
@@ -2975,6 +3007,8 @@ audio {
             <h3 id="tituloCamara" class="camera-title">Comparte un momento especial</h3>
             <div id="temporizadorCamara" class="camera-timer hidden">00:00</div>
         </div>
+
+        <button id="btnMarcoBoda" class="camera-frame-toggle" type="button" aria-label="Activar marco de la boda" title="Activar marco de la boda">🖼️</button>
     </div>
 
     <canvas id="canvasFoto" class="hidden"></canvas>
@@ -2986,7 +3020,6 @@ audio {
             </div>
 
             <div class="camera-editor-toolbar">
-                <button id="btnMarcoBoda" type="button">Marco de la boda</button>
                 <button id="btnAgregarDedicatoria" type="button">Dedicatoria</button>
                 <button id="btnAgregarSticker" type="button">Sticker</button>
                 <button id="btnGuardarEditada" class="camera-editor-accept" type="button">Guardar foto</button>
@@ -3066,6 +3099,8 @@ audio {
             Tocá para sacar la foto
         </div>
     </div>
+
+    <button id="btnCambiarCamara" class="camera-switch" type="button" aria-label="Cambiar cámara" title="Cambiar cámara">🔄</button>
 </div>
 </section>
 
@@ -3657,6 +3692,8 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
     let videoListoParaSubir = null;
     let grabacionInicio = 0;
     let temporizadorIntervalo = null;
+    let camaraFrontal = false;
+    let marcoPreparado = false;
     let fotoBaseParaEditar = null;
     let editorActiva = false;
     let editorMarco = false;
@@ -3668,6 +3705,7 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
     const editorCanvas = document.getElementById("editorCanvas");
     const cameraEditor = document.getElementById("cameraEditor");
     const btnMarcoBoda = document.getElementById("btnMarcoBoda");
+    const btnCambiarCamara = document.getElementById("btnCambiarCamara");
     const btnAgregarDedicatoria = document.getElementById("btnAgregarDedicatoria");
     const dedicatoriaControls = document.getElementById("dedicatoriaControls");
     const dedicatoriaTextInput = document.getElementById("dedicatoriaTextInput");
@@ -3756,7 +3794,7 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
         const url = URL.createObjectURL(blob);
         img.onload = function() {
             fotoBaseParaEditar = img;
-            editorMarco = false;
+            editorMarco = marcoPreparado;
             editorDedicatoria = null;
             editorStickers = [];
             editorActiva = true;
@@ -3841,9 +3879,13 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
     });
 
     btnMarcoBoda?.addEventListener("click", function() {
-        if (!editorActiva || !fotoBaseParaEditar) return;
-        editorMarco = !editorMarco;
-        renderEditorCanvas();
+        marcoPreparado = !marcoPreparado;
+        btnMarcoBoda.classList.toggle("active", marcoPreparado);
+        btnMarcoBoda.setAttribute("aria-label", marcoPreparado ? "Desactivar marco de la boda" : "Activar marco de la boda");
+        if (editorActiva && fotoBaseParaEditar) {
+            editorMarco = marcoPreparado;
+            renderEditorCanvas();
+        }
     });
 
     btnAgregarDedicatoria?.addEventListener("click", function() {
@@ -3906,6 +3948,40 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
         cerrarEditorFoto();
         estadoCamara.textContent = "Foto cancelada";
     });
+
+    async function cambiarCamara() {
+        if (!streamCamara || btnCambiarCamara.disabled) return;
+
+        btnCambiarCamara.disabled = true;
+        estadoCamara.textContent = "Cambiando cámara…";
+        camaraFrontal = !camaraFrontal;
+
+        streamCamara.getTracks().forEach(function(track) {
+            track.stop();
+        });
+
+        try {
+            streamCamara = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: { exact: camaraFrontal ? "user" : "environment" },
+                    width: { ideal: 1280, max: 1920 },
+                    height: { ideal: 720, max: 1080 },
+                    frameRate: { ideal: 30, max: 30 }
+                },
+                audio: modoCamara === "video"
+            });
+
+            previewCamara.srcObject = streamCamara;
+            await previewCamara.play();
+            estadoCamara.textContent = "";
+        } catch (error) {
+            camaraFrontal = !camaraFrontal;
+            estadoCamara.textContent = "No se pudo cambiar la cámara.";
+            console.error("Error al cambiar cámara:", error);
+        } finally {
+            btnCambiarCamara.disabled = false;
+        }
+    }
 
     function mostrarMensajeSubida(texto) {
         const mensaje = document.getElementById("mensajeSubida");
@@ -3972,6 +4048,7 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
 
     async function abrirCamara(modo) {
         modoCamara = modo;
+        camaraFrontal = false;
         videoListoParaSubir = null;
         partesVideoCamara = [];
         mediaRecorderCamara = null;
@@ -3988,7 +4065,7 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
             }
 
             const restriccionesVideo = {
-                facingMode: { ideal: "environment" },
+                facingMode: { ideal: camaraFrontal ? "user" : "environment" },
                 width: { ideal: 1280, max: 1920 },
                 height: { ideal: 720, max: 1080 },
                 frameRate: { ideal: 30, max: 30 }
@@ -4318,6 +4395,7 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
     btnDetenerGrabacionCamara?.addEventListener("click", detenerGrabacionCamara);
     btnSubirVideo?.addEventListener("click", subirVideoPreparado);
     cerrarModalCamara?.addEventListener("click", cerrarCamara);
+    btnCambiarCamara?.addEventListener("click", cambiarCamara);
 
 
 
