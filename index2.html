@@ -1363,6 +1363,12 @@ audio {
     border-color: #fff;
 }
 
+.camera-editor,
+.camera-frame-toggle,
+.camera-switch {
+    display: none !important;
+}
+
 
 }
 
@@ -4221,37 +4227,49 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
         if (!streamCamara || btnCapturarFoto.disabled) return;
 
         btnCapturarFoto.disabled = true;
-            estadoCamara.textContent = "Editando foto…";
+        estadoCamara.textContent = "☁️ Subiendo…";
 
-            try {
-                const ancho = previewCamara.videoWidth || 1280;
-                const alto = previewCamara.videoHeight || 720;
-                canvasFoto.width = ancho;
-                canvasFoto.height = alto;
+        try {
+            const ancho = previewCamara.videoWidth || 1280;
+            const alto = previewCamara.videoHeight || 720;
+            canvasFoto.width = ancho;
+            canvasFoto.height = alto;
 
-                const contexto = canvasFoto.getContext("2d");
-                contexto.drawImage(previewCamara, 0, 0, ancho, alto);
+            const contexto = canvasFoto.getContext("2d");
+            contexto.drawImage(previewCamara, 0, 0, ancho, alto);
 
-                const blobFoto = await new Promise(function(resolve, reject) {
-                    let terminado = false;
-                    canvasFoto.toBlob(function(blob) {
-                        terminado = true;
-                        resolve(blob);
-                    }, "image/jpeg", 0.92);
-                    setTimeout(function() {
-                        if (!terminado) reject(new Error("No se pudo preparar la foto."));
-                    }, 5000);
-                });
+            const blobFoto = await new Promise(function(resolve, reject) {
+                let terminado = false;
+                canvasFoto.toBlob(function(blob) {
+                    terminado = true;
+                    resolve(blob);
+                }, "image/jpeg", 0.92);
+                setTimeout(function() {
+                    if (!terminado) reject(new Error("No se pudo preparar la foto."));
+                }, 5000);
+            });
 
-                if (!blobFoto) throw new Error("No se pudo crear la foto.");
+            if (!blobFoto) throw new Error("No se pudo crear la foto.");
 
-                abrirEditorFoto(blobFoto);
-                btnCapturarFoto.disabled = false;
-                btnCapturarFoto.classList.remove("hidden");
-                textoControlCamara.textContent = "Editá la foto y guardá";
-            } catch (error) {
-                console.error("Error al preparar foto:", error);
-                estadoCamara.textContent = "No se pudo preparar la foto. Intentá nuevamente.";
+            await subirArchivoDirecto(
+                blobFoto,
+                "foto-boda-" + Date.now() + ".jpg",
+                "❤️ ¡Foto subida!"
+            );
+
+            estadoCamara.textContent = "❤️ ¡Foto subida!";
+            btnCapturarFoto.disabled = false;
+            btnCapturarFoto.classList.remove("hidden");
+            textoControlCamara.textContent = "Tocá para sacar otra foto";
+            setTimeout(function() {
+                if (modalCamara && !modalCamara.classList.contains("hidden")) {
+                    estadoCamara.textContent = "";
+                }
+            }, 1200);
+        } catch (error) {
+            console.error("Error al subir foto:", error);
+            estadoCamara.textContent = "No se pudo subir la foto. Intentá nuevamente.";
+            btnCapturarFoto.disabled = false;
         }
     }
 
