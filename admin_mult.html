@@ -40,7 +40,7 @@
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycby80WR98QzVdQk9SrVOuZ_AiA42rKROIT-ZjkMXLfEt4usPjbZ585kD5DcS_Zns2M8Y/exec";
-    const CLOUDINARY_CLOUD_NAME = "entbx2xv";
+    const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
     const grid = document.getElementById("mediaGrid");
     const status = document.getElementById("status");
     const selectionStatus = document.getElementById("selectionStatus");
@@ -56,6 +56,17 @@
 
     async function apiGet(action, params = {}) {
       const response = await fetch(apiUrl(action, params), { method: "GET", cache: "no-store" });
+      const data = await response.json();
+      if (!response.ok || data.success === false) throw new Error(data.error || `HTTP ${response.status}`);
+      return data;
+    }
+
+    async function apiPost(action, body = {}) {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action, ...body })
+      });
       const data = await response.json();
       if (!response.ok || data.success === false) throw new Error(data.error || `HTTP ${response.status}`);
       return data;
@@ -128,8 +139,8 @@
     async function deleteSelected(chosen) {
       if (!confirm(`¿Eliminar ${chosen.length} archivo${chosen.length === 1 ? "" : "s"}? Esta acción no se puede deshacer.`)) return;
       status.textContent = `Eliminando ${chosen.length} archivos...`;
-      await apiGet("media_delete", {
-        resources: JSON.stringify(chosen.map(({ public_id, resource_type }) => ({ public_id, resource_type })))
+      await apiPost("media_delete", {
+        resources: chosen.map(({ public_id, resource_type }) => ({ public_id, resource_type }))
       });
       await loadMedia();
     }
