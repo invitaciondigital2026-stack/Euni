@@ -41,6 +41,9 @@
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycby80WR98QzVdQk9SrVOuZ_AiA42rKROIT-ZjkMXLfEt4usPjbZ585kD5DcS_Zns2M8Y/exec";
     const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
+    const GALERIA_TAG = "boda-eunice-david";
+    const URL_LISTA_IMAGENES = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/list/${GALERIA_TAG}.json`;
+    const URL_LISTA_VIDEOS = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/video/list/${GALERIA_TAG}.json`;
     const grid = document.getElementById("mediaGrid");
     const status = document.getElementById("status");
     const selectionStatus = document.getElementById("selectionStatus");
@@ -109,11 +112,19 @@
     async function loadMedia() {
       status.textContent = "Cargando multimedia...";
       try {
-        const data = await apiJsonp("media_list");
-        resources = (data.resources || []).map(resource => ({
+        const [imagesResponse, videosResponse] = await Promise.all([
+          fetch(`${URL_LISTA_IMAGENES}?v=${Date.now()}`),
+          fetch(`${URL_LISTA_VIDEOS}?v=${Date.now()}`)
+        ]);
+        if (!imagesResponse.ok || !videosResponse.ok) throw new Error("No se pudo cargar la galería de Cloudinary.");
+        const [images, videos] = await Promise.all([imagesResponse.json(), videosResponse.json()]);
+        resources = [
+          ...(images.resources || []).map(resource => ({ ...resource, resource_type: "image" })),
+          ...(videos.resources || []).map(resource => ({ ...resource, resource_type: "video" }))
+        ].map(resource => ({
           ...resource,
-          url: resource.url || `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/${resource.resource_type}/upload/${resource.public_id}.${resource.format}`
-        }));
+          url: `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/${resource.resource_type}/upload/${resource.public_id}.${resource.format}`
+        })).sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
         selected.clear();
         render();
         status.textContent = resources.length ? `${resources.length} archivos disponibles.` : "Todavía no hay fotos ni videos.";
