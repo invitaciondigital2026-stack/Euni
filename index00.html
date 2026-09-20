@@ -992,16 +992,146 @@ audio {
     min-height: 20px;
 }
 
-@media (min-width: 769px) {
+.camera-editor {
+    position: absolute;
+    inset: 0;
+    z-index: 9;
+    background: rgba(15, 23, 42, 0.82);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 12px 22px;
+}
 
-    .camera-fullscreen {
-        max-width: 100vw;
-        max-height: 100vh;
-    }
+.camera-editor.hidden {
+    display: none;
+}
 
-    .camera-title {
-        font-size: 34px;
-    }
+.camera-editor-panel {
+    width: min(100%, 820px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.camera-editor-canvas-wrap {
+    background: rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid rgba(255,255,255,0.22);
+}
+
+.camera-editor-canvas {
+    width: min(100%, 620px);
+    max-height: 72vh;
+    border-radius: 14px;
+    background: #f5f5f4;
+    box-shadow: 0 18px 45px rgba(0,0,0,.35);
+    cursor: crosshair;
+}
+
+.camera-editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.camera-editor-toolbar button,
+.camera-editor-accept,
+.camera-editor-cancel {
+    border: 0;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.camera-editor-toolbar button {
+    background: #fff;
+    color: #1f2937;
+}
+
+.camera-editor-accept {
+    background: #16a34a;
+    color: #fff;
+}
+
+.camera-editor-cancel {
+    background: #e5e7eb;
+    color: #1f2937;
+}
+
+.camera-editor-settings {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.camera-editor-settings.hidden,
+.camera-sticker-tray.hidden {
+    display: none;
+}
+
+.camera-editor-settings label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    color: #fff;
+    font-size: 13px;
+}
+
+.camera-editor-settings input[type="text"] {
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.3);
+    background: rgba(255,255,255,.08);
+    color: #fff;
+    padding: 9px 10px;
+}
+
+.camera-editor-settings input[type="color"] {
+    width: 56px;
+    height: 40px;
+    border: 0;
+    background: transparent;
+    padding: 0;
+}
+
+.camera-editor-settings input[type="range"] {
+    width: 100%;
+}
+
+.camera-sticker-tray {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 10px;
+}
+
+.camera-sticker {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    border: 0;
+    background: #fff;
+    font-size: 24px;
+    cursor: pointer;
+}
+
 
 }
 
@@ -2617,6 +2747,50 @@ audio {
 
     <canvas id="canvasFoto" class="hidden"></canvas>
 
+    <div id="cameraEditor" class="camera-editor hidden" aria-live="polite">
+        <div class="camera-editor-panel">
+            <div class="camera-editor-canvas-wrap">
+                <canvas id="editorCanvas" class="camera-editor-canvas" width="900" height="1200"></canvas>
+            </div>
+
+            <div class="camera-editor-toolbar">
+                <button id="btnMarcoBoda" type="button">Marco de la boda</button>
+                <button id="btnAgregarDedicatoria" type="button">Dedicatoria</button>
+                <button id="btnAgregarSticker" type="button">Sticker</button>
+                <button id="btnGuardarEditada" class="camera-editor-accept" type="button">Guardar foto</button>
+                <button id="btnCancelarEdicion" class="camera-editor-cancel" type="button">Cancelar</button>
+            </div>
+
+            <div id="dedicatoriaControls" class="camera-editor-settings hidden">
+                <label>
+                    Texto
+                    <input id="dedicatoriaTextInput" type="text" value="Te esperamos en nuestro día especial" maxlength="80">
+                </label>
+                <label>
+                    Color
+                    <input id="dedicatoriaColor" type="color" value="#ffffff">
+                </label>
+                <label>
+                    Tamaño
+                    <input id="dedicatoriaSize" type="range" min="18" max="72" value="34">
+                </label>
+                <label>
+                    Posición
+                    <input id="dedicatoriaPosition" type="range" min="0" max="100" value="50">
+                </label>
+            </div>
+
+            <div id="stickerTray" class="camera-sticker-tray hidden">
+                <button type="button" class="camera-sticker" data-sticker="💍">💍</button>
+                <button type="button" class="camera-sticker" data-sticker="💒">💒</button>
+                <button type="button" class="camera-sticker" data-sticker="💖">💖</button>
+                <button type="button" class="camera-sticker" data-sticker="✨">✨</button>
+                <button type="button" class="camera-sticker" data-sticker="🎉">🎉</button>
+                <button type="button" class="camera-sticker" data-sticker="🥂">🥂</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Mensajes -->
     <div id="estadoCamara" class="camera-status">
         Preparando cámara…
@@ -3251,6 +3425,255 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
     let videoListoParaSubir = null;
     let grabacionInicio = 0;
     let temporizadorIntervalo = null;
+    let fotoBaseParaEditar = null;
+    let editorActiva = false;
+    let editorMarco = false;
+    let editorDedicatoria = null;
+    let editorStickers = [];
+    let editorActivoId = null;
+    let editorPointerStart = null;
+
+    const editorCanvas = document.getElementById("editorCanvas");
+    const cameraEditor = document.getElementById("cameraEditor");
+    const btnMarcoBoda = document.getElementById("btnMarcoBoda");
+    const btnAgregarDedicatoria = document.getElementById("btnAgregarDedicatoria");
+    const dedicatoriaControls = document.getElementById("dedicatoriaControls");
+    const dedicatoriaTextInput = document.getElementById("dedicatoriaTextInput");
+    const dedicatoriaColor = document.getElementById("dedicatoriaColor");
+    const dedicatoriaSize = document.getElementById("dedicatoriaSize");
+    const dedicatoriaPosition = document.getElementById("dedicatoriaPosition");
+    const stickerTray = document.getElementById("stickerTray");
+    const btnGuardarEditada = document.getElementById("btnGuardarEditada");
+    const btnCancelarEdicion = document.getElementById("btnCancelarEdicion");
+
+    function renderEditorCanvas() {
+        if (!editorCanvas || !fotoBaseParaEditar) return;
+
+        const ctx = editorCanvas.getContext("2d");
+        const { width, height } = editorCanvas;
+        const img = fotoBaseParaEditar;
+
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = "#f5f5f4";
+        ctx.fillRect(0, 0, width, height);
+
+        const escala = Math.max(width / img.width, height / img.height);
+        const drawWidth = img.width * escala;
+        const drawHeight = img.height * escala;
+        const drawX = (width - drawWidth) / 2;
+        const drawY = (height - drawHeight) / 2;
+
+        ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+
+        const margen = 26;
+        const borde = 22;
+        const frameX = drawX + margen;
+        const frameY = drawY + margen;
+        const frameW = drawWidth - margen * 2;
+        const frameH = drawHeight - margen * 2;
+
+        if (editorMarco) {
+            ctx.strokeStyle = "#f3dfb5";
+            ctx.lineWidth = 8;
+            ctx.strokeRect(frameX, frameY, frameW, frameH);
+
+            ctx.strokeStyle = "rgba(255,255,255,0.9)";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(frameX + borde, frameY + borde, frameW - borde * 2, frameH - borde * 2);
+
+            ctx.fillStyle = "rgba(245, 243, 238, 0.9)";
+            ctx.fillRect(frameX + 18, frameY + frameH - 70, frameW - 36, 46);
+
+            ctx.fillStyle = "#4f3d37";
+            ctx.font = "600 22px Poppins, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("27 de noviembre de 2026", drawX + drawWidth / 2, frameY + frameH - 40);
+        }
+
+        if (editorDedicatoria) {
+            const posY = height * (Number(dedicatoriaPosition.value) / 100);
+            ctx.fillStyle = editorDedicatoria.color;
+            ctx.font = `600 ${editorDedicatoria.size}px Poppins, sans-serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(editorDedicatoria.text, width / 2, posY);
+        }
+
+        editorStickers.forEach((sticker) => {
+            ctx.font = `${sticker.size}px serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(sticker.emoji, sticker.x, sticker.y);
+        });
+    }
+
+    function cerrarEditorFoto() {
+        if (cameraEditor) cameraEditor.classList.add("hidden");
+        editorActiva = false;
+        editorMarco = false;
+        editorDedicatoria = null;
+        editorStickers = [];
+        editorActivoId = null;
+        fotoBaseParaEditar = null;
+        if (dedicatoriaControls) dedicatoriaControls.classList.add("hidden");
+        if (stickerTray) stickerTray.classList.add("hidden");
+    }
+
+    function abrirEditorFoto(blob) {
+        const img = new Image();
+        const url = URL.createObjectURL(blob);
+        img.onload = function() {
+            fotoBaseParaEditar = img;
+            editorMarco = false;
+            editorDedicatoria = null;
+            editorStickers = [];
+            editorActiva = true;
+            if (cameraEditor) cameraEditor.classList.remove("hidden");
+            if (dedicatoriaControls) dedicatoriaControls.classList.add("hidden");
+            if (stickerTray) stickerTray.classList.add("hidden");
+            renderEditorCanvas();
+            URL.revokeObjectURL(url);
+        };
+        img.src = url;
+    }
+
+    function guardarFotoEditada() {
+        if (!editorCanvas || !fotoBaseParaEditar) return;
+
+        btnGuardarEditada.disabled = true;
+        editorCanvas.toBlob(async function(blob) {
+            if (!blob) {
+                btnGuardarEditada.disabled = false;
+                return;
+            }
+            await subirArchivoDirecto(blob, "foto-boda-" + Date.now() + ".jpg", "❤️ ¡Foto subida!");
+            btnGuardarEditada.disabled = false;
+            cerrarEditorFoto();
+            estadoCamara.textContent = "❤️ ¡Foto subida!";
+        }, "image/jpeg", 0.92);
+    }
+
+    function obtenerCoordenadasEditor(event) {
+        const rect = editorCanvas.getBoundingClientRect();
+        const x = (event.clientX - rect.left) * (editorCanvas.width / rect.width);
+        const y = (event.clientY - rect.top) * (editorCanvas.height / rect.height);
+        return { x, y };
+    }
+
+    editorCanvas?.addEventListener("pointerdown", function(event) {
+        if (!editorActiva) return;
+        const { x, y } = obtenerCoordenadasEditor(event);
+
+        if (editorDedicatoria) {
+            const radio = editorDedicatoria.size * 1.6;
+            const dist = Math.hypot(x - editorCanvas.width / 2, y - Number(dedicatoriaPosition.value) / 100 * editorCanvas.height);
+            if (dist <= radio) {
+                editorActivoId = "text";
+                editorPointerStart = { x: x - editorCanvas.width / 2, y: y - Number(dedicatoriaPosition.value) / 100 * editorCanvas.height };
+                return;
+            }
+        }
+
+        for (const sticker of editorStickers) {
+            if (Math.hypot(x - sticker.x, y - sticker.y) <= sticker.size * 0.8) {
+                editorActivoId = sticker.id;
+                editorPointerStart = { x: x - sticker.x, y: y - sticker.y };
+                return;
+            }
+        }
+    });
+
+    editorCanvas?.addEventListener("pointermove", function(event) {
+        if (!editorActiva || !editorActivoId || !editorPointerStart) return;
+        const { x, y } = obtenerCoordenadasEditor(event);
+
+        if (editorActivoId === "text" && editorDedicatoria) {
+            const nextPos = y - editorPointerStart.y;
+            if (nextPos >= 10 && nextPos <= editorCanvas.height - 10) {
+                dedicatoriaPosition.value = String((nextPos / editorCanvas.height) * 100);
+                renderEditorCanvas();
+            }
+            return;
+        }
+
+        const sticker = editorStickers.find(item => item.id === editorActivoId);
+        if (!sticker) return;
+        sticker.x = x - editorPointerStart.x;
+        sticker.y = y - editorPointerStart.y;
+        renderEditorCanvas();
+    });
+
+    editorCanvas?.addEventListener("pointerup", function() {
+        editorActivoId = null;
+        editorPointerStart = null;
+    });
+
+    btnMarcoBoda?.addEventListener("click", function() {
+        if (!editorActiva || !fotoBaseParaEditar) return;
+        editorMarco = !editorMarco;
+        renderEditorCanvas();
+    });
+
+    btnAgregarDedicatoria?.addEventListener("click", function() {
+        if (!editorActiva || !fotoBaseParaEditar) return;
+        editorDedicatoria = {
+            text: dedicatoriaTextInput.value || "Te esperamos en nuestro día especial",
+            color: dedicatoriaColor.value || "#ffffff",
+            size: Number(dedicatoriaSize.value) || 34,
+        };
+        dedicatoriaControls?.classList.remove("hidden");
+        renderEditorCanvas();
+    });
+
+    dedicatoriaTextInput?.addEventListener("input", function() {
+        if (!editorDedicatoria) return;
+        editorDedicatoria.text = this.value || "Te esperamos en nuestro día especial";
+        renderEditorCanvas();
+    });
+
+    dedicatoriaColor?.addEventListener("input", function() {
+        if (!editorDedicatoria) return;
+        editorDedicatoria.color = this.value;
+        renderEditorCanvas();
+    });
+
+    dedicatoriaSize?.addEventListener("input", function() {
+        if (!editorDedicatoria) return;
+        editorDedicatoria.size = Number(this.value) || 34;
+        renderEditorCanvas();
+    });
+
+    dedicatoriaPosition?.addEventListener("input", function() {
+        if (!editorDedicatoria) return;
+        renderEditorCanvas();
+    });
+
+    stickerTray?.querySelectorAll(".camera-sticker").forEach(function(stickerButton) {
+        stickerButton.addEventListener("click", function() {
+            if (!editorActiva || !fotoBaseParaEditar) return;
+            const emoji = stickerButton.dataset.sticker || "💖";
+            editorStickers.push({
+                id: crypto.randomUUID ? crypto.randomUUID() : `sticker-${Date.now()}-${Math.random()}`,
+                emoji,
+                x: editorCanvas.width / 2,
+                y: editorCanvas.height / 2,
+                size: 42
+            });
+            stickerTray.classList.remove("hidden");
+            renderEditorCanvas();
+        });
+    });
+
+    btnAgregarSticker?.addEventListener("click", function() {
+        if (!editorActiva || !fotoBaseParaEditar) return;
+        stickerTray.classList.toggle("hidden");
+    });
+
+    btnGuardarEditada?.addEventListener("click", guardarFotoEditada);
+    btnCancelarEdicion?.addEventListener("click", function() {
+        cerrarEditorFoto();
+        estadoCamara.textContent = "Foto cancelada";
+    });
 
     function mostrarMensajeSubida(texto) {
         const mensaje = document.getElementById("mensajeSubida");
@@ -3459,51 +3882,37 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
         if (!streamCamara || btnCapturarFoto.disabled) return;
 
         btnCapturarFoto.disabled = true;
-        estadoCamara.textContent = "☁️ Subiendo…";
+            estadoCamara.textContent = "Editando foto…";
 
-        try {
-            const ancho = previewCamara.videoWidth || 1280;
-            const alto = previewCamara.videoHeight || 720;
-            canvasFoto.width = ancho;
-            canvasFoto.height = alto;
+            try {
+                const ancho = previewCamara.videoWidth || 1280;
+                const alto = previewCamara.videoHeight || 720;
+                canvasFoto.width = ancho;
+                canvasFoto.height = alto;
 
-            const contexto = canvasFoto.getContext("2d");
-            contexto.drawImage(previewCamara, 0, 0, ancho, alto);
+                const contexto = canvasFoto.getContext("2d");
+                contexto.drawImage(previewCamara, 0, 0, ancho, alto);
 
-            const blobFoto = await new Promise(function(resolve, reject) {
-                let terminado = false;
-                canvasFoto.toBlob(function(blob) {
-                    terminado = true;
-                    resolve(blob);
-                }, "image/jpeg", 0.92);
-                setTimeout(function() {
-                    if (!terminado) reject(new Error("No se pudo preparar la foto."));
-                }, 5000);
-            });
+                const blobFoto = await new Promise(function(resolve, reject) {
+                    let terminado = false;
+                    canvasFoto.toBlob(function(blob) {
+                        terminado = true;
+                        resolve(blob);
+                    }, "image/jpeg", 0.92);
+                    setTimeout(function() {
+                        if (!terminado) reject(new Error("No se pudo preparar la foto."));
+                    }, 5000);
+                });
 
-            if (!blobFoto) throw new Error("No se pudo crear la foto.");
+                if (!blobFoto) throw new Error("No se pudo crear la foto.");
 
-            await subirArchivoDirecto(
-                blobFoto,
-                "foto-boda-" + Date.now() + ".jpg",
-                "❤️ ¡Foto subida!"
-            );
-
-            // IMPORTANTE: después de subir la foto NO se cierra la cámara.
-            // El mismo stream queda activo para sacar otra foto inmediatamente.
-            estadoCamara.textContent = "❤️ ¡Foto subida!";
-            btnCapturarFoto.disabled = false;
-            btnCapturarFoto.classList.remove("hidden");
-            textoControlCamara.textContent = "Tocá para sacar otra foto";
-            setTimeout(function() {
-                if (modalCamara && !modalCamara.classList.contains("hidden")) {
-                    estadoCamara.textContent = "";
-                }
-            }, 1200);
-        } catch (error) {
-            console.error("Error al subir foto:", error);
-            estadoCamara.textContent = "No se pudo subir la foto. Intentá nuevamente.";
-            btnCapturarFoto.disabled = false;
+                abrirEditorFoto(blobFoto);
+                btnCapturarFoto.disabled = false;
+                btnCapturarFoto.classList.remove("hidden");
+                textoControlCamara.textContent = "Editá la foto y guardá";
+            } catch (error) {
+                console.error("Error al preparar foto:", error);
+                estadoCamara.textContent = "No se pudo preparar la foto. Intentá nuevamente.";
         }
     }
 
