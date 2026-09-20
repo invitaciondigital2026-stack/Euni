@@ -4042,7 +4042,7 @@ const CLOUDINARY_CLOUD_NAME = "entbx2xv";
         thanks?.classList.remove('hidden');
 
         const texto = $('rsvpGraciasTexto');
-        if (texto) texto.textContent = 'Ya enviaste la confirmación.';
+        if (texto) texto.textContent = 'Ya tenés tu confirmación guardada. Podés actualizarla si querés.';
 
         const datos = $('rsvpGraciasDatos');
         if (datos) {
@@ -4177,16 +4177,22 @@ form?.addEventListener('submit', async e => {
         }
         updateRsvpUI();
 
+        const tieneFechaConfirmacion =
+            !!g.fechaConfirmacion &&
+            String(g.fechaConfirmacion).trim() !== '' &&
+            String(g.fechaConfirmacion).trim().toLowerCase() !== 'null';
+
         // Si Google devuelve una confirmación previa, la mostramos.
         const yaConfirmado =
+            tieneFechaConfirmacion ||
             String(g.estado || '').trim().toLowerCase() === 'confirmado' ||
             String(g.estado || '').trim().toLowerCase() === 'no_asiste' ||
             normalizarSiNo(g.confirmoCivil) ||
             normalizarSiNo(g.confirmoCeremonia) ||
             normalizarSiNo(g.confirmoFiesta) ||
             Number(g.cantidadConfirmada) > 0 ||
-            String(g.asistencia || '').trim() !== '' &&
-            String(g.asistencia || '').trim().toLowerCase() !== 'pendiente';
+            (String(g.asistencia || '').trim() !== '' &&
+             String(g.asistencia || '').trim().toLowerCase() !== 'pendiente');
 
         if (yaConfirmado) {
             mostrarConfirmacion(g);
@@ -4230,7 +4236,22 @@ form?.addEventListener('submit', async e => {
 
             render(g);
             load?.classList.add('hidden');
-            form?.classList.remove('hidden');
+            const tieneFechaConfirmacion =
+                !!g.fechaConfirmacion &&
+                String(g.fechaConfirmacion).trim() !== '' &&
+                String(g.fechaConfirmacion).trim().toLowerCase() !== 'null';
+            if (!tieneFechaConfirmacion && !(
+                String(g.estado || '').trim().toLowerCase() === 'confirmado' ||
+                String(g.estado || '').trim().toLowerCase() === 'no_asiste' ||
+                normalizarSiNo(g.confirmoCivil) ||
+                normalizarSiNo(g.confirmoCeremonia) ||
+                normalizarSiNo(g.confirmoFiesta) ||
+                Number(g.cantidadConfirmada) > 0 ||
+                (String(g.asistencia || '').trim() !== '' &&
+                 String(g.asistencia || '').trim().toLowerCase() !== 'pendiente')
+            )) {
+                form?.classList.remove('hidden');
+            }
         } catch (error) {
             console.error('Error al cargar invitación:', error);
             fail(error?.message || 'No pudimos cargar tu invitación personalizada.');
