@@ -1,4 +1,5 @@
 const SHEET_NAME = "Invitados";
+const DEDICATIONS_SHEET_NAME = "Dedicatorias";
 const CLOUDINARY_TAG = "boda-eunice-david";
 
 /* =====================================
@@ -9,6 +10,18 @@ function getSheet() {
   return SpreadsheetApp
     .getActiveSpreadsheet()
     .getSheetByName(SHEET_NAME);
+}
+
+function getDedicationsSheet() {
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = spreadsheet.getSheetByName(DEDICATIONS_SHEET_NAME);
+
+  if (!sheet) {
+    sheet = spreadsheet.insertSheet(DEDICATIONS_SHEET_NAME);
+    sheet.appendRow(["fecha", "token", "nombre", "dedicatoria"]);
+  }
+
+  return sheet;
 }
 
 function json(data) {
@@ -74,6 +87,12 @@ function doGet(e) {
 
     case "media_delete":
       return eliminarMultimedia(e.parameter.resources);
+
+    case "dedication_list":
+      return listarDedicatorias();
+
+    case "dedication_add":
+      return agregarDedicatoriaGet(e.parameter);
 
     default:
       return json({
@@ -223,6 +242,65 @@ function obtenerInvitado(token) {
   return json({
     success: false,
     error: "Invitado no encontrado"
+  });
+}
+
+function listarDedicatorias() {
+  const sheet = getDedicationsSheet();
+  const data = sheet.getDataRange().getValues();
+  const dedicatorias = [];
+
+  for (let i = 1; i < data.length; i++) {
+    const texto = String(data[i][3] || "").trim();
+    if (!texto) continue;
+
+    dedicatorias.push({
+      fecha: data[i][0],
+      nombre: String(data[i][2] || "Invitado").trim() || "Invitado",
+      dedicatoria: texto
+    });
+  }
+
+  return json({
+    success: true,
+    dedicatorias
+  });
+}
+
+function agregarDedicatoriaGet(p) {
+  const token = String(p.token || "").trim();
+  const texto = String(p.dedicatoria || "").trim().slice(0, 500);
+
+  if (!token || !texto) {
+    return json({
+      success: false,
+      error: "Falta la dedicatoria o el código de invitación."
+    });
+  }
+
+  const data = getAllRows();
+  let nombre = "";
+
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][0]).trim() === token) {
+      nombre = String(data[i][1] || "Invitado").trim();
+      break;
+    }
+  }
+
+  if (!nombre) {
+    return json({
+      success: false,
+      error: "No se encontró la invitación."
+    });
+  }
+
+  getDedicationsSheet().appendRow([new Date(), token, nombre, texto]);
+
+  return json({
+    success: true,
+    nombre,
+    dedicatoria: texto
   });
 }
 
