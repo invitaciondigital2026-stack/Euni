@@ -101,6 +101,50 @@ body {
     margin: 15px auto;
 }
 
+/* FAQ */
+
+.faq-item {
+    border: 1px solid #e7e5e4;
+    border-radius: 1rem;
+    background: #f8f7f5;
+    overflow: hidden;
+}
+
+.faq-item summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 1.1rem 1.25rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #292524;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.faq-item summary::after {
+    content: "+";
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #57534e;
+    transition: transform 0.2s ease;
+}
+
+.faq-item[open] summary::after {
+    content: "−";
+}
+
+.faq-answer {
+    padding: 0 1.25rem 1.1rem;
+    color: #57534e;
+    line-height: 1.7;
+}
+
 /* Cuenta regresiva */
 
 .countdown-box {
@@ -2217,19 +2261,77 @@ audio {
 
     <div class="decorative-line"></div>
 
-    <div class="max-w-xl mx-auto mt-8 text-left">
+    <div class="max-w-3xl mx-auto mt-8 text-left space-y-3">
 
-        <div class="rounded-2xl bg-stone-100 p-5">
+        <details class="faq-item" open>
+            <summary>¿Cuándo y dónde es la ceremonia?</summary>
+            <div class="faq-answer">
+                La ceremonia civil será el viernes 27 de noviembre a las 11:00 hs. Podés encontrar el punto GPS en la sección Agenda o desde el botón Ubicación.
+            </div>
+        </details>
 
-            <h3 class="text-lg font-medium">
-                ¿Cuál es la vestimenta?
-            </h3>
+        <details class="faq-item">
+            <summary>¿Cómo confirmo mi asistencia?</summary>
+            <div class="faq-answer">
+                Podés hacerlo desde esta misma invitación, en la sección Confirmación.
+            </div>
+        </details>
 
-            <p class="text-gray-600 mt-2 leading-relaxed">
-                Vestimenta formal.
-            </p>
+        <details class="faq-item">
+            <summary>¿Hasta cuándo puedo confirmar?</summary>
+            <div class="faq-answer">
+                Por favor, confirmá tu asistencia antes del sábado 7 de noviembre.
+            </div>
+        </details>
 
-        </div>
+        <details class="faq-item">
+            <summary>¿Qué debo vestir?</summary>
+            <div class="faq-answer">
+                Te pedimos que asistas con vestimenta formal para todos los eventos.
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿Cómo llego al lugar?</summary>
+            <div class="faq-answer">
+                Podés usar el punto GPS que aparece en cada evento desde la opción Ubicación.
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿Hay estacionamiento o traslado?</summary>
+            <div class="faq-answer">
+                No hay estacionamiento en el lugar ni arreglos de traslados.
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿Puedo traer acompañante?</summary>
+            <div class="faq-answer">
+                Por favor, solo deben asistir la cantidad de personas indicadas en la invitación, ya que la capacidad es reducida.
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿Hay comida especial o restricciones?</summary>
+            <div class="faq-answer">
+                Se servirá una comida sencilla, sin bebidas alcohólicas.
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿La fiesta es en el mismo lugar?</summary>
+            <div class="faq-answer">
+                Sí, la fiesta será en el mismo lugar, pero en diferentes días. Podés encontrar más información en la sección Agenda.
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿Hay lista de regalos o se puede contribuir de otra manera?</summary>
+            <div class="faq-answer">
+                No hay lista de regalos. Si deseas hacer un obsequio económico, podés hacerlo con la información suministrada en la opción Regalo de la barra de opciones.
+            </div>
+        </details>
 
     </div>
 
