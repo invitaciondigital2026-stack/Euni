@@ -338,6 +338,20 @@ function crearBoton(texto, clases, accion) {
     return button;
 }
 
+function getComentarioValue(invitado) {
+    if (!invitado) return "";
+    return invitado.comentario ?? invitado.observaciones ?? invitado.comentarioInvitado ?? invitado.observacion ?? "";
+}
+
+function getComentarioPayload(valor) {
+    const texto = String(valor ?? "").trim();
+    return {
+        observaciones: texto,
+        comentario: texto,
+        observacion: texto
+    };
+}
+
 function render() {
     const search = document.getElementById("search");
     const rows = document.getElementById("rows");
@@ -362,7 +376,7 @@ function render() {
             tr.appendChild(crearCelda(i.cantidadConfirmada ?? 0, "text-center"));
             tr.appendChild(crearCelda(estaHabilitado(i.invitadoCeremonia) ? "✓ Sí" : "— No", "text-center"));
             tr.appendChild(crearCelda(estaHabilitado(i.invitadoFiesta) ? "✓ Sí" : "— No", "text-center"));
-            tr.appendChild(crearCelda(i.observaciones || "", "max-w-xs text-left"));
+            tr.appendChild(crearCelda(getComentarioValue(i), "max-w-xs text-left"));
 
             const acciones = document.createElement("div");
             acciones.className = "flex flex-wrap gap-2";
@@ -404,6 +418,8 @@ function editarInvitado(token) {
         .find(fila => fila.dataset.token === token);
     if (!tr) return;
 
+    const comentarioActual = getComentarioValue(invitado);
+
     tr.innerHTML = `
         <td class="p-3"><input data-edit="nombre" value="${esc(invitado.nombre || "")}" class="border rounded p-2 w-full"></td>
         <td class="p-3"><input data-edit="telefono" value="${esc(invitado.telefono || "")}" class="border rounded p-2 w-full"></td>
@@ -411,7 +427,7 @@ function editarInvitado(token) {
         <td class="p-3 text-center">${invitado.cantidadConfirmada ?? 0}</td>
         <td class="p-3 text-center"><input data-edit="invitadoCeremonia" type="checkbox" ${estaHabilitado(invitado.invitadoCeremonia) ? "checked" : ""} class="w-4 h-4"></td>
         <td class="p-3 text-center"><input data-edit="invitadoFiesta" type="checkbox" ${estaHabilitado(invitado.invitadoFiesta) ? "checked" : ""} class="w-4 h-4"></td>
-        <td class="p-3"><input data-edit="observaciones" value="${esc(invitado.observaciones || "")}" class="border rounded p-2 w-full"></td>
+        <td class="p-3"><input data-edit="observaciones" value="${esc(comentarioActual)}" class="border rounded p-2 w-full"></td>
         <td class="p-3"><div class="flex flex-wrap gap-2">
             <button class="bg-green-700 text-white px-3 py-1 rounded" onclick="guardarInvitado('${esc(token)}', this)">Guardar</button>
             <button class="bg-stone-200 px-3 py-1 rounded" onclick="render()">Cancelar</button>
@@ -430,6 +446,7 @@ async function guardarInvitado(token, boton) {
     }
 
     boton.disabled = true;
+    const comentario = valor("observaciones").value.trim();
     try {
         const data = await apiGet("update", {
             token,
@@ -438,7 +455,7 @@ async function guardarInvitado(token, boton) {
             cantidadPermitida: cantidad,
             invitadoCeremonia: valor("invitadoCeremonia").checked ? "SI" : "NO",
             invitadoFiesta: valor("invitadoFiesta").checked ? "SI" : "NO",
-            observaciones: valor("observaciones").value.trim()
+            ...getComentarioPayload(comentario)
         });
 
         if (!data.success) {
@@ -448,7 +465,10 @@ async function guardarInvitado(token, boton) {
             throw new Error(data.error || "No se pudo actualizar el invitado.");
         }
         const indice = invitados.findIndex(i => i.token === token);
-        invitados[indice] = data.invitado || data;
+        const invitadoActualizado = data.invitado || data;
+        invitadoActualizado.observaciones = getComentarioValue(invitadoActualizado);
+        invitadoActualizado.comentario = getComentarioValue(invitadoActualizado);
+        invitados[indice] = invitadoActualizado;
         render();
     } catch (error) {
         boton.disabled = false;
@@ -490,7 +510,7 @@ async function crearInvitado() {
             cantidadPermitida: cantidad,
             invitadoCeremonia: ceremonia,
             invitadoFiesta: fiesta,
-            observaciones
+            ...getComentarioPayload(observaciones)
         });
 
         if (!data.success) {
