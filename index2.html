@@ -4338,6 +4338,7 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
     }
 
     function bloquearAcceso() {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
         if (gate) gate.classList.remove('hidden');
         document.body.classList.add('gate-open');
     }
