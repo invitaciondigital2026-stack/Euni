@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dedicatorias | Administración</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root { color-scheme: light; }
+    .dedication-card.is-selected { outline: 3px solid #b45309; outline-offset: -3px; }
+    .dedication-card:focus-visible { outline: 3px solid #78716c; outline-offset: 2px; }
+  </style>
+</head>
+<body class="min-h-screen bg-stone-100 text-stone-900">
+  <main class="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+    <header class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <a href="admin2.html" class="text-sm text-stone-500 hover:text-stone-900">← Volver a administración</a>
+        <h1 class="mt-2 text-3xl font-semibold tracking-tight">Dedicatorias</h1>
+        <p class="mt-1 text-stone-500">Seleccioná las dedicatorias que quieras quitar del libro digital.</p>
+      </div>
+      <button id="refreshButton" type="button" class="rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-medium shadow-sm hover:bg-stone-50">↻ Actualizar</button>
+    </header>
+
+    <section class="mb-5 rounded-xl bg-white p-4 shadow-sm" aria-label="Acciones de dedicatorias">
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="selectAllButton" type="button" class="rounded-lg bg-stone-200 px-4 py-2.5 text-sm font-medium hover:bg-stone-300">Marcar todo</button>
+        <button id="deleteButton" type="button" class="rounded-lg bg-red-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-800">Eliminar seleccionadas</button>
+        <span id="selectionStatus" class="ml-auto text-sm text-stone-500">0 seleccionadas</span>
+      </div>
+      <p id="status" class="mt-3 text-sm text-stone-500" role="status">Cargando dedicatorias...</p>
+    </section>
+
+    <section id="dedicationsGrid" class="grid gap-4 md:grid-cols-2" aria-live="polite"></section>
+  </main>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycby80WR98QzVdQk9SrVOuZ_AiA42rKROIT-ZjkMXLfEt4usPjbZ585kD5DcS_Zns2M8Y/exec";
+    const grid = document.getElementById("dedicationsGrid");
+    const status = document.getElementById("status");
+    const selectionStatus = document.getElementById("selectionStatus");
+    let dedications = [];
+    const selected = new Set();
+
+    function apiUrl(action, params = {}) {
+      const url = new URL(API_URL);
+      url.searchParams.set("action", action);
+      Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, String(value)));
+      return url.toString();
+    }
+
+    function apiJsonp(action, params = {}) {
+      return new Promise((resolve, reject) => {
+        const callbackName = `dedicationCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const script = document.createElement("script");
+        const timeout = setTimeout(() => finish(new Error("Tiempo de espera agotado al consultar Apps Script.")), 20000);
+
+        function finish(error, data) {
+          clearTimeout(timeout);
+          delete window[callbackName];
+          script.remove();
+          error ? reject(error) : resolve(data);
+        }
+
+        window[callbackName] = data => {
+          if (!data || data.success === false) finish(new Error(data?.error || "Apps Script rechazó la operación."));
+          else finish(null, data);
+        };
+        script.onerror = () => finish(new Error("No se pudo conectar con Google Apps Script."));
+        script.src = apiUrl(action, { ...params, callback: callbackName });
+        document.head.appendChild(script);
+      });
+    }
+
+    function updateSelectionStatus() {
+      selectionStatus.textContent = `${selected.size} seleccionada${selected.size === 1 ? "" : "s"}`;
+      document.querySelectorAll(".dedication-card").forEach(card => card.classList.toggle("is-selected", selected.has(card.dataset.row)));
+    }
+
+    function render() {
+      grid.replaceChildren();
+      dedications.forEach(item => {
+        const card = document.createElement("article");
+        card.className = "dedication-card w-full rounded-xl bg-white p-5 text-left shadow-sm transition hover:shadow-md";
+        card.dataset.row = String(item.fila);
+        card.tabIndex = 0;
+        card.setAttribute("role", "button");
+        card.innerHTML = `<p class="text-lg leading-relaxed text-stone-700"></p><p class="mt-4 text-sm font-medium text-amber-800"></p><p class="mt-1 text-xs text-stone-400"></p><div class="mt-4 flex flex-wrap gap-2"><button type="button" class="thank-button rounded-lg bg-green-700 px-3 py-2 text-sm font-medium text-white hover:bg-green-800">Agradecer</button></div>`;
+        card.children[0].textContent = item.dedicatoria;
+        card.children[1].textContent = `— ${item.nombre || "Invitado"}`;
+        card.children[2].textContent = item.fecha ? new Date(item.fecha).toLocaleString("es-AR") : "";
+        card.addEventListener("click", event => {
+          if (event.target.closest("button")) return;
+          selected.has(item.fila) ? selected.delete(item.fila) : selected.add(item.fila);
+          updateSelectionStatus();
+        });
+        card.addEventListener("keydown", event => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          selected.has(item.fila) ? selected.delete(item.fila) : selected.add(item.fila);
+          updateSelectionStatus();
+        });
+        card.querySelector(".thank-button").addEventListener("click", event => {
+          event.stopPropagation();
+          agradecer(item);
+        });
+        grid.appendChild(card);
+      });
+      updateSelectionStatus();
+    }
+
+    function agradecer(item) {
+      const telefono = String(item.telefono || "").replace(/\D/g, "");
+      if (!telefono) {
+        alert(`No hay un teléfono cargado para ${item.nombre || "este invitado"}.`);
+        return;
+      }
+
+      const mensaje = `Hola ${item.nombre || ""}! Muchas gracias por tu dedicatoria: "${item.dedicatoria}". Nos emocionó mucho leerte. ❤️`;
+      window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, "_blank", "noopener,noreferrer");
+    }
+
+    async function loadDedications() {
+      status.textContent = "Cargando dedicatorias...";
+      try {
+        const data = await apiJsonp("dedication_list");
+        dedications = Array.isArray(data.dedicatorias) ? data.dedicatorias : [];
+        selected.clear();
+        render();
+        status.textContent = dedications.length ? `${dedications.length} dedicatoria${dedications.length === 1 ? "" : "s"} disponible${dedications.length === 1 ? "" : "s"}.` : "Todavía no hay dedicatorias.";
+      } catch (error) {
+        status.textContent = error.message;
+        grid.replaceChildren();
+      }
+    }
+
+    async function deleteSelected() {
+      const rows = [...selected];
+      if (!rows.length) { alert("Seleccioná al menos una dedicatoria."); return; }
+      if (!confirm(`¿Eliminar ${rows.length} dedicatoria${rows.length === 1 ? "" : "s"}? Esta acción no se puede deshacer.`)) return;
+
+      status.textContent = `Eliminando ${rows.length} dedicatoria${rows.length === 1 ? "" : "s"}...`;
+      const iframe = document.createElement("iframe");
+      iframe.name = `dedicationDelete_${Date.now()}`;
+      iframe.style.display = "none";
+      document.body.appendChild(iframe);
+
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = API_URL;
+      form.target = iframe.name;
+      form.style.display = "none";
+      const action = document.createElement("input");
+      action.name = "action";
+      action.value = "dedication_delete";
+      const rowsInput = document.createElement("input");
+      rowsInput.name = "rows";
+      rowsInput.value = JSON.stringify(rows);
+      form.append(action, rowsInput);
+      document.body.appendChild(form);
+      form.submit();
+      form.remove();
+      setTimeout(() => { iframe.remove(); loadDedications(); }, 1800);
+    }
+
+    document.getElementById("selectAllButton").addEventListener("click", () => {
+      if (selected.size === dedications.length) selected.clear();
+      else dedications.forEach(item => selected.add(item.fila));
+      updateSelectionStatus();
+    });
+    document.getElementById("deleteButton").addEventListener("click", deleteSelected);
+    document.getElementById("refreshButton").addEventListener("click", loadDedications);
+    loadDedications();
+  </script>
+</body>
+</html>

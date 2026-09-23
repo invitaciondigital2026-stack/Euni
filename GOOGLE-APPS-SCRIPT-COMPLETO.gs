@@ -89,10 +89,13 @@ function doGet(e) {
       return eliminarMultimedia(e.parameter.resources);
 
     case "dedication_list":
-      return listarDedicatorias();
+      return listarDedicatorias(e.parameter.callback);
 
     case "dedication_add":
       return agregarDedicatoriaGet(e.parameter);
+
+    case "dedication_delete":
+      return eliminarDedicatorias(e.parameter.rows);
 
     default:
       return json({
@@ -114,7 +117,8 @@ function doPost(e) {
       ? JSON.parse(contenido || "{}")
       : {
           action: e.parameter.action,
-          resources: e.parameter.resources
+          resources: e.parameter.resources,
+          rows: e.parameter.rows
         };
 
     switch (String(body.action || "").toLowerCase()) {
@@ -123,6 +127,9 @@ function doPost(e) {
 
       case "media_delete":
         return eliminarMultimedia(body.resources);
+
+      case "dedication_delete":
+        return eliminarDedicatorias(body.rows);
 
       default:
         return json({
@@ -245,25 +252,61 @@ function obtenerInvitado(token) {
   });
 }
 
-function listarDedicatorias() {
+function listarDedicatorias(callback) {
   const sheet = getDedicationsSheet();
   const data = sheet.getDataRange().getValues();
+  const invitados = getAllRows();
   const dedicatorias = [];
 
   for (let i = 1; i < data.length; i++) {
     const texto = String(data[i][3] || "").trim();
     if (!texto) continue;
+    const token = String(data[i][1] || "").trim();
+    const invitado = invitados.slice(1).find(row => String(row[0] || "").trim() === token);
 
     dedicatorias.push({
+      fila: i + 1,
       fecha: data[i][0],
+      token,
       nombre: String(data[i][2] || "Invitado").trim() || "Invitado",
+      telefono: invitado ? String(invitado[2] || "").trim() : "",
       dedicatoria: texto
     });
   }
 
-  return json({
+  return jsonp({
     success: true,
     dedicatorias
+  }, callback);
+}
+
+function eliminarDedicatorias(rawRows) {
+  let rows = rawRows;
+
+  if (typeof rows === "string") {
+    rows = JSON.parse(rows);
+  }
+
+  if (!Array.isArray(rows) || !rows.length || rows.length > 500) {
+    return json({
+      success: false,
+      error: "Selecciona entre 1 y 500 dedicatorias."
+    });
+  }
+
+  const validRows = [...new Set(rows.map(Number))]
+    .filter(row => Number.isInteger(row) && row >= 2)
+    .sort((a, b) => b - a);
+
+  const sheet = getDedicationsSheet();
+  const lastRow = sheet.getLastRow();
+  const rowsToDelete = validRows.filter(row => row <= lastRow);
+
+  rowsToDelete.forEach(row => sheet.deleteRow(row));
+
+  return json({
+    success: true,
+    deleted: rowsToDelete.length
   });
 }
 
