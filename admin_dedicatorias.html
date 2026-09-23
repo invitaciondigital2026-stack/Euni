@@ -84,7 +84,7 @@
 
     function updateSelectionStatus() {
       selectionStatus.textContent = `${selected.size} seleccionada${selected.size === 1 ? "" : "s"}`;
-      document.querySelectorAll(".dedication-card").forEach(card => card.classList.toggle("is-selected", selected.has(card.dataset.row)));
+      document.querySelectorAll(".dedication-card").forEach(card => card.classList.toggle("is-selected", selected.has(Number(card.dataset.row))));
     }
 
     function render() {
