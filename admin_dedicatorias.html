@@ -126,7 +126,7 @@
         return;
       }
 
-      const mensaje = `Hola ${item.nombre || ""}! Muchas gracias por tu dedicatoria: "${item.dedicatoria}". Nos emocionó mucho leerte. ♥`;
+      const mensaje = `Hola ${item.nombre || ""}! Muchas gracias por tu dedicatoria: "${item.dedicatoria}". Nos emocionó mucho leerte. ${String.fromCharCode(9829)}`;
       window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, "_blank", "noopener,noreferrer");
     }
 
