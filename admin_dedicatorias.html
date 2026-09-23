@@ -53,9 +53,17 @@
       return new Promise((resolve, reject) => {
         const callbackName = `dedicationCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
         const script = document.createElement("script");
-        const timeout = setTimeout(() => finish(new Error("Tiempo de espera agotado al consultar Apps Script.")), 20000);
+        let settled = false;
+        const timeout = setTimeout(() => {
+          settled = true;
+          script.remove();
+          reject(new Error("Tiempo de espera agotado al consultar Apps Script."));
+          setTimeout(() => delete window[callbackName], 60000);
+        }, 30000);
 
         function finish(error, data) {
+          if (settled) return;
+          settled = true;
           clearTimeout(timeout);
           delete window[callbackName];
           script.remove();
@@ -66,7 +74,7 @@
           if (!data || data.success === false) finish(new Error(data?.error || "Apps Script rechazó la operación."));
           else finish(null, data);
         };
-        script.onerror = () => finish(new Error("No se pudo conectar con Google Apps Script."));
+        script.onerror = () => finish(new Error("No se pudo consultar Apps Script. Verificá que la implementación web esté publicada y configurada para permitir el acceso a cualquier usuario."));
         script.src = apiUrl(action, { ...params, callback: callbackName });
         document.head.appendChild(script);
       });
