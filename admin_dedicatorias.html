@@ -125,8 +125,9 @@
         alert(`No hay un teléfono cargado para ${item.nombre || "este invitado"}.`);
         return;
       }
+const corazon = "\u2764\uFE0F";
 
-      const mensaje = `Hola ${item.nombre || ""}! Muchas gracias por tu dedicatoria: "${item.dedicatoria}". Nos emocionó mucho leerte.  ${String.fromCharCode(%E2%9D%A4%EF%B8%8F)}`;
+const mensaje = `Hola ${item.nombre || ""}! Muchas gracias por tu dedicatoria: "${item.dedicatoria}". Nos emocionó mucho leerte. ${corazon}`;
       window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, "_blank", "noopener,noreferrer");
     }
 
