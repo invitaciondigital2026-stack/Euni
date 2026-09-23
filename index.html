@@ -113,7 +113,7 @@ body.gate-open #inviteGate * {
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.40);
+    background: linear-gradient(90deg, rgba(20, 16, 13, .08) 0%, rgba(20, 16, 13, .12) 48%, rgba(20, 16, 13, .48) 100%);
 }
 
 .hero-content {
@@ -124,6 +124,7 @@ body.gate-open #inviteGate * {
     width: min(48%, 620px);
     text-align: right;
     padding: 20px;
+    text-shadow: 0 3px 18px rgba(0, 0, 0, .32);
 }
 
 /* Ubicación del texto de portada: arriba y hacia la derecha,
@@ -1825,7 +1826,9 @@ audio {
 .dedication-cover::before,.dedication-cover::after{content:"";position:absolute;width:70px;height:70px;border:1px solid rgba(255,248,233,.7);border-radius:50%;opacity:.7}
 .dedication-cover::before{top:38px;left:38px}.dedication-cover::after{right:38px;bottom:38px}
 .dedication-cover-kicker{font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;opacity:.82}
-.dedication-cover-title{margin:18px 0 10px;font-family:Georgia,serif;font-size:2.3rem;line-height:1.05}
+.dedication-cover-title{max-width:330px;margin:18px 0 10px;font-family:Georgia,serif;font-size:2.3rem;line-height:1.05}
+.dedication-cover-invitation{display:block;margin-bottom:18px;font-size:.92em;letter-spacing:.01em}
+.dedication-cover-quote{display:block;margin-top:14px;font-family:'Great Vibes',cursive;font-size:1.28em;line-height:1.08;font-weight:400;letter-spacing:.01em;text-shadow:0 2px 8px rgba(54,29,26,.2)}
 .dedication-cover-subtitle{font-family:Georgia,serif;font-style:italic;font-size:1.1rem;opacity:.9}
 .dedication-pencil{position:absolute;right:18px;bottom:18px;width:58px;height:58px;border:0;border-radius:50%;background:#fff8e9;color:#765646;font-size:28px;line-height:1;box-shadow:0 6px 18px rgba(48,30,20,.25);cursor:pointer;transform:rotate(-18deg);transition:transform .2s ease,background .2s ease}
 .dedication-pencil:hover,.dedication-pencil:focus-visible{background:#fff;transform:rotate(-18deg) scale(1.08)}
@@ -2211,7 +2214,10 @@ audio {
     <div class="dedication-book">
         <div class="dedication-cover">
             <span class="dedication-cover-kicker">Euni y David</span>
-            <h4 class="dedication-cover-title">Firma nuestro libro digital <br><br> 🎶 Las buenas palabras son más dulces que la miel. 🎶</h4>
+            <h4 class="dedication-cover-title">
+                <span class="dedication-cover-invitation">Firma nuestro libro digital</span>
+                <span class="dedication-cover-quote">Las buenas palabras son más dulces que la miel.</span>
+            </h4>
             <span class="dedication-cover-subtitle">Nuestra boda · 27/11/26</span>
             <button id="btnAbrirDedicatoria" class="dedication-pencil" type="button" aria-label="Escribir una dedicatoria" title="Escribir una dedicatoria">✎</button>
         </div>
@@ -4421,6 +4427,7 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
         'assets/carrucel5.jpg'
     ];
     let indice = 0;
+    let avanceAutomatico;
 
     function mostrarFoto(nuevoIndice) {
         indice = (nuevoIndice + fotos.length) % fotos.length;
@@ -4429,6 +4436,13 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
             dot.classList.toggle('active', dotIndex === indice);
             dot.setAttribute('aria-current', dotIndex === indice ? 'true' : 'false');
         });
+    }
+
+    function iniciarAutoplay() {
+        clearInterval(avanceAutomatico);
+        if (fotos.length > 1) {
+            avanceAutomatico = setInterval(() => mostrarFoto(indice + 1), 4500);
+        }
     }
 
     fotos.forEach((src, fotoIndex) => {
@@ -4461,9 +4475,18 @@ const CLOUDINARY_CLOUD_NAME = "h9ziupx4";
         dots.appendChild(dot);
     });
 
-    previous?.addEventListener('click', () => mostrarFoto(indice - 1));
-    next?.addEventListener('click', () => mostrarFoto(indice + 1));
+    previous?.addEventListener('click', () => { mostrarFoto(indice - 1); iniciarAutoplay(); });
+    next?.addEventListener('click', () => { mostrarFoto(indice + 1); iniciarAutoplay(); });
+    dots.addEventListener('click', iniciarAutoplay);
+    const carouselWrap = document.getElementById('carouselWrap');
+    carouselWrap?.addEventListener('mouseenter', () => clearInterval(avanceAutomatico));
+    carouselWrap?.addEventListener('mouseleave', iniciarAutoplay);
+    carouselWrap?.addEventListener('focusin', () => clearInterval(avanceAutomatico));
+    carouselWrap?.addEventListener('focusout', (event) => {
+        if (!carouselWrap.contains(event.relatedTarget)) iniciarAutoplay();
+    });
     mostrarFoto(0);
+    iniciarAutoplay();
 })();
 
 
