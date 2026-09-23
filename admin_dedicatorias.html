@@ -7,7 +7,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root { color-scheme: light; }
-    .dedication-card.is-selected { outline: 3px solid #b45309; outline-offset: -3px; }
+    .dedication-card { position: relative; }
+    .dedication-card.is-selected { outline: 4px solid #292524; outline-offset: -4px; }
+    .dedication-card.is-selected::after { content: "✓"; position: absolute; top: 10px; left: 10px; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 999px; background: #292524; color: white; font-weight: 700; }
     .dedication-card:focus-visible { outline: 3px solid #78716c; outline-offset: 2px; }
   </style>
 </head>
